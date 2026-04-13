@@ -191,15 +191,11 @@ class ValidationError(Exception):
     def message_dict(self):
         # Trigger an AttributeError if this ValidationError
         # doesn't have an error_dict.
-        getattr(self, "error_dict")
-
-        return dict(self)
+        pass
 
     @property
     def messages(self):
-        if hasattr(self, "error_dict"):
-            return sum(dict(self).values(), [])
-        return list(self)
+        pass
 
     def update_error_dict(self, error_dict):
         if hasattr(self, "error_dict"):

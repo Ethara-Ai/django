@@ -33,17 +33,15 @@ def decoder(conv_func):
 
 
 def adapt_date(val):
-    return val.isoformat()
+    pass
 
 
 def adapt_datetime(val):
-    return val.isoformat(" ")
+    pass
 
 
 def _get_varchar_column(data):
-    if data["max_length"] is None:
-        return "varchar"
-    return "varchar(%(max_length)s)" % data
+    pass
 
 
 Database.register_converter("bool", b"1".__eq__)

@@ -64,36 +64,36 @@ class BaseSpatialFeatures:
 
     @property
     def supports_crosses_lookup(self):
-        return "crosses" in self.connection.ops.gis_operators
+        pass
 
     @property
     def supports_distances_lookups(self):
-        return self.has_Distance_function
+        pass
 
     @property
     def supports_relate_lookup(self):
-        return "relate" in self.connection.ops.gis_operators
+        pass
 
     @property
     def supports_isvalid_lookup(self):
-        return self.has_IsValid_function
+        pass
 
     # Is the aggregate supported by the database?
     @property
     def supports_collect_aggr(self):
-        return models.Collect not in self.connection.ops.disallowed_aggregates
+        pass
 
     @property
     def supports_extent_aggr(self):
-        return models.Extent not in self.connection.ops.disallowed_aggregates
+        pass
 
     @property
     def supports_make_line_aggr(self):
-        return models.MakeLine not in self.connection.ops.disallowed_aggregates
+        pass
 
     @property
     def supports_union_aggr(self):
-        return models.Union not in self.connection.ops.disallowed_aggregates
+        pass
 
     def __getattr__(self, name):
         m = re.match(r"has_(\w*)_function$", name)

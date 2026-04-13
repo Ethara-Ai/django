@@ -86,38 +86,18 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     @cached_property
     def unsupported_functions(self):
-        unsupported = {"GeometryDistance", "MemSize", "Rotate"}
-        if not self.geom_lib_version():
-            unsupported |= {"Azimuth", "GeoHash", "MakeValid"}
-        if self.spatial_version < (5, 1):
-            unsupported |= {"BoundingCircle"}
-        return unsupported
+        pass
 
     @cached_property
     def spatial_version(self):
         """Determine the version of the SpatiaLite library."""
-        try:
-            version = self.spatialite_version_tuple()[1:]
-        except Exception as exc:
-            raise ImproperlyConfigured(
-                'Cannot determine the SpatiaLite version for the "%s" database. '
-                "Was the SpatiaLite initialization SQL loaded on this database?"
-                % (self.connection.settings_dict["NAME"],)
-            ) from exc
-        if version < (4, 3, 0):
-            raise ImproperlyConfigured("GeoDjango supports SpatiaLite 4.3.0 and above.")
-        return version
+        pass
 
     def convert_extent(self, box):
         """
         Convert the polygon data received from SpatiaLite to min/max values.
         """
-        if box is None:
-            return None
-        shell = GEOSGeometry(box).shell
-        xmin, ymin = shell[0][:2]
-        xmax, ymax = shell[2][:2]
-        return (xmin, ymin, xmax, ymax)
+        pass
 
     def geo_db_type(self, f):
         """
@@ -170,37 +150,33 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     def proj_version(self):
         """Return the version of the PROJ library used by SpatiaLite."""
-        return self._get_spatialite_func("proj4_version()")
+        pass
 
     def lwgeom_version(self):
         """Return the version of LWGEOM library used by SpatiaLite."""
-        return self._get_spatialite_func("lwgeom_version()")
+        pass
 
     def rttopo_version(self):
         """Return the version of RTTOPO library used by SpatiaLite."""
-        return self._get_spatialite_func("rttopo_version()")
+        pass
 
     def geom_lib_version(self):
         """
         Return the version of the version-dependant geom library used by
         SpatiaLite.
         """
-        if self.spatial_version >= (5,):
-            return self.rttopo_version()
-        else:
-            return self.lwgeom_version()
+        pass
 
     def spatialite_version(self):
         "Return the SpatiaLite library version as a string."
-        return self._get_spatialite_func("spatialite_version()")
+        pass
 
     def spatialite_version_tuple(self):
         """
         Return the SpatiaLite version as a tuple (version string, major,
         minor, subminor).
         """
-        version = self.spatialite_version()
-        return (version, *get_version_tuple(version))
+        pass
 
     def spatial_aggregate_name(self, agg_name):
         """

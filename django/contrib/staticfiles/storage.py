@@ -380,7 +380,7 @@ class HashedFilesMixin:
     def _post_process(self, paths, adjustable_paths, hashed_files):
         # Sort the files by directory level
         def path_level(name):
-            return len(name.split(os.sep))
+            pass
 
         for name in sorted(paths, key=path_level, reverse=True):
             substitutions = True
@@ -470,37 +470,10 @@ class HashedFilesMixin:
         # Normalize the path to avoid multiple names for the same file like
         # ../foo/bar.css and ../foo/../foo/bar.css which normalize to the same
         # path.
-        name = posixpath.normpath(name)
-        cleaned_name = self.clean_name(name)
-        hash_key = self.hash_key(cleaned_name)
-        cache_name = hashed_files.get(hash_key)
-        if cache_name is None:
-            cache_name = self.clean_name(self.hashed_name(name))
-        return cache_name
+        pass
 
     def stored_name(self, name):
-        cleaned_name = self.clean_name(name)
-        hash_key = self.hash_key(cleaned_name)
-        cache_name = self.hashed_files.get(hash_key)
-        if cache_name:
-            return cache_name
-        # No cached name found, recalculate it from the files.
-        intermediate_name = name
-        for i in range(self.max_post_process_passes + 1):
-            cache_name = self.clean_name(
-                self.hashed_name(name, content=None, filename=intermediate_name)
-            )
-            if intermediate_name == cache_name:
-                # Store the hashed name if there was a miss.
-                self.hashed_files[hash_key] = cache_name
-                return cache_name
-            else:
-                # Move on to the next intermediate file.
-                intermediate_name = cache_name
-        # If the cache name can't be determined after the max number of passes,
-        # the intermediate files on disk may be corrupt; avoid an infinite
-        # loop.
-        raise ValueError("The name '%s' could not be hashed with %r." % (name, self))
+        pass
 
 
 class ManifestFilesMixin(HashedFilesMixin):
@@ -562,23 +535,7 @@ class ManifestFilesMixin(HashedFilesMixin):
         self.manifest_storage._save(self.manifest_name, ContentFile(contents))
 
     def stored_name(self, name):
-        parsed_name = urlsplit(unquote(name))
-        clean_name = parsed_name.path.strip()
-        hash_key = self.hash_key(clean_name)
-        cache_name = self.hashed_files.get(hash_key)
-        if cache_name is None:
-            if self.manifest_strict:
-                raise ValueError(
-                    "Missing staticfiles manifest entry for '%s'" % clean_name
-                )
-            cache_name = self.clean_name(self.hashed_name(name))
-        unparsed_name = list(parsed_name)
-        unparsed_name[2] = cache_name
-        # Special casing for a @font-face hack, like url(myfont.eot?#iefix")
-        # http://www.fontspring.com/blog/the-new-bulletproof-font-face-syntax
-        if "?#" in name and not unparsed_name[3]:
-            unparsed_name[2] += "?"
-        return urlunsplit(unparsed_name)
+        pass
 
 
 class ManifestStaticFilesStorage(ManifestFilesMixin, StaticFilesStorage):

@@ -42,13 +42,10 @@ class BaseConnectionHandler:
 
     @cached_property
     def settings(self):
-        self._settings = self.configure_settings(self._settings)
-        return self._settings
+        pass
 
     def configure_settings(self, settings):
-        if settings is None:
-            settings = getattr(django_settings, self.settings_name)
-        return settings
+        pass
 
     def create_connection(self, alias):
         raise NotImplementedError("Subclasses must implement create_connection().")
@@ -73,12 +70,7 @@ class BaseConnectionHandler:
         return iter(self.settings)
 
     def all(self, initialized_only=False):
-        return [
-            self[alias]
-            for alias in self
-            # If initialized_only is True, return only initialized connections.
-            if not initialized_only or hasattr(self._connections, alias)
-        ]
+        pass
 
     def close_all(self):
         for conn in self.all(initialized_only=True):

@@ -229,14 +229,7 @@ def do_get_available_languages(parser, token):
 
     This puts settings.LANGUAGES into the named variable.
     """
-    # token.split_contents() isn't useful here because this tag doesn't accept
-    # variable as arguments.
-    args = token.contents.split()
-    if len(args) != 3 or args[1] != "as":
-        raise TemplateSyntaxError(
-            "'get_available_languages' requires 'as variable' (got %r)" % args
-        )
-    return GetAvailableLanguagesNode(args[2])
+    pass
 
 
 @register.tag("get_language_info")
@@ -254,12 +247,7 @@ def do_get_language_info(parser, token):
         {{ l.name_local }}
         {{ l.bidi|yesno:"bi-directional,uni-directional" }}
     """
-    args = token.split_contents()
-    if len(args) != 5 or args[1] != "for" or args[3] != "as":
-        raise TemplateSyntaxError(
-            "'%s' requires 'for string as variable' (got %r)" % (args[0], args[1:])
-        )
-    return GetLanguageInfoNode(parser.compile_filter(args[2]), args[4])
+    pass
 
 
 @register.tag("get_language_info_list")
@@ -281,33 +269,27 @@ def do_get_language_info_list(parser, token):
           {{ l.bidi|yesno:"bi-directional,uni-directional" }}
         {% endfor %}
     """
-    args = token.split_contents()
-    if len(args) != 5 or args[1] != "for" or args[3] != "as":
-        raise TemplateSyntaxError(
-            "'%s' requires 'for sequence as variable' (got %r)" % (args[0], args[1:])
-        )
-    return GetLanguageInfoListNode(parser.compile_filter(args[2]), args[4])
+    pass
 
 
 @register.filter
 def language_name(lang_code):
-    return translation.get_language_info(lang_code)["name"]
+    pass
 
 
 @register.filter
 def language_name_translated(lang_code):
-    english_name = translation.get_language_info(lang_code)["name"]
-    return translation.gettext(english_name)
+    pass
 
 
 @register.filter
 def language_name_local(lang_code):
-    return translation.get_language_info(lang_code)["name_local"]
+    pass
 
 
 @register.filter
 def language_bidi(lang_code):
-    return translation.get_language_info(lang_code)["bidi"]
+    pass
 
 
 @register.tag("get_current_language")
@@ -322,14 +304,7 @@ def do_get_current_language(parser, token):
     This fetches the currently active language and puts its value into the
     ``language`` context variable.
     """
-    # token.split_contents() isn't useful here because this tag doesn't accept
-    # variable as arguments.
-    args = token.contents.split()
-    if len(args) != 3 or args[1] != "as":
-        raise TemplateSyntaxError(
-            "'get_current_language' requires 'as variable' (got %r)" % args
-        )
-    return GetCurrentLanguageNode(args[2])
+    pass
 
 
 @register.tag("get_current_language_bidi")
@@ -345,14 +320,7 @@ def do_get_current_language_bidi(parser, token):
     the ``bidi`` context variable. True indicates right-to-left layout,
     otherwise left-to-right.
     """
-    # token.split_contents() isn't useful here because this tag doesn't accept
-    # variable as arguments.
-    args = token.contents.split()
-    if len(args) != 3 or args[1] != "as":
-        raise TemplateSyntaxError(
-            "'get_current_language_bidi' requires 'as variable' (got %r)" % args
-        )
-    return GetCurrentLanguageBidiNode(args[2])
+    pass
 
 
 @register.tag("translate")
@@ -397,60 +365,7 @@ def do_translate(parser, token):
 
     This is equivalent to calling pgettext instead of (u)gettext.
     """
-    bits = token.split_contents()
-    if len(bits) < 2:
-        raise TemplateSyntaxError("'%s' takes at least one argument" % bits[0])
-    message_string = parser.compile_filter(bits[1])
-    remaining = bits[2:]
-
-    noop = False
-    asvar = None
-    message_context = None
-    seen = set()
-    invalid_context = {"as", "noop"}
-
-    while remaining:
-        option = remaining.pop(0)
-        if option in seen:
-            raise TemplateSyntaxError(
-                "The '%s' option was specified more than once." % option,
-            )
-        elif option == "noop":
-            noop = True
-        elif option == "context":
-            try:
-                value = remaining.pop(0)
-            except IndexError:
-                raise TemplateSyntaxError(
-                    "No argument provided to the '%s' tag for the context option."
-                    % bits[0]
-                )
-            if value in invalid_context:
-                raise TemplateSyntaxError(
-                    "Invalid argument '%s' provided to the '%s' tag for the context "
-                    "option" % (value, bits[0]),
-                )
-            message_context = parser.compile_filter(value)
-        elif option == "as":
-            try:
-                value = remaining.pop(0)
-            except IndexError:
-                raise TemplateSyntaxError(
-                    "No argument provided to the '%s' tag for the as option." % bits[0]
-                )
-            asvar = value
-        else:
-            raise TemplateSyntaxError(
-                "Unknown argument for '%s' tag: '%s'. The only options "
-                "available are 'noop', 'context' \"xxx\", and 'as VAR'."
-                % (
-                    bits[0],
-                    option,
-                )
-            )
-        seen.add(option)
-
-    return TranslateNode(message_string, noop, asvar, message_context)
+    pass
 
 
 @register.tag("blocktranslate")
@@ -496,104 +411,7 @@ def do_block_translate(parser, token):
     This is equivalent to calling pgettext/npgettext instead of
     (u)gettext/(u)ngettext.
     """
-    bits = token.split_contents()
-
-    options = {}
-    remaining_bits = bits[1:]
-    asvar = None
-    while remaining_bits:
-        option = remaining_bits.pop(0)
-        if option in options:
-            raise TemplateSyntaxError(
-                "The %r option was specified more than once." % option
-            )
-        if option == "with":
-            value = token_kwargs(remaining_bits, parser, support_legacy=True)
-            if not value:
-                raise TemplateSyntaxError(
-                    '"with" in %r tag needs at least one keyword argument.' % bits[0]
-                )
-        elif option == "count":
-            value = token_kwargs(remaining_bits, parser, support_legacy=True)
-            if len(value) != 1:
-                raise TemplateSyntaxError(
-                    '"count" in %r tag expected exactly '
-                    "one keyword argument." % bits[0]
-                )
-        elif option == "context":
-            try:
-                value = remaining_bits.pop(0)
-                value = parser.compile_filter(value)
-            except Exception:
-                raise TemplateSyntaxError(
-                    '"context" in %r tag expected exactly one argument.' % bits[0]
-                )
-        elif option == "trimmed":
-            value = True
-        elif option == "asvar":
-            try:
-                value = remaining_bits.pop(0)
-            except IndexError:
-                raise TemplateSyntaxError(
-                    "No argument provided to the '%s' tag for the asvar option."
-                    % bits[0]
-                )
-            asvar = value
-        else:
-            raise TemplateSyntaxError(
-                "Unknown argument for %r tag: %r." % (bits[0], option)
-            )
-        options[option] = value
-
-    if "count" in options:
-        countervar, counter = next(iter(options["count"].items()))
-    else:
-        countervar, counter = None, None
-    if "context" in options:
-        message_context = options["context"]
-    else:
-        message_context = None
-    extra_context = options.get("with", {})
-
-    trimmed = options.get("trimmed", False)
-
-    singular = []
-    plural = []
-    while parser.tokens:
-        token = parser.next_token()
-        if token.token_type in (TokenType.VAR, TokenType.TEXT):
-            singular.append(token)
-        else:
-            break
-    if countervar and counter:
-        if token.contents.strip() != "plural":
-            raise TemplateSyntaxError(
-                "%r doesn't allow other block tags inside it" % bits[0]
-            )
-        while parser.tokens:
-            token = parser.next_token()
-            if token.token_type in (TokenType.VAR, TokenType.TEXT):
-                plural.append(token)
-            else:
-                break
-    end_tag_name = "end%s" % bits[0]
-    if token.contents.strip() != end_tag_name:
-        raise TemplateSyntaxError(
-            "%r doesn't allow other block tags (seen %r) inside it"
-            % (bits[0], token.contents)
-        )
-
-    return BlockTranslateNode(
-        extra_context,
-        singular,
-        plural,
-        countervar,
-        counter,
-        message_context,
-        trimmed=trimmed,
-        asvar=asvar,
-        tag_name=bits[0],
-    )
+    pass
 
 
 @register.tag
@@ -607,10 +425,4 @@ def language(parser, token):
             This is {{ bar }} and {{ boo }}.
         {% endlanguage %}
     """
-    bits = token.split_contents()
-    if len(bits) != 2:
-        raise TemplateSyntaxError("'%s' takes one argument (language)" % bits[0])
-    language = parser.compile_filter(bits[1])
-    nodelist = parser.parse(("endlanguage",))
-    parser.delete_first_token()
-    return LanguageNode(nodelist, language)
+    pass

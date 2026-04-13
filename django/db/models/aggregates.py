@@ -158,12 +158,7 @@ class Aggregate(Func):
 
     @property
     def default_alias(self):
-        expressions = [
-            expr for expr in self.get_source_expressions() if expr is not None
-        ]
-        if len(expressions) == 1 and hasattr(expressions[0], "name"):
-            return "%s__%s" % (expressions[0].name, self.name.lower())
-        raise TypeError("Complex expressions require an alias")
+        pass
 
     def get_group_by_cols(self):
         return []
@@ -210,14 +205,7 @@ class Aggregate(Func):
         return sql, (*params, *order_by_params, *filter_params)
 
     def _get_repr_options(self):
-        options = super()._get_repr_options()
-        if self.distinct:
-            options["distinct"] = self.distinct
-        if self.filter:
-            options["filter"] = self.filter
-        if self.order_by:
-            options["order_by"] = self.order_by
-        return options
+        pass
 
 
 class AnyValue(Aggregate):
@@ -295,7 +283,7 @@ class StdDev(NumericOutputFieldMixin, Aggregate):
         super().__init__(expression, **extra)
 
     def _get_repr_options(self):
-        return {**super()._get_repr_options(), "sample": self.function == "STDDEV_SAMP"}
+        pass
 
 
 class StringAggDelimiter(Func):
@@ -307,14 +295,7 @@ class StringAggDelimiter(Func):
         super().__init__(value)
 
     def as_mysql(self, compiler, connection, **extra_context):
-        template = " SEPARATOR %(expressions)s"
-
-        return self.as_sql(
-            compiler,
-            connection,
-            template=template,
-            **extra_context,
-        )
+        pass
 
 
 class StringAgg(Aggregate):
@@ -330,72 +311,13 @@ class StringAgg(Aggregate):
         super().__init__(expression, self.delimiter, **extra)
 
     def as_oracle(self, compiler, connection, **extra_context):
-        if self.order_by:
-            template = (
-                "%(function)s(%(distinct)s%(expressions)s) WITHIN GROUP (%(order_by)s)"
-                "%(filter)s"
-            )
-        else:
-            template = "%(function)s(%(distinct)s%(expressions)s)%(filter)s"
-
-        return self.as_sql(
-            compiler,
-            connection,
-            function="LISTAGG",
-            template=template,
-            **extra_context,
-        )
+        pass
 
     def as_mysql(self, compiler, connection, **extra_context):
-        extra_context["function"] = "GROUP_CONCAT"
-
-        template = "%(function)s(%(distinct)s%(expressions)s%(order_by)s%(delimiter)s)"
-        extra_context["template"] = template
-
-        c = self.copy()
-        # The creation of the delimiter SQL and the ordering of the parameters
-        # must be handled explicitly, as MySQL puts the delimiter at the end of
-        # the aggregate using the `SEPARATOR` declaration (rather than treating
-        # as an expression like other database backends).
-        delimiter_params = []
-        if c.delimiter:
-            delimiter_sql, delimiter_params = compiler.compile(c.delimiter)
-            # Drop the delimiter from the source expressions.
-            c.source_expressions = c.source_expressions[:-1]
-            extra_context["delimiter"] = delimiter_sql
-
-        sql, params = c.as_sql(compiler, connection, **extra_context)
-
-        return sql, (*params, *delimiter_params)
+        pass
 
     def as_sqlite(self, compiler, connection, **extra_context):
-        if (
-            self.distinct
-            and isinstance(self.delimiter.value, Value)
-            and self.delimiter.value.value == ","
-        ):
-            clone = self.copy()
-            source_expressions = clone.get_source_expressions()
-            clone.set_source_expressions(
-                source_expressions[:1] + source_expressions[2:]
-            )
-
-            return clone.as_sql(
-                compiler,
-                connection,
-                function="GROUP_CONCAT",
-                **extra_context,
-            )
-
-        if connection.get_database_version() < (3, 44):
-            return self.as_sql(
-                compiler,
-                connection,
-                function="GROUP_CONCAT",
-                **extra_context,
-            )
-
-        return self.as_sql(compiler, connection, **extra_context)
+        pass
 
 
 class Sum(FixDurationInputMixin, Aggregate):
@@ -414,4 +336,4 @@ class Variance(NumericOutputFieldMixin, Aggregate):
         super().__init__(expression, **extra)
 
     def _get_repr_options(self):
-        return {**super()._get_repr_options(), "sample": self.function == "VAR_SAMP"}
+        pass

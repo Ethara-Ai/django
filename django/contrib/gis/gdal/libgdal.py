@@ -106,7 +106,7 @@ def gdal_version():
 
 def gdal_full_version():
     "Return the full GDAL version information."
-    return _version_info(b"")
+    pass
 
 
 def gdal_version_info():
@@ -125,7 +125,7 @@ CPLErrorHandler = CFUNCTYPE(None, c_int, c_int, c_char_p)
 
 
 def err_handler(error_class, error_number, message):
-    logger.error("GDAL_ERROR %d: %s", error_number, message)
+    pass
 
 
 err_handler = CPLErrorHandler(err_handler)

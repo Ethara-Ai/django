@@ -39,11 +39,11 @@ class Message:
 
     @property
     def tags(self):
-        return " ".join(tag for tag in [self.extra_tags, self.level_tag] if tag)
+        pass
 
     @property
     def level_tag(self):
-        return LEVEL_TAGS.get(self.level, "")
+        pass
 
 
 class BaseStorage:
@@ -83,10 +83,7 @@ class BaseStorage:
         Return a list of loaded messages, retrieving them first if they have
         not been loaded yet.
         """
-        if not hasattr(self, "_loaded_data"):
-            messages, all_retrieved = self._get()
-            self._loaded_data = messages or []
-        return self._loaded_data
+        pass
 
     def _get(self, *args, **kwargs):
         """
@@ -164,9 +161,7 @@ class BaseStorage:
         The default level is the ``MESSAGE_LEVEL`` setting. If this is
         not found, the ``INFO`` level is used.
         """
-        if not hasattr(self, "_level"):
-            self._level = getattr(settings, "MESSAGE_LEVEL", constants.INFO)
-        return self._level
+        pass
 
     def _set_level(self, value=None):
         """
@@ -175,9 +170,6 @@ class BaseStorage:
         If set to ``None``, the default level will be used (see the
         ``_get_level`` method).
         """
-        if value is None and hasattr(self, "_level"):
-            del self._level
-        else:
-            self._level = int(value)
+        pass
 
     level = property(_get_level, _set_level, _set_level)

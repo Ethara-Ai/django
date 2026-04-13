@@ -179,53 +179,7 @@ class BaseHandler:
         template_response middleware. This method is everything that happens
         inside the request/response middleware.
         """
-        response = None
-        callback, callback_args, callback_kwargs = self.resolve_request(request)
-
-        # Apply view middleware
-        for middleware_method in self._view_middleware:
-            response = middleware_method(
-                request, callback, callback_args, callback_kwargs
-            )
-            if response:
-                break
-
-        if response is None:
-            wrapped_callback = self.make_view_atomic(callback)
-            # If it is an asynchronous view, run it in a subthread.
-            if iscoroutinefunction(wrapped_callback):
-                wrapped_callback = async_to_sync(wrapped_callback)
-            try:
-                response = wrapped_callback(request, *callback_args, **callback_kwargs)
-            except Exception as e:
-                response = self.process_exception_by_middleware(e, request)
-                if response is None:
-                    raise
-
-        # Complain if the view returned None (a common error).
-        self.check_response(response, callback)
-
-        # If the response supports deferred rendering, apply template
-        # response middleware and then render the response
-        if hasattr(response, "render") and callable(response.render):
-            for middleware_method in self._template_response_middleware:
-                response = middleware_method(request, response)
-                # Complain if the template response middleware returned None
-                # (a common error).
-                self.check_response(
-                    response,
-                    middleware_method,
-                    name="%s.process_template_response"
-                    % (middleware_method.__self__.__class__.__name__,),
-                )
-            try:
-                response = response.render()
-            except Exception as e:
-                response = self.process_exception_by_middleware(e, request)
-                if response is None:
-                    raise
-
-        return response
+        pass
 
     async def _get_response_async(self, request):
         """
@@ -233,143 +187,37 @@ class BaseHandler:
         template_response middleware. This method is everything that happens
         inside the request/response middleware.
         """
-        response = None
-        callback, callback_args, callback_kwargs = self.resolve_request(request)
-
-        # Apply view middleware.
-        for middleware_method in self._view_middleware:
-            response = await middleware_method(
-                request, callback, callback_args, callback_kwargs
-            )
-            if response:
-                break
-
-        if response is None:
-            wrapped_callback = self.make_view_atomic(callback)
-            # If it is a synchronous view, run it in a subthread
-            if not iscoroutinefunction(wrapped_callback):
-                wrapped_callback = sync_to_async(
-                    wrapped_callback, thread_sensitive=True
-                )
-            try:
-                response = await wrapped_callback(
-                    request, *callback_args, **callback_kwargs
-                )
-            except Exception as e:
-                response = await sync_to_async(
-                    self.process_exception_by_middleware,
-                    thread_sensitive=True,
-                )(e, request)
-                if response is None:
-                    raise
-
-        # Complain if the view returned None or an uncalled coroutine.
-        self.check_response(response, callback)
-
-        # If the response supports deferred rendering, apply template
-        # response middleware and then render the response
-        if hasattr(response, "render") and callable(response.render):
-            for middleware_method in self._template_response_middleware:
-                response = await middleware_method(request, response)
-                # Complain if the template response middleware returned None or
-                # an uncalled coroutine.
-                self.check_response(
-                    response,
-                    middleware_method,
-                    name="%s.process_template_response"
-                    % (middleware_method.__self__.__class__.__name__,),
-                )
-            try:
-                if iscoroutinefunction(response.render):
-                    response = await response.render()
-                else:
-                    response = await sync_to_async(
-                        response.render, thread_sensitive=True
-                    )()
-            except Exception as e:
-                response = await sync_to_async(
-                    self.process_exception_by_middleware,
-                    thread_sensitive=True,
-                )(e, request)
-                if response is None:
-                    raise
-
-        # Make sure the response is not a coroutine
-        if asyncio.iscoroutine(response):
-            raise RuntimeError("Response is still a coroutine.")
-        return response
+        pass
 
     def resolve_request(self, request):
         """
         Retrieve/set the urlconf for the request. Return the view resolved,
         with its args and kwargs.
         """
-        # Work out the resolver.
-        if hasattr(request, "urlconf"):
-            urlconf = request.urlconf
-            set_urlconf(urlconf)
-            resolver = get_resolver(urlconf)
-        else:
-            resolver = get_resolver()
-        # Resolve the view, and assign the match object back to the request.
-        resolver_match = resolver.resolve(request.path_info)
-        request.resolver_match = resolver_match
-        return resolver_match
+        pass
 
     def check_response(self, response, callback, name=None):
         """
         Raise an error if the view returned None or an uncalled coroutine.
         """
-        if not (response is None or asyncio.iscoroutine(response)):
-            return
-        if not name:
-            if isinstance(callback, types.FunctionType):  # FBV
-                name = "The view %s.%s" % (callback.__module__, callback.__name__)
-            else:  # CBV
-                name = "The view %s.%s.__call__" % (
-                    callback.__module__,
-                    callback.__class__.__name__,
-                )
-        if response is None:
-            raise ValueError(
-                "%s didn't return an HttpResponse object. It returned None "
-                "instead." % name
-            )
-        elif asyncio.iscoroutine(response):
-            raise ValueError(
-                "%s didn't return an HttpResponse object. It returned an "
-                "unawaited coroutine instead. You may need to add an 'await' "
-                "into your view." % name
-            )
+        pass
 
     # Other utility methods.
 
     def make_view_atomic(self, view):
-        non_atomic_requests = getattr(view, "_non_atomic_requests", set())
-        for alias, settings_dict in connections.settings.items():
-            if settings_dict["ATOMIC_REQUESTS"] and alias not in non_atomic_requests:
-                if iscoroutinefunction(view):
-                    raise RuntimeError(
-                        "You cannot use ATOMIC_REQUESTS with async views."
-                    )
-                view = transaction.atomic(using=alias)(view)
-        return view
+        pass
 
     def process_exception_by_middleware(self, exception, request):
         """
         Pass the exception to the exception middleware. If no middleware
         return a response for this exception, return None.
         """
-        for middleware_method in self._exception_middleware:
-            response = middleware_method(request, exception)
-            if response:
-                return response
-        return None
+        pass
 
 
 def reset_urlconf(sender, **kwargs):
     """Reset the URLconf after each request is finished."""
-    set_urlconf(None)
+    pass
 
 
 request_finished.connect(reset_urlconf)

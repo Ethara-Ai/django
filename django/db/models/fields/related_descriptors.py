@@ -697,10 +697,7 @@ class ReverseManyToOneDescriptor:
         return self.related_manager_cls(instance)
 
     def _get_set_deprecation_msg_params(self):
-        return (
-            "reverse side of a related set",
-            self.rel.accessor_name,
-        )
+        pass
 
     def __set__(self, instance, value):
         raise TypeError(
@@ -882,7 +879,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
         add.alters_data = True
 
         async def aadd(self, *objs, bulk=True):
-            return await sync_to_async(self.add)(*objs, bulk=bulk)
+            pass
 
         aadd.alters_data = True
 
@@ -922,7 +919,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
         update_or_create.alters_data = True
 
         async def aupdate_or_create(self, **kwargs):
-            return await sync_to_async(self.update_or_create)(**kwargs)
+            pass
 
         aupdate_or_create.alters_data = True
 
@@ -957,7 +954,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
             remove.alters_data = True
 
             async def aremove(self, *objs, bulk=True):
-                return await sync_to_async(self.remove)(*objs, bulk=bulk)
+                pass
 
             aremove.alters_data = True
 
@@ -968,7 +965,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
             clear.alters_data = True
 
             async def aclear(self, *, bulk=True):
-                return await sync_to_async(self.clear)(bulk=bulk)
+                pass
 
             aclear.alters_data = True
 
@@ -988,30 +985,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
             _clear.alters_data = True
 
         def set(self, objs, *, bulk=True, clear=False):
-            self._check_fk_val()
-            # Force evaluation of `objs` in case it's a queryset whose value
-            # could be affected by `manager.clear()`. Refs #19816.
-            objs = tuple(objs)
-
-            if self.field.null:
-                db = router.db_for_write(self.model, instance=self.instance)
-                with transaction.atomic(using=db, savepoint=False):
-                    if clear:
-                        self.clear(bulk=bulk)
-                        self.add(*objs, bulk=bulk)
-                    else:
-                        old_objs = set(self.using(db).all())
-                        new_objs = []
-                        for obj in objs:
-                            if obj in old_objs:
-                                old_objs.remove(obj)
-                            else:
-                                new_objs.append(obj)
-
-                        self.remove(*old_objs, bulk=bulk)
-                        self.add(*new_objs, bulk=bulk)
-            else:
-                self.add(*objs, bulk=bulk)
+            pass
 
         set.alters_data = True
 
@@ -1063,11 +1037,7 @@ class ManyToManyDescriptor(ReverseManyToOneDescriptor):
         )
 
     def _get_set_deprecation_msg_params(self):
-        return (
-            "%s side of a many-to-many set"
-            % ("reverse" if self.reverse else "forward"),
-            self.rel.accessor_name if self.reverse else self.field.name,
-        )
+        pass
 
 
 def create_forward_many_to_many_manager(superclass, rel, reverse):
@@ -1261,19 +1231,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             # If the through relation's target field's foreign integrity is
             # enforced, the query can be performed solely against the through
             # table as the INNER JOIN'ing against target table is unnecessary.
-            if not self.target_field.db_constraint:
-                return None
-            db = router.db_for_read(self.through, instance=self.instance)
-            if not connections[db].features.supports_foreign_keys:
-                return None
-            hints = {"instance": self.instance}
-            manager = self.through._base_manager.db_manager(db, hints=hints)
-            filters = {self.source_field_name: self.related_val[0]}
-            # Nullable target rows must be excluded as well as they would have
-            # been filtered out from an INNER JOIN.
-            if self.target_field.null:
-                filters["%s__isnull" % self.target_field_name] = False
-            return manager.filter(**filters)
+            pass
 
         def exists(self):
             if (
@@ -1326,9 +1284,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
         add.alters_data = True
 
         async def aadd(self, *objs, through_defaults=None):
-            return await sync_to_async(self.add)(
-                *objs, through_defaults=through_defaults
-            )
+            pass
 
         aadd.alters_data = True
 
@@ -1346,7 +1302,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
         remove.alters_data = True
 
         async def aremove(self, *objs):
-            return await sync_to_async(self.remove)(*objs)
+            pass
 
         aremove.alters_data = True
 
@@ -1385,7 +1341,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
         clear.alters_data = True
 
         async def aclear(self):
-            return await sync_to_async(self.clear)()
+            pass
 
         aclear.alters_data = True
 
@@ -1427,7 +1383,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     )
 
         def set(self, objs, *, clear=False, through_defaults=None):
-            self.set_base(objs, clear=clear, through_defaults=through_defaults)
+            pass
 
         set.alters_data = True
 
@@ -1487,9 +1443,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
         update_or_create.alters_data = True
 
         async def aupdate_or_create(self, *, through_defaults=None, **kwargs):
-            return await sync_to_async(self.update_or_create)(
-                through_defaults=through_defaults, **kwargs
-            )
+            pass
 
         aupdate_or_create.alters_data = True
 

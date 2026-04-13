@@ -50,12 +50,12 @@ except ImportError:
 
 def is_django_module(module):
     """Return True if the given module is nested under Django."""
-    return module.__name__.startswith("django.")
+    pass
 
 
 def is_django_path(path):
     """Return True if the given file path is nested under Django."""
-    return Path(django.__file__).parent in Path(path).parents
+    pass
 
 
 def check_errors(fn):
@@ -299,18 +299,7 @@ class BaseReloader:
         self._stop_condition = threading.Event()
 
     def watch_dir(self, path, glob):
-        path = Path(path)
-        try:
-            path = path.absolute()
-        except FileNotFoundError:
-            logger.debug(
-                "Unable to watch directory %s as it cannot be resolved.",
-                path,
-                exc_info=True,
-            )
-            return
-        logger.debug("Watching dir %s with glob %s.", path, glob)
-        self.directory_globs[path].add(glob)
+        pass
 
     def watched_files(self, include_globs=True):
         """
@@ -392,7 +381,7 @@ class BaseReloader:
     # These are primarily used for testing.
     @property
     def should_stop(self):
-        return self._stop_condition.is_set()
+        pass
 
     def stop(self):
         self._stop_condition.set()
@@ -601,8 +590,7 @@ class WatchmanReloader(BaseReloader):
                 self.notify_file_changed(root_directory / file)
 
     def request_processed(self, **kwargs):
-        logger.debug("Request processed. Setting update_watches event.")
-        self.processed_request.set()
+        pass
 
     def tick(self):
         request_finished.connect(self.request_processed)

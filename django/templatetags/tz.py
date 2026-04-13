@@ -31,7 +31,7 @@ def utc(value):
     """
     Convert a datetime to UTC.
     """
-    return do_timezone(value, UTC)
+    pass
 
 
 @register.filter("timezone")
@@ -142,16 +142,7 @@ def localtime_tag(parser, token):
 
         {% localtime off %}{{ value_in_utc }}{% endlocaltime %}
     """
-    bits = token.split_contents()
-    if len(bits) == 1:
-        use_tz = True
-    elif len(bits) > 2 or bits[1] not in ("on", "off"):
-        raise TemplateSyntaxError("%r argument should be 'on' or 'off'" % bits[0])
-    else:
-        use_tz = bits[1] == "on"
-    nodelist = parser.parse(("endlocaltime",))
-    parser.delete_first_token()
-    return LocalTimeNode(nodelist, use_tz)
+    pass
 
 
 @register.tag("timezone")
@@ -169,13 +160,7 @@ def timezone_tag(parser, token):
             It is {{ now }} in Paris.
         {% endtimezone %}
     """
-    bits = token.split_contents()
-    if len(bits) != 2:
-        raise TemplateSyntaxError("'%s' takes one argument (timezone)" % bits[0])
-    tz = parser.compile_filter(bits[1])
-    nodelist = parser.parse(("endtimezone",))
-    parser.delete_first_token()
-    return TimezoneNode(nodelist, tz)
+    pass
 
 
 @register.tag("get_current_timezone")
@@ -190,11 +175,4 @@ def get_current_timezone_tag(parser, token):
     This will fetch the currently active time zone and put its name
     into the ``TIME_ZONE`` context variable.
     """
-    # token.split_contents() isn't useful here because this tag doesn't accept
-    # variable as arguments.
-    args = token.contents.split()
-    if len(args) != 3 or args[1] != "as":
-        raise TemplateSyntaxError(
-            "'get_current_timezone' requires 'as variable' (got %r)" % args
-        )
-    return GetCurrentTimezoneNode(args[2])
+    pass

@@ -14,12 +14,7 @@ def _simple_domain_name_validator(value):
     Validate that the given value contains no whitespaces to prevent common
     typos.
     """
-    checks = ((s in value) for s in string.whitespace)
-    if any(checks):
-        raise ValidationError(
-            _("The domain name cannot contain any spaces or tabs."),
-            code="invalid",
-        )
+    pass
 
 
 class SiteManager(models.Manager):
@@ -104,16 +99,7 @@ def clear_site_cache(sender, **kwargs):
     """
     Clear the cache (if primed) each time a site is saved or deleted.
     """
-    instance = kwargs["instance"]
-    using = kwargs["using"]
-    try:
-        del SITE_CACHE[instance.pk]
-    except KeyError:
-        pass
-    try:
-        del SITE_CACHE[Site.objects.using(using).get(pk=instance.pk).domain]
-    except (KeyError, Site.DoesNotExist):
-        pass
+    pass
 
 
 pre_save.connect(clear_site_cache, sender=Site)

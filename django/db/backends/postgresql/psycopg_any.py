@@ -52,10 +52,7 @@ try:
         def upgrade(self, obj, format):
             # Dump ranges containing naive datetimes as tstzrange, because
             # Django doesn't use tz-aware ones.
-            dumper = super().upgrade(obj, format)
-            if dumper is not self and dumper.oid == TSRANGE_OID:
-                dumper.oid = TSTZRANGE_OID
-            return dumper
+            pass
 
     @lru_cache
     def get_adapters_template(use_tz, timezone):
@@ -100,11 +97,7 @@ except ImportError:
         SERIALIZABLE = extensions.ISOLATION_LEVEL_SERIALIZABLE
 
     def _quote(value, connection=None):
-        adapted = extensions.adapt(value)
-        if hasattr(adapted, "encoding"):
-            adapted.encoding = "utf8"
-        # getquoted() returns a quoted bytestring of the adapted value.
-        return adapted.getquoted().decode()
+        pass
 
     sql.quote = _quote
 

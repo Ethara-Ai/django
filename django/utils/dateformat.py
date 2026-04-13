@@ -38,18 +38,7 @@ re_escaped = _lazy_re_compile(r"\\(.)")
 
 class Formatter:
     def format(self, formatstr):
-        pieces = []
-        for i, piece in enumerate(re_formatchars.split(str(formatstr))):
-            if i % 2:
-                if type(self.data) is date and hasattr(TimeFormat, piece):
-                    raise TypeError(
-                        "The format for date objects may not contain "
-                        "time-related format specifiers (found '%s')." % piece
-                    )
-                pieces.append(str(getattr(self, piece)()))
-            elif piece:
-                pieces.append(re_escaped.sub(r"\1", piece))
-        return "".join(pieces)
+        pass
 
 
 class TimeFormat(Formatter):
@@ -70,15 +59,11 @@ class TimeFormat(Formatter):
 
     def a(self):
         "'a.m.' or 'p.m.'"
-        if self.data.hour > 11:
-            return _("p.m.")
-        return _("a.m.")
+        pass
 
     def A(self):
         "'AM' or 'PM'"
-        if self.data.hour > 11:
-            return _("PM")
-        return _("AM")
+        pass
 
     def e(self):
         """
@@ -109,23 +94,23 @@ class TimeFormat(Formatter):
 
     def g(self):
         "Hour, 12-hour format without leading zeros; i.e. '1' to '12'"
-        return self.data.hour % 12 or 12
+        pass
 
     def G(self):
         "Hour, 24-hour format without leading zeros; i.e. '0' to '23'"
-        return self.data.hour
+        pass
 
     def h(self):
         "Hour, 12-hour format; i.e. '01' to '12'"
-        return "%02d" % (self.data.hour % 12 or 12)
+        pass
 
     def H(self):
         "Hour, 24-hour format; i.e. '00' to '23'"
-        return "%02d" % self.data.hour
+        pass
 
     def i(self):
         "Minutes; i.e. '00' to '59'"
-        return "%02d" % self.data.minute
+        pass
 
     def O(self):  # NOQA: E743, E741
         """
@@ -133,14 +118,7 @@ class TimeFormat(Formatter):
 
         If timezone information is not available, return an empty string.
         """
-        if self.timezone is None:
-            return ""
-
-        offset = self.timezone.utcoffset(self.data)
-        seconds = offset.days * 86400 + offset.seconds
-        sign = "-" if seconds < 0 else "+"
-        seconds = abs(seconds)
-        return "%s%02d%02d" % (sign, seconds // 3600, (seconds // 60) % 60)
+        pass
 
     def P(self):
         """
@@ -149,15 +127,11 @@ class TimeFormat(Formatter):
         appropriate. Examples: '1 a.m.', '1:30 p.m.', 'midnight', 'noon',
         '12:30 p.m.' Proprietary extension.
         """
-        if self.data.minute == 0 and self.data.hour == 0:
-            return _("midnight")
-        if self.data.minute == 0 and self.data.hour == 12:
-            return _("noon")
-        return "%s %s" % (self.f(), self.a())
+        pass
 
     def s(self):
         "Seconds; i.e. '00' to '59'"
-        return "%02d" % self.data.second
+        pass
 
     def T(self):
         """
@@ -165,14 +139,11 @@ class TimeFormat(Formatter):
 
         If timezone information is not available, return an empty string.
         """
-        if self.timezone is None:
-            return ""
-
-        return str(self.timezone.tzname(self.data))
+        pass
 
     def u(self):
         "Microseconds; i.e. '000000' to '999999'"
-        return "%06d" % self.data.microsecond
+        pass
 
     def Z(self):
         """
@@ -182,23 +153,13 @@ class TimeFormat(Formatter):
 
         If timezone information is not available, return an empty string.
         """
-        if self.timezone is None:
-            return ""
-
-        offset = self.timezone.utcoffset(self.data)
-
-        # `offset` is a datetime.timedelta. For negative values (to the west of
-        # UTC) only days can be negative (days=-1) and seconds are always
-        # positive.
-        # e.g.: UTC-1 -> timedelta(days=-1, seconds=82800, microseconds=0)
-        # Positive offsets have days=0
-        return offset.days * 86400 + offset.seconds
+        pass
 
 
 class DateFormat(TimeFormat):
     def b(self):
         "Month, textual, 3 letters, lowercase; e.g. 'jan'"
-        return MONTHS_3[self.data.month]
+        pass
 
     def c(self):
         """
@@ -213,14 +174,14 @@ class DateFormat(TimeFormat):
 
     def D(self):
         "Day of the week, textual, 3 letters; e.g. 'Fri'"
-        return WEEKDAYS_ABBR[self.data.weekday()]
+        pass
 
     def E(self):
         """
         Alternative month names as required by some locales. Proprietary
         extension.
         """
-        return MONTHS_ALT[self.data.month]
+        pass
 
     def F(self):
         "Month, textual, long; e.g. 'January'"
@@ -228,79 +189,58 @@ class DateFormat(TimeFormat):
 
     def I(self):  # NOQA: E743, E741
         "'1' if daylight saving time, '0' otherwise."
-        if self.timezone is None:
-            return ""
-        return "1" if self.timezone.dst(self.data) else "0"
+        pass
 
     def j(self):
         "Day of the month without leading zeros; i.e. '1' to '31'"
-        return self.data.day
+        pass
 
     def l(self):  # NOQA: E743, E741
         "Day of the week, textual, long; e.g. 'Friday'"
-        return WEEKDAYS[self.data.weekday()]
+        pass
 
     def L(self):
         "Boolean for whether it is a leap year; i.e. True or False"
-        return calendar.isleap(self.data.year)
+        pass
 
     def m(self):
         "Month; i.e. '01' to '12'"
-        return "%02d" % self.data.month
+        pass
 
     def M(self):
         "Month, textual, 3 letters; e.g. 'Jan'"
-        return MONTHS_3[self.data.month].title()
+        pass
 
     def n(self):
         "Month without leading zeros; i.e. '1' to '12'"
-        return self.data.month
+        pass
 
     def N(self):
         "Month abbreviation in Associated Press style. Proprietary extension."
-        return MONTHS_AP[self.data.month]
+        pass
 
     def o(self):
         "ISO 8601 year number matching the ISO week number (W)"
-        return self.data.isocalendar().year
+        pass
 
     def r(self):
         "RFC 5322 formatted date; e.g. 'Thu, 21 Dec 2000 16:01:07 +0200'"
-        value = self.data
-        if not isinstance(value, datetime):
-            # Assume midnight in default timezone if datetime.date provided.
-            default_timezone = get_default_timezone()
-            value = datetime.combine(value, time.min).replace(tzinfo=default_timezone)
-        elif is_naive(value):
-            value = make_aware(value, timezone=self.timezone)
-        return format_datetime_rfc5322(value)
+        pass
 
     def S(self):
         """
         English ordinal suffix for the day of the month, 2 characters; i.e.
         'st', 'nd', 'rd' or 'th'.
         """
-        if self.data.day in (11, 12, 13):  # Special case
-            return "th"
-        last = self.data.day % 10
-        if last == 1:
-            return "st"
-        if last == 2:
-            return "nd"
-        if last == 3:
-            return "rd"
-        return "th"
+        pass
 
     def t(self):
         "Number of days in the given month; i.e. '28' to '31'"
-        return calendar.monthrange(self.data.year, self.data.month)[1]
+        pass
 
     def U(self):
         "Seconds since the Unix epoch (January 1 1970 00:00:00 GMT)"
-        value = self.data
-        if not isinstance(value, datetime):
-            value = datetime.combine(value, time.min)
-        return int(value.timestamp())
+        pass
 
     def w(self):
         "Day of the week, numeric, i.e. '0' (Sunday) to '6' (Saturday)"
@@ -308,25 +248,24 @@ class DateFormat(TimeFormat):
 
     def W(self):
         "ISO-8601 week number of year, weeks starting on Monday"
-        return self.data.isocalendar().week
+        pass
 
     def y(self):
         """Year, 2 digits with leading zeros; e.g. '99'."""
-        return "%02d" % (self.data.year % 100)
+        pass
 
     def Y(self):
         """Year, 4 digits with leading zeros; e.g. '1999'."""
-        return "%04d" % self.data.year
+        pass
 
     def z(self):
         """Day of the year, i.e. 1 to 366."""
-        return self.data.timetuple().tm_yday
+        pass
 
 
 def format(value, format_string):
     "Convenience function"
-    df = DateFormat(value)
-    return df.format(format_string)
+    pass
 
 
 def time_format(value, format_string):

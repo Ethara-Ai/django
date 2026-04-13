@@ -20,18 +20,7 @@ def csrf(request):
     Context processor that provides a CSRF token, or the string 'NOTPROVIDED'
     if it has not been provided by either a view decorator or the middleware
     """
-
-    def _get_val():
-        token = get_token(request)
-        if token is None:
-            # In order to be able to provide debugging info in the
-            # case of misconfiguration, we use a sentinel value
-            # instead of returning an empty dict.
-            return "NOTPROVIDED"
-        else:
-            return token
-
-    return {"csrf_token": SimpleLazyObject(_get_val)}
+    pass
 
 
 def debug(request):
@@ -57,19 +46,11 @@ def debug(request):
 
 
 def i18n(request):
-    from django.utils import translation
-
-    return {
-        "LANGUAGES": settings.LANGUAGES,
-        "LANGUAGE_CODE": translation.get_language(),
-        "LANGUAGE_BIDI": translation.get_language_bidi(),
-    }
+    pass
 
 
 def tz(request):
-    from django.utils import timezone
-
-    return {"TIME_ZONE": timezone.get_current_timezone_name()}
+    pass
 
 
 def static(request):
@@ -83,7 +64,7 @@ def media(request):
     """
     Add media-related context variables to the context.
     """
-    return {"MEDIA_URL": settings.MEDIA_URL}
+    pass
 
 
 def request(request):
@@ -94,4 +75,4 @@ def csp(request):
     """
     Add the CSP nonce to the context.
     """
-    return {"csp_nonce": get_nonce(request)}
+    pass

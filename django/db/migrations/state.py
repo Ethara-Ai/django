@@ -113,9 +113,7 @@ class ProjectState:
 
     @property
     def relations(self):
-        if self._relations is None:
-            self.resolve_fields_and_relations()
-        return self._relations
+        pass
 
     def add_model(self, model_state):
         model_key = model_state.app_label, model_state.name_lower
@@ -536,12 +534,7 @@ class ProjectState:
             self._relations[model_key] = self._relations[concretes[model_key]]
 
     def get_concrete_model_key(self, model):
-        (
-            concrete_models_mapping,
-            _,
-        ) = self._get_concrete_models_mapping_and_proxy_models()
-        model_key = make_model_tuple(model)
-        return concrete_models_mapping[model_key]
+        pass
 
     def _get_concrete_models_mapping_and_proxy_models(self):
         concrete_models_mapping = {}
@@ -589,7 +582,7 @@ class ProjectState:
 
     @cached_property
     def apps(self):
-        return StateApps(self.real_apps, self.models)
+        pass
 
     @classmethod
     def from_apps(cls, apps):
@@ -785,7 +778,7 @@ class ModelState:
 
     @cached_property
     def name_lower(self):
-        return self.name.lower()
+        pass
 
     def get_field(self, field_name):
         if (

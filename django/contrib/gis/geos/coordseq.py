@@ -86,28 +86,28 @@ class GEOSCoordSeq(GEOSBase):
             raise GEOSException(f'Invalid ordinate dimension: "{dim:d}"')
 
     def _get_x(self, index):
-        return capi.cs_getx(self.ptr, index, byref(c_double()))
+        pass
 
     def _get_y(self, index):
-        return capi.cs_gety(self.ptr, index, byref(c_double()))
+        pass
 
     def _get_z(self, index):
-        return capi.cs_getz(self.ptr, index, byref(c_double()))
+        pass
 
     def _get_m(self, index):
-        return capi.cs_getm(self.ptr, index, byref(c_double()))
+        pass
 
     def _set_x(self, index, value):
-        capi.cs_setx(self.ptr, index, value)
+        pass
 
     def _set_y(self, index, value):
-        capi.cs_sety(self.ptr, index, value)
+        pass
 
     def _set_z(self, index, value):
-        capi.cs_setz(self.ptr, index, value)
+        pass
 
     def _set_m(self, index, value):
-        capi.cs_setm(self.ptr, index, value)
+        pass
 
     @property
     def _point_getter(self):
@@ -120,52 +120,33 @@ class GEOSCoordSeq(GEOSBase):
         return self._get_point_2d
 
     def _get_point_2d(self, index):
-        return (self._get_x(index), self._get_y(index))
+        pass
 
     def _get_point_3d(self, index):
-        return (self._get_x(index), self._get_y(index), self._get_z(index))
+        pass
 
     def _get_point_3d_m(self, index):
-        return (self._get_x(index), self._get_y(index), self._get_m(index))
+        pass
 
     def _get_point_4d(self, index):
-        return (
-            self._get_x(index),
-            self._get_y(index),
-            self._get_z(index),
-            self._get_m(index),
-        )
+        pass
 
     def _set_point_2d(self, index, value):
-        x, y = value
-        self._set_x(index, x)
-        self._set_y(index, y)
+        pass
 
     def _set_point_3d(self, index, value):
-        x, y, z = value
-        self._set_x(index, x)
-        self._set_y(index, y)
-        self._set_z(index, z)
+        pass
 
     def _set_point_3d_m(self, index, value):
-        x, y, m = value
-        self._set_x(index, x)
-        self._set_y(index, y)
-        self._set_m(index, m)
+        pass
 
     def _set_point_4d(self, index, value):
-        x, y, z, m = value
-        self._set_x(index, x)
-        self._set_y(index, y)
-        self._set_z(index, z)
-        self._set_m(index, m)
+        pass
 
     # #### Ordinate getting and setting routines ####
     def getOrdinate(self, dimension, index):
         "Return the value for the given dimension and index."
-        self._checkindex(index)
-        self._checkdim(dimension)
-        return capi.cs_getordinate(self.ptr, index, dimension, byref(c_double()))
+        pass
 
     def setOrdinate(self, dimension, index, value):
         "Set the value for the given dimension and index."
@@ -175,35 +156,35 @@ class GEOSCoordSeq(GEOSBase):
 
     def getX(self, index):
         "Get the X value at the index."
-        return self.getOrdinate(0, index)
+        pass
 
     def setX(self, index, value):
         "Set X with the value at the given index."
-        self.setOrdinate(0, index, value)
+        pass
 
     def getY(self, index):
         "Get the Y value at the given index."
-        return self.getOrdinate(1, index)
+        pass
 
     def setY(self, index, value):
         "Set Y with the value at the given index."
-        self.setOrdinate(1, index, value)
+        pass
 
     def getZ(self, index):
         "Get Z with the value at the given index."
-        return self.getOrdinate(2, index)
+        pass
 
     def setZ(self, index, value):
         "Set Z with the value at the given index."
-        self.setOrdinate(2, index, value)
+        pass
 
     def getM(self, index):
         "Get M with the value at the given index."
-        return self.getOrdinate(3, index)
+        pass
 
     def setM(self, index, value):
         "Set M with the value at the given index."
-        self.setOrdinate(3, index, value)
+        pass
 
     # ### Dimensions ###
     @property
@@ -214,7 +195,7 @@ class GEOSCoordSeq(GEOSBase):
     @property
     def dims(self):
         "Return the dimensions of this coordinate sequence."
-        return capi.cs_getdims(self.ptr, byref(c_uint()))
+        pass
 
     @property
     def hasz(self):
@@ -222,19 +203,14 @@ class GEOSCoordSeq(GEOSBase):
         Return whether this coordinate sequence is 3D. This property value is
         inherited from the parent Geometry.
         """
-        return self._z
+        pass
 
     @property
     def hasm(self):
         """
         Return whether this coordinate sequence has M dimension.
         """
-        if geos_version_tuple() >= (3, 14):
-            return capi.cs_hasm(self._ptr)
-        else:
-            raise NotImplementedError(
-                "GEOSCoordSeq with an M dimension requires GEOS 3.14+."
-            )
+        pass
 
     # ### Other Methods ###
     def clone(self):
@@ -244,29 +220,14 @@ class GEOSCoordSeq(GEOSBase):
     @property
     def kml(self):
         "Return the KML representation for the coordinates."
-        if self.hasz:
-            coords = [f"{coord[0]},{coord[1]},{coord[2]}" for coord in self]
-        else:
-            coords = [f"{coord[0]},{coord[1]},0" for coord in self]
-
-        coordinate_string = " ".join(coords)
-        return f"<coordinates>{coordinate_string}</coordinates>"
+        pass
 
     @property
     def tuple(self):
         "Return a tuple version of this coordinate sequence."
-        n = self.size
-        get_point = self._point_getter
-        if n == 1:
-            return get_point(0)
-        return tuple(get_point(i) for i in range(n))
+        pass
 
     @property
     def is_counterclockwise(self):
         """Return whether this coordinate sequence is counterclockwise."""
-        ret = c_byte()
-        if not capi.cs_is_ccw(self.ptr, byref(ret)):
-            raise GEOSException(
-                'Error encountered in GEOS C function "%s".' % capi.cs_is_ccw.func_name
-            )
-        return ret.value == 1
+        pass

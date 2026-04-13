@@ -102,23 +102,7 @@ class BasePaginator:
 
             1, 2, …, 40, 41, 42, 43, 44, 45, 46, …, 49, 50.
         """
-        if num_pages <= (on_each_side + on_ends) * 2:
-            yield from page_range
-            return
-
-        if number > (1 + on_each_side + on_ends) + 1:
-            yield from range(1, on_ends + 1)
-            yield self.ELLIPSIS
-            yield from range(number - on_each_side, number + 1)
-        else:
-            yield from range(1, number + 1)
-
-        if number < (num_pages - on_each_side - on_ends) - 1:
-            yield from range(number + 1, number + on_each_side + 1)
-            yield self.ELLIPSIS
-            yield from range(num_pages - on_ends + 1, num_pages + 1)
-        else:
-            yield from range(number + 1, num_pages + 1)
+        pass
 
     def _get_page(self, *args, **kwargs):
         """
@@ -157,13 +141,7 @@ class Paginator(BasePaginator):
         Return a valid page, even if the page argument isn't a number or isn't
         in range.
         """
-        try:
-            number = self.validate_number(number)
-        except PageNotAnInteger:
-            number = 1
-        except EmptyPage:
-            number = self.num_pages
-        return self.page(number)
+        pass
 
     def page(self, number):
         """Return a Page object for the given 1-based page number."""
@@ -185,10 +163,7 @@ class Paginator(BasePaginator):
     @cached_property
     def num_pages(self):
         """Return the total number of pages."""
-        if self.count == 0 and not self.allow_empty_first_page:
-            return 0
-        hits = max(1, self.count - self.orphans)
-        return ceil(hits / self.per_page)
+        pass
 
     @property
     def page_range(self):
@@ -196,13 +171,10 @@ class Paginator(BasePaginator):
         Return a 1-based range of pages for iterating through within
         a template for loop.
         """
-        return range(1, self.num_pages + 1)
+        pass
 
     def get_elided_page_range(self, number=1, *, on_each_side=3, on_ends=2):
-        number = self.validate_number(number)
-        yield from self._get_elided_page_range(
-            number, self.num_pages, self.page_range, on_each_side, on_ends
-        )
+        pass
 
 
 class AsyncPaginator(BasePaginator):
@@ -226,77 +198,33 @@ class AsyncPaginator(BasePaginator):
             yield await self.apage(page_number)
 
     async def avalidate_number(self, number):
-        num_pages = await self.anum_pages()
-        return self._validate_number(number, num_pages)
+        pass
 
     async def aget_page(self, number):
         """See Paginator.get_page()."""
-        try:
-            number = await self.avalidate_number(number)
-        except PageNotAnInteger:
-            number = 1
-        except EmptyPage:
-            number = await self.anum_pages()
-        return await self.apage(number)
+        pass
 
     async def apage(self, number):
         """See Paginator.page()."""
-        number = await self.avalidate_number(number)
-        bottom = (number - 1) * self.per_page
-        top = bottom + self.per_page
-        count = await self.acount()
-        if top + self.orphans >= count:
-            top = count
-
-        return self._get_page(self.object_list[bottom:top], number, self)
+        pass
 
     def _get_page(self, *args, **kwargs):
         return AsyncPage(*args, **kwargs)
 
     async def acount(self):
         """See Paginator.count()."""
-        if self._cache_acount is not None:
-            return self._cache_acount
-        c = getattr(self.object_list, "acount", None)
-        if (
-            inspect.iscoroutinefunction(c)
-            and not inspect.isbuiltin(c)
-            and method_has_no_args(c)
-        ):
-            count = await c()
-        else:
-            count = len(self.object_list)
-
-        self._cache_acount = count
-        return count
+        pass
 
     async def anum_pages(self):
         """See Paginator.num_pages()."""
-        if self._cache_anum_pages is not None:
-            return self._cache_anum_pages
-        count = await self.acount()
-        if count == 0 and not self.allow_empty_first_page:
-            self._cache_anum_pages = 0
-            return self._cache_anum_pages
-        hits = max(1, count - self.orphans)
-        num_pages = ceil(hits / self.per_page)
-
-        self._cache_anum_pages = num_pages
-        return num_pages
+        pass
 
     async def apage_range(self):
         """See Paginator.page_range()"""
-        num_pages = await self.anum_pages()
-        return range(1, num_pages + 1)
+        pass
 
     async def aget_elided_page_range(self, number=1, *, on_each_side=3, on_ends=2):
-        number = await self.avalidate_number(number)
-        num_pages = await self.anum_pages()
-        page_range = await self.apage_range()
-        for page in self._get_elided_page_range(
-            number, num_pages, page_range, on_each_side, on_ends
-        ):
-            yield page
+        pass
 
 
 class Page(collections.abc.Sequence):
@@ -333,30 +261,24 @@ class Page(collections.abc.Sequence):
         return self.has_previous() or self.has_next()
 
     def next_page_number(self):
-        return self.paginator.validate_number(self.number + 1)
+        pass
 
     def previous_page_number(self):
-        return self.paginator.validate_number(self.number - 1)
+        pass
 
     def start_index(self):
         """
         Return the 1-based index of the first object on this page,
         relative to total objects in the paginator.
         """
-        # Special case, return zero if no items.
-        if self.paginator.count == 0:
-            return 0
-        return (self.paginator.per_page * (self.number - 1)) + 1
+        pass
 
     def end_index(self):
         """
         Return the 1-based index of the last object on this page,
         relative to total objects found (hits).
         """
-        # Special case for the last page because there can be orphans.
-        if self.number == self.paginator.num_pages:
-            return self.paginator.count
-        return self.number * self.paginator.per_page
+        pass
 
 
 class AsyncPage:
@@ -412,41 +334,27 @@ class AsyncPage:
         This method must be awaited before AsyncPage can be
         treated as a sequence of self.object_list.
         """
-        if not isinstance(self.object_list, list):
-            if hasattr(self.object_list, "__aiter__"):
-                self.object_list = [obj async for obj in self.object_list]
-            else:
-                self.object_list = await sync_to_async(list)(self.object_list)
-        return self.object_list
+        pass
 
     async def ahas_next(self):
-        num_pages = await self.paginator.anum_pages()
-        return self.number < num_pages
+        pass
 
     async def ahas_previous(self):
-        return self.number > 1
+        pass
 
     async def ahas_other_pages(self):
-        has_previous = await self.ahas_previous()
-        has_next = await self.ahas_next()
-        return has_previous or has_next
+        pass
 
     async def anext_page_number(self):
-        return await self.paginator.avalidate_number(self.number + 1)
+        pass
 
     async def aprevious_page_number(self):
-        return await self.paginator.avalidate_number(self.number - 1)
+        pass
 
     async def astart_index(self):
         """See Page.start_index()."""
-        count = await self.paginator.acount()
-        if count == 0:
-            return 0
-        return (self.paginator.per_page * (self.number - 1)) + 1
+        pass
 
     async def aend_index(self):
         """See Page.end_index()."""
-        num_pages = await self.paginator.anum_pages()
-        if self.number == num_pages:
-            return await self.paginator.acount()
-        return self.number * self.paginator.per_page
+        pass

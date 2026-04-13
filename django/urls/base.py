@@ -112,9 +112,7 @@ reverse_lazy = lazy(reverse, str)
 
 
 def clear_url_caches():
-    get_callable.cache_clear()
-    _get_cached_resolver.cache_clear()
-    get_ns_resolver.cache_clear()
+    pass
 
 
 def set_script_prefix(prefix):
@@ -139,10 +137,7 @@ def clear_script_prefix():
     """
     Unset the script prefix for the current thread.
     """
-    try:
-        del _prefixes.value
-    except AttributeError:
-        pass
+    pass
 
 
 def set_urlconf(urlconf_name):
@@ -184,25 +179,4 @@ def translate_url(url, lang_code):
     the `lang_code` language (either by i18n_patterns or by translated regex).
     Return the original URL if no translated version is found.
     """
-    parsed = urlsplit(url)
-    try:
-        # URL may be encoded.
-        match = resolve(unquote(parsed.path))
-    except Resolver404:
-        pass
-    else:
-        to_be_reversed = (
-            "%s:%s" % (match.namespace, match.url_name)
-            if match.namespace
-            else match.url_name
-        )
-        with override(lang_code):
-            try:
-                url = reverse(to_be_reversed, args=match.args, kwargs=match.kwargs)
-            except NoReverseMatch:
-                pass
-            else:
-                url = urlunsplit(
-                    (parsed.scheme, parsed.netloc, url, parsed.query, parsed.fragment)
-                )
-    return url
+    pass

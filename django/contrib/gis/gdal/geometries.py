@@ -163,11 +163,7 @@ class OGRGeometry(GDALBase):
     @classmethod
     def from_bbox(cls, bbox):
         "Construct a Polygon from a bounding box (4-tuple)."
-        x0, y0, x1, y1 = bbox
-        return OGRGeometry(
-            "POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))"
-            % (x0, y0, x0, y1, x1, y1, x1, y0, x0, y0)
-        )
+        pass
 
     @staticmethod
     def from_json(geom_input):
@@ -175,7 +171,7 @@ class OGRGeometry(GDALBase):
 
     @classmethod
     def from_gml(cls, gml_string):
-        return cls(capi.from_gml(force_bytes(gml_string)))
+        pass
 
     # ### Geometry set-like operations ###
     # g = g1 | g2
@@ -210,42 +206,42 @@ class OGRGeometry(GDALBase):
     @property
     def dimension(self):
         "Return 0 for points, 1 for lines, and 2 for surfaces."
-        return capi.get_dims(self.ptr)
+        pass
 
     @property
     def coord_dim(self):
         "Return the coordinate dimension of the Geometry."
-        return capi.get_coord_dim(self.ptr)
+        pass
 
     @property
     def geom_count(self):
         "Return the number of elements in this Geometry."
-        return capi.get_geom_count(self.ptr)
+        pass
 
     @property
     def point_count(self):
         "Return the number of Points in this Geometry."
-        return capi.get_point_count(self.ptr)
+        pass
 
     @property
     def num_points(self):
         "Alias for `point_count` (same name method in GEOS API.)"
-        return self.point_count
+        pass
 
     @property
     def num_coords(self):
         "Alias for `point_count`."
-        return self.point_count
+        pass
 
     @property
     def geom_type(self):
         "Return the Type for this Geometry."
-        return OGRGeomType(capi.get_geom_type(self.ptr))
+        pass
 
     @property
     def geom_name(self):
         "Return the Name of this Geometry."
-        return capi.get_geom_name(self.ptr)
+        pass
 
     @property
     def area(self):
@@ -253,27 +249,26 @@ class OGRGeometry(GDALBase):
         Return the area for a LinearRing, Polygon, or MultiPolygon; 0
         otherwise.
         """
-        return capi.get_area(self.ptr)
+        pass
 
     @property
     def envelope(self):
         "Return the envelope for this Geometry."
-        # TODO: Fix Envelope() for Point geometries.
-        return Envelope(capi.get_envelope(self.ptr, byref(OGREnvelope())))
+        pass
 
     @property
     def empty(self):
-        return capi.is_empty(self.ptr)
+        pass
 
     @property
     def extent(self):
         "Return the envelope as a 4-tuple, instead of as an Envelope object."
-        return self.envelope.tuple
+        pass
 
     @property
     def is_3d(self):
         """Return True if the geometry has Z coordinates."""
-        return capi.is_3d(self.ptr)
+        pass
 
     def set_3d(self, value):
         """Set if this geometry has Z coordinates."""
@@ -287,7 +282,7 @@ class OGRGeometry(GDALBase):
     @property
     def is_measured(self):
         """Return True if the geometry has M coordinates."""
-        return capi.is_measured(self.ptr)
+        pass
 
     def set_measured(self, value):
         """Set if this geometry has M coordinates."""
@@ -303,60 +298,35 @@ class OGRGeometry(GDALBase):
     @property
     def has_curve(self):
         """Return True if the geometry is or has curve geometry."""
-        return capi.has_curve_geom(self.ptr, 0)
+        pass
 
     def get_linear_geometry(self):
         """Return a linear version of this geometry."""
-        return OGRGeometry(capi.get_linear_geom(self.ptr, 0, None))
+        pass
 
     def get_curve_geometry(self):
         """Return a curve version of this geometry."""
-        return OGRGeometry(capi.get_curve_geom(self.ptr, None))
+        pass
 
     # #### SpatialReference-related Properties ####
 
     # The SRS property
     def _get_srs(self):
         "Return the Spatial Reference for this Geometry."
-        try:
-            srs_ptr = capi.get_geom_srs(self.ptr)
-            return SpatialReference(srs_api.clone_srs(srs_ptr))
-        except SRSException:
-            return None
+        pass
 
     def _set_srs(self, srs):
         "Set the SpatialReference for this geometry."
-        # Do not have to clone the `SpatialReference` object pointer because
-        # when it is assigned to this `OGRGeometry` it's internal OGR
-        # reference count is incremented, and will likewise be released
-        # (decremented) when this geometry's destructor is called.
-        if isinstance(srs, SpatialReference):
-            srs_ptr = srs.ptr
-        elif isinstance(srs, (int, str)):
-            sr = SpatialReference(srs)
-            srs_ptr = sr.ptr
-        elif srs is None:
-            srs_ptr = None
-        else:
-            raise TypeError(
-                "Cannot assign spatial reference with object of type: %s" % type(srs)
-            )
-        capi.assign_srs(self.ptr, srs_ptr)
+        pass
 
     srs = property(_get_srs, _set_srs)
 
     # The SRID property
     def _get_srid(self):
-        srs = self.srs
-        if srs:
-            return srs.srid
-        return None
+        pass
 
     def _set_srid(self, srid):
-        if isinstance(srid, int) or srid is None:
-            self.srs = srid
-        else:
-            raise TypeError("SRID must be set with an integer.")
+        pass
 
     srid = property(_get_srid, _set_srid)
 
@@ -369,19 +339,12 @@ class OGRGeometry(GDALBase):
     @property
     def geos(self):
         "Return a GEOSGeometry object from this OGRGeometry."
-        if self.geos_support:
-            from django.contrib.gis.geos import GEOSGeometry
-
-            return GEOSGeometry(self._geos_ptr(), self.srid)
-        else:
-            from django.contrib.gis.geos import GEOSException
-
-            raise GEOSException(f"GEOS does not support {self.__class__.__qualname__}.")
+        pass
 
     @property
     def gml(self):
         "Return the GML representation of the Geometry."
-        return capi.to_gml(self.ptr)
+        pass
 
     @property
     def hex(self):
@@ -400,49 +363,27 @@ class OGRGeometry(GDALBase):
     @property
     def kml(self):
         "Return the KML representation of the Geometry."
-        return capi.to_kml(self.ptr, None)
+        pass
 
     @property
     def wkb_size(self):
         "Return the size of the WKB buffer."
-        return capi.get_wkbsize(self.ptr)
+        pass
 
     @property
     def wkb(self):
         "Return the WKB representation of the Geometry."
-        if sys.byteorder == "little":
-            byteorder = 1  # wkbNDR (from ogr_core.h)
-        else:
-            byteorder = 0  # wkbXDR
-        sz = self.wkb_size
-        # Creating the unsigned character buffer, and passing it in by
-        # reference.
-        buf = (c_ubyte * sz)()
-        # For backward compatibility, export old-style 99-402 extended
-        # dimension types when geometry does not have an M dimension.
-        # https://gdal.org/api/vector_c_api.html#_CPPv417OGR_G_ExportToWkb12OGRGeometryH15OGRwkbByteOrderPh
-        to_wkb = capi.to_iso_wkb if self.is_measured else capi.to_wkb
-        to_wkb(self.ptr, byteorder, byref(buf))
-        # Returning a buffer of the string at the pointer.
-        return memoryview(string_at(buf, sz))
+        pass
 
     @property
     def wkt(self):
         "Return the WKT representation of the Geometry."
-        # For backward compatibility, export old-style 99-402 extended
-        # dimension types when geometry does not have an M dimension.
-        # https://gdal.org/api/vector_c_api.html#_CPPv417OGR_G_ExportToWkt12OGRGeometryHPPc
-        to_wkt = capi.to_iso_wkt if self.is_measured else capi.to_wkt
-        return to_wkt(self.ptr, byref(c_char_p()))
+        pass
 
     @property
     def ewkt(self):
         "Return the EWKT representation of the Geometry."
-        srs = self.srs
-        if srs and srs.srid:
-            return "SRID=%s;%s" % (srs.srid, self.wkt)
-        else:
-            return self.wkt
+        pass
 
     # #### Geometry Methods ####
     def clone(self):
@@ -455,8 +396,7 @@ class OGRGeometry(GDALBase):
         closed, this routine will do so by adding the starting point at the
         end.
         """
-        # Closing the open rings.
-        capi.geom_close_rings(self.ptr)
+        pass
 
     def transform(self, coord_trans, clone=False):
         """
@@ -501,27 +441,27 @@ class OGRGeometry(GDALBase):
 
     def intersects(self, other):
         "Return True if this geometry intersects with the other."
-        return self._topology(capi.ogr_intersects, other)
+        pass
 
     def equals(self, other):
         "Return True if this geometry is equivalent to the other."
-        return self._topology(capi.ogr_equals, other)
+        pass
 
     def disjoint(self, other):
         "Return True if this geometry and the other are spatially disjoint."
-        return self._topology(capi.ogr_disjoint, other)
+        pass
 
     def touches(self, other):
         "Return True if this geometry touches the other."
-        return self._topology(capi.ogr_touches, other)
+        pass
 
     def crosses(self, other):
         "Return True if this geometry crosses the other."
-        return self._topology(capi.ogr_crosses, other)
+        pass
 
     def within(self, other):
         "Return True if this geometry is within the other."
-        return self._topology(capi.ogr_within, other)
+        pass
 
     def contains(self, other):
         "Return True if this geometry contains the other."
@@ -529,7 +469,7 @@ class OGRGeometry(GDALBase):
 
     def overlaps(self, other):
         "Return True if this geometry overlaps the other."
-        return self._topology(capi.ogr_overlaps, other)
+        pass
 
     # #### Geometry-generation Methods ####
     def _geomgen(self, gen_func, other=None):
@@ -542,7 +482,7 @@ class OGRGeometry(GDALBase):
     @property
     def boundary(self):
         "Return the boundary of this geometry."
-        return self._geomgen(capi.get_boundary)
+        pass
 
     @property
     def convex_hull(self):
@@ -550,7 +490,7 @@ class OGRGeometry(GDALBase):
         Return the smallest convex Polygon that contains all the points in
         this Geometry.
         """
-        return self._geomgen(capi.geom_convex_hull)
+        pass
 
     def difference(self, other):
         """
@@ -571,7 +511,7 @@ class OGRGeometry(GDALBase):
         Return a new geometry which is the symmetric difference of this
         geometry and the other.
         """
-        return self._geomgen(capi.geom_sym_diff, other)
+        pass
 
     def union(self, other):
         """
@@ -583,10 +523,7 @@ class OGRGeometry(GDALBase):
     @property
     def centroid(self):
         """Return the centroid (a Point) of this Polygon."""
-        # The centroid is a Point, create a geometry for this.
-        p = OGRGeometry(OGRGeomType("Point"))
-        capi.get_centroid(self.ptr, p.ptr)
-        return p
+        pass
 
 
 # The subclasses for OGR Geometry.
@@ -603,35 +540,27 @@ class Point(OGRGeometry):
     @property
     def x(self):
         "Return the X coordinate for this Point."
-        return capi.getx(self.ptr, 0)
+        pass
 
     @property
     def y(self):
         "Return the Y coordinate for this Point."
-        return capi.gety(self.ptr, 0)
+        pass
 
     @property
     def z(self):
         "Return the Z coordinate for this Point."
-        if self.is_3d:
-            return capi.getz(self.ptr, 0)
+        pass
 
     @property
     def m(self):
         """Return the M coordinate for this Point."""
-        if self.is_measured:
-            return capi.getm(self.ptr, 0)
+        pass
 
     @property
     def tuple(self):
         "Return the tuple of this point."
-        if self.is_3d and self.is_measured:
-            return self.x, self.y, self.z, self.m
-        if self.is_3d:
-            return self.x, self.y, self.z
-        if self.is_measured:
-            return self.x, self.y, self.m
-        return self.x, self.y
+        pass
 
     coords = tuple
 
@@ -665,7 +594,7 @@ class LineString(OGRGeometry):
     @property
     def tuple(self):
         "Return the tuple representation of this LineString."
-        return tuple(self[i] for i in range(len(self)))
+        pass
 
     coords = tuple
 
@@ -674,29 +603,27 @@ class LineString(OGRGeometry):
         Internal routine that returns a sequence (list) corresponding with
         the given function.
         """
-        return [func(self.ptr, i) for i in range(len(self))]
+        pass
 
     @property
     def x(self):
         "Return the X coordinates in a list."
-        return self._listarr(capi.getx)
+        pass
 
     @property
     def y(self):
         "Return the Y coordinates in a list."
-        return self._listarr(capi.gety)
+        pass
 
     @property
     def z(self):
         "Return the Z coordinates in a list."
-        if self.is_3d:
-            return self._listarr(capi.getz)
+        pass
 
     @property
     def m(self):
         """Return the M coordinates in a list."""
-        if self.is_measured:
-            return self._listarr(capi.getm)
+        pass
 
 
 # LinearRings are used in Polygons.
@@ -724,22 +651,21 @@ class Polygon(OGRGeometry):
     @property
     def shell(self):
         "Return the shell of this Polygon."
-        return self[0]  # First ring is the shell
+        pass
 
     exterior_ring = shell
 
     @property
     def tuple(self):
         "Return a tuple of LinearRing coordinate tuples."
-        return tuple(self[i].tuple for i in range(self.geom_count))
+        pass
 
     coords = tuple
 
     @property
     def point_count(self):
         "Return the number of Points in this Polygon."
-        # Summing up the number of points in each ring of the Polygon.
-        return sum(self[i].point_count for i in range(self.geom_count))
+        pass
 
 
 class CircularString(LineString):
@@ -791,13 +717,12 @@ class GeometryCollection(OGRGeometry):
     @property
     def point_count(self):
         "Return the number of Points in this Geometry Collection."
-        # Summing up the number of points in each geometry in this collection
-        return sum(self[i].point_count for i in range(self.geom_count))
+        pass
 
     @property
     def tuple(self):
         "Return a tuple representation of this Geometry Collection."
-        return tuple(self[i].tuple for i in range(self.geom_count))
+        pass
 
     coords = tuple
 

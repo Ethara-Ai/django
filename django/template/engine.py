@@ -113,9 +113,7 @@ class Engine:
 
     @cached_property
     def template_context_processors(self):
-        context_processors = _builtin_context_processors
-        context_processors += tuple(self.context_processors)
-        return tuple(import_string(path) for path in context_processors)
+        pass
 
     def get_template_builtins(self, builtins):
         return [import_library(x) for x in builtins]
@@ -128,7 +126,7 @@ class Engine:
 
     @cached_property
     def template_loaders(self):
-        return self.get_template_loaders(self.loaders)
+        pass
 
     def get_template_loaders(self, template_loaders):
         loaders = []

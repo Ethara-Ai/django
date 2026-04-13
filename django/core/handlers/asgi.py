@@ -117,30 +117,26 @@ class ASGIRequest(HttpRequest):
 
     @cached_property
     def GET(self):
-        return QueryDict(self.META["QUERY_STRING"])
+        pass
 
     def _get_scheme(self):
-        return self.scope.get("scheme") or super()._get_scheme()
+        pass
 
     def _get_post(self):
-        if not hasattr(self, "_post"):
-            self._load_post_and_files()
-        return self._post
+        pass
 
     def _set_post(self, post):
-        self._post = post
+        pass
 
     def _get_files(self):
-        if not hasattr(self, "_files"):
-            self._load_post_and_files()
-        return self._files
+        pass
 
     POST = property(_get_post, _set_post)
     FILES = property(_get_files)
 
     @cached_property
     def COOKIES(self):
-        return parse_cookie(self.META.get("HTTP_COOKIE", ""))
+        pass
 
     def close(self):
         super().close()

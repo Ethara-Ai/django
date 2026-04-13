@@ -27,25 +27,25 @@ class PreparedGeometry(GEOSBase):
         return capi.prepared_contains(self.ptr, other.ptr)
 
     def contains_properly(self, other):
-        return capi.prepared_contains_properly(self.ptr, other.ptr)
+        pass
 
     def covers(self, other):
-        return capi.prepared_covers(self.ptr, other.ptr)
+        pass
 
     def intersects(self, other):
-        return capi.prepared_intersects(self.ptr, other.ptr)
+        pass
 
     def crosses(self, other):
-        return capi.prepared_crosses(self.ptr, other.ptr)
+        pass
 
     def disjoint(self, other):
-        return capi.prepared_disjoint(self.ptr, other.ptr)
+        pass
 
     def overlaps(self, other):
-        return capi.prepared_overlaps(self.ptr, other.ptr)
+        pass
 
     def touches(self, other):
-        return capi.prepared_touches(self.ptr, other.ptr)
+        pass
 
     def within(self, other):
-        return capi.prepared_within(self.ptr, other.ptr)
+        pass

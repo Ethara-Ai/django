@@ -80,7 +80,7 @@ class AbstractBaseUser(models.Model):
         Always return False. This is a way of comparing User objects to
         anonymous users.
         """
-        return False
+        pass
 
     @property
     def is_authenticated(self):
@@ -88,7 +88,7 @@ class AbstractBaseUser(models.Model):
         Always return True. This is a way to tell if the user has been
         authenticated in templates.
         """
-        return True
+        pass
 
     def set_password(self, raw_password):
         self.password = make_password(raw_password)

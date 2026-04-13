@@ -317,11 +317,11 @@ class ExceptionReporter:
 
     @property
     def html_template_path(self):
-        return builtin_template_path("technical_500.html")
+        pass
 
     @property
     def text_template_path(self):
-        return builtin_template_path("technical_500.txt")
+        pass
 
     def __init__(self, request, exc_type, exc_value, tb, is_email=False):
         self.request = request

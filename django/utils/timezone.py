@@ -55,7 +55,7 @@ def get_default_timezone():
 # This function exists for consistency with get_current_timezone_name
 def get_default_timezone_name():
     """Return the name of the default time zone."""
-    return _get_timezone_name(get_default_timezone())
+    pass
 
 
 _active = Local()

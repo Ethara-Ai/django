@@ -15,17 +15,12 @@ from django.contrib.gis.geos.prototypes.errcheck import (
 # ## Error-checking routines specific to coordinate sequences. ##
 def check_cs_op(result, func, cargs):
     "Check the status code of a coordinate sequence operation."
-    if result == 0:
-        raise GEOSException("Could not set value on coordinate sequence")
-    else:
-        return result
+    pass
 
 
 def check_cs_get(result, func, cargs):
     "Check the coordinate sequence retrieval."
-    check_cs_op(result, func, cargs)
-    # Object in by reference, return its value.
-    return last_arg_byref(cargs)
+    pass
 
 
 # ## Coordinate sequence prototype factory classes. ##
@@ -67,12 +62,7 @@ class CsOutput(GEOSFuncFactory):
 
     @staticmethod
     def errcheck(result, func, cargs):
-        if not result:
-            raise GEOSException(
-                "Error encountered checking Coordinate Sequence returned from GEOS "
-                'C function "%s".' % func.__name__
-            )
-        return result
+        pass
 
 
 class CsUnaryPredicate(GEOSFuncFactory):

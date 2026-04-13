@@ -119,10 +119,9 @@ class DataSource(GDALBase):
     @property
     def layer_count(self):
         "Return the number of layers in the data source."
-        return capi.get_layer_count(self._ptr)
+        pass
 
     @property
     def name(self):
         "Return the name of the data source."
-        name = capi.get_ds_name(self._ptr)
-        return force_str(name, self.encoding, strings_only=True)
+        pass

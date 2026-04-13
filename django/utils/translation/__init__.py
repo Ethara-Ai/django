@@ -138,10 +138,7 @@ def lazy_number(func, resultclass, number=None, **kwargs):
                 return func(**kwargs)
 
             def format(self, *args, **kwargs):
-                number_value = (
-                    self._get_number_value(kwargs) if kwargs and number else args[0]
-                )
-                return self._translate(number_value).format(*args, **kwargs)
+                pass
 
             def __mod__(self, rhs):
                 if isinstance(rhs, dict) and number:
@@ -165,7 +162,7 @@ def lazy_number(func, resultclass, number=None, **kwargs):
 
 
 def _lazy_number_unpickle(func, resultclass, number, kwargs):
-    return lazy_number(func, resultclass, number=number, **kwargs)
+    pass
 
 
 def ngettext_lazy(singular, plural, number=None):
@@ -299,4 +296,4 @@ def trim_whitespace(s):
 
 
 def round_away_from_one(value):
-    return int(Decimal(value - 1).quantize(Decimal("0"), rounding=ROUND_UP)) + 1
+    pass

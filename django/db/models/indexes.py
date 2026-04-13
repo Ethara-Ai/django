@@ -81,7 +81,7 @@ class Index:
 
     @property
     def contains_expressions(self):
-        return bool(self.expressions)
+        pass
 
     def check(self, model, connection):
         """Check fields, names, and conditions of indexes."""
@@ -388,4 +388,4 @@ class IndexExpression(Func):
 
     def as_sqlite(self, compiler, connection, **extra_context):
         # Casting to numeric is unnecessary.
-        return self.as_sql(compiler, connection, **extra_context)
+        pass

@@ -28,15 +28,7 @@ class AreaField(models.FloatField):
         return getattr(value, area_att) if area_att else value
 
     def from_db_value(self, value, expression, connection):
-        if value is None:
-            return
-        # If the database returns a Decimal, convert it to a float as expected
-        # by the Python geometric objects.
-        if isinstance(value, Decimal):
-            value = float(value)
-        # If the units are known, convert value into area measure.
-        area_att = connection.ops.get_area_att_for_field(self.geo_field)
-        return Area(**{area_att: value}) if area_att else value
+        pass
 
     def get_internal_type(self):
         return "AreaField"
@@ -65,10 +57,7 @@ class DistanceField(models.FloatField):
         return getattr(value, distance_att)
 
     def from_db_value(self, value, expression, connection):
-        if value is None:
-            return
-        distance_att = connection.ops.get_distance_att_for_field(self.geo_field)
-        return Distance(**{distance_att: value}) if distance_att else value
+        pass
 
     def get_internal_type(self):
         return "DistanceField"

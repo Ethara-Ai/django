@@ -20,16 +20,12 @@ def vary_on_headers(*headers):
         if iscoroutinefunction(func):
 
             async def _view_wrapper(request, *args, **kwargs):
-                response = await func(request, *args, **kwargs)
-                patch_vary_headers(response, headers)
-                return response
+                pass
 
         else:
 
             def _view_wrapper(request, *args, **kwargs):
-                response = func(request, *args, **kwargs)
-                patch_vary_headers(response, headers)
-                return response
+                pass
 
         return wraps(func)(_view_wrapper)
 

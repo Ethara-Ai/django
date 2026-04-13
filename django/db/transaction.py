@@ -74,12 +74,12 @@ def clean_savepoints(using=None):
     """
     Reset the counter used to generate unique savepoint ids in this thread.
     """
-    get_connection(using).clean_savepoints()
+    pass
 
 
 def get_rollback(using=None):
     """Get the "needs rollback" flag -- for *advanced use* only."""
-    return get_connection(using).get_rollback()
+    pass
 
 
 def set_rollback(rollback, using=None):
@@ -131,7 +131,7 @@ def on_commit(func, using=None, robust=False):
     Register `func` to be called when the current transaction is committed.
     If the current transaction is rolled back, `func` will not be called.
     """
-    get_connection(using).on_commit(func, robust)
+    pass
 
 
 #################################

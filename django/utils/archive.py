@@ -93,7 +93,7 @@ class Archive:
         self._archive.extract(to_path)
 
     def list(self):
-        self._archive.list()
+        pass
 
     def close(self):
         self._archive.close()
@@ -169,7 +169,7 @@ class TarArchive(BaseArchive):
         self._archive = tarfile.open(file)
 
     def list(self, *args, **kwargs):
-        self._archive.list(*args, **kwargs)
+        pass
 
     def extract(self, to_path):
         members = self._archive.getmembers()
@@ -212,7 +212,7 @@ class ZipArchive(BaseArchive):
         self._archive = zipfile.ZipFile(file)
 
     def list(self, *args, **kwargs):
-        self._archive.printdir(*args, **kwargs)
+        pass
 
     def extract(self, to_path):
         namelist = self._archive.namelist()

@@ -20,8 +20,7 @@ def update_last_login(sender, user, **kwargs):
     A signal receiver which updates the last_login date for
     the user logging in.
     """
-    user.last_login = timezone.now()
-    user.save(update_fields=["last_login"])
+    pass
 
 
 class PermissionManager(models.Manager):
@@ -82,7 +81,7 @@ class Permission(models.Model):
     @property
     def user_perm_str(self):
         """String representation for the user permission check."""
-        return f"{self.content_type.app_label}.{self.codename}"
+        pass
 
     def natural_key(self):
         return (self.codename, *self.content_type.natural_key())
@@ -170,9 +169,7 @@ class UserManager(BaseUserManager):
 
     async def _acreate_user(self, username, email, password, **extra_fields):
         """See _create_user()"""
-        user = self._create_user_object(username, email, password, **extra_fields)
-        await user.asave(using=self._db)
-        return user
+        pass
 
     def create_user(self, username, email=None, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", False)
@@ -182,9 +179,7 @@ class UserManager(BaseUserManager):
     create_user.alters_data = True
 
     async def acreate_user(self, username, email=None, password=None, **extra_fields):
-        extra_fields.setdefault("is_staff", False)
-        extra_fields.setdefault("is_superuser", False)
-        return await self._acreate_user(username, email, password, **extra_fields)
+        pass
 
     acreate_user.alters_data = True
 
@@ -204,44 +199,14 @@ class UserManager(BaseUserManager):
     async def acreate_superuser(
         self, username, email=None, password=None, **extra_fields
     ):
-        extra_fields.setdefault("is_staff", True)
-        extra_fields.setdefault("is_superuser", True)
-
-        if extra_fields.get("is_staff") is not True:
-            raise ValueError("Superuser must have is_staff=True.")
-        if extra_fields.get("is_superuser") is not True:
-            raise ValueError("Superuser must have is_superuser=True.")
-
-        return await self._acreate_user(username, email, password, **extra_fields)
+        pass
 
     acreate_superuser.alters_data = True
 
     def with_perm(
         self, perm, is_active=True, include_superusers=True, backend=None, obj=None
     ):
-        if backend is None:
-            backends = auth.get_backends()
-            if len(backends) == 1:
-                backend = backends[0]
-            else:
-                raise ValueError(
-                    "You have multiple authentication backends configured and "
-                    "therefore must provide the `backend` argument."
-                )
-        elif not isinstance(backend, str):
-            raise TypeError(
-                "backend must be a dotted import path string (got %r)." % backend
-            )
-        else:
-            backend = auth.load_backend(backend)
-        if hasattr(backend, "with_perm"):
-            return backend.with_perm(
-                perm,
-                is_active=is_active,
-                include_superusers=include_superusers,
-                obj=obj,
-            )
-        return self.none()
+        pass
 
 
 # A few helper functions for common logic between User and AnonymousUser.
@@ -308,15 +273,7 @@ def _user_has_module_perms(user, app_label):
 
 async def _auser_has_module_perms(user, app_label):
     """See _user_has_module_perms()"""
-    for backend in auth.get_backends():
-        if not hasattr(backend, "ahas_module_perms"):
-            continue
-        try:
-            if await backend.ahas_module_perms(user, app_label):
-                return True
-        except PermissionDenied:
-            return False
-    return False
+    pass
 
 
 class PermissionsMixin(models.Model):
@@ -441,11 +398,7 @@ class PermissionsMixin(models.Model):
 
     async def ahas_module_perms(self, app_label):
         """See has_module_perms()"""
-        # Active superusers have all permissions.
-        if self.is_active and self.is_superuser:
-            return True
-
-        return await _auser_has_module_perms(self, app_label)
+        pass
 
 
 class AbstractUser(AbstractBaseUser, PermissionsMixin):
@@ -507,16 +460,15 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         """
         Return the first_name plus the last_name, with a space in between.
         """
-        full_name = "%s %s" % (self.first_name, self.last_name)
-        return full_name.strip()
+        pass
 
     def get_short_name(self):
         """Return the short name for the user."""
-        return self.first_name
+        pass
 
     def email_user(self, subject, message, from_email=None, **kwargs):
         """Send an email to this user."""
-        send_mail(subject, message, from_email, [self.email], **kwargs)
+        pass
 
 
 class User(AbstractUser):
@@ -582,7 +534,7 @@ class AnonymousUser:
 
     @property
     def user_permissions(self):
-        return self._user_permissions
+        pass
 
     def get_user_permissions(self, obj=None):
         return _user_get_permissions(self, obj, "user")
@@ -625,15 +577,15 @@ class AnonymousUser:
         return _user_has_module_perms(self, module)
 
     async def ahas_module_perms(self, module):
-        return await _auser_has_module_perms(self, module)
+        pass
 
     @property
     def is_anonymous(self):
-        return True
+        pass
 
     @property
     def is_authenticated(self):
-        return False
+        pass
 
     def get_username(self):
         return self.username

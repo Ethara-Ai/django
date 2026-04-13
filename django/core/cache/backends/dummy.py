@@ -16,11 +16,10 @@ class DummyCache(BaseCache):
         return default
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        self.make_and_validate_key(key, version=version)
+        pass
 
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
-        self.make_and_validate_key(key, version=version)
-        return False
+        pass
 
     def delete(self, key, version=None):
         self.make_and_validate_key(key, version=version)

@@ -147,145 +147,85 @@ E026 = Error(
 
 
 def _security_middleware():
-    return "django.middleware.security.SecurityMiddleware" in settings.MIDDLEWARE
+    pass
 
 
 def _xframe_middleware():
-    return (
-        "django.middleware.clickjacking.XFrameOptionsMiddleware" in settings.MIDDLEWARE
-    )
+    pass
 
 
 @register(Tags.security, deploy=True)
 def check_security_middleware(app_configs, **kwargs):
-    passed_check = _security_middleware()
-    return [] if passed_check else [W001]
+    pass
 
 
 @register(Tags.security, deploy=True)
 def check_xframe_options_middleware(app_configs, **kwargs):
-    passed_check = _xframe_middleware()
-    return [] if passed_check else [W002]
+    pass
 
 
 @register(Tags.security, deploy=True)
 def check_sts(app_configs, **kwargs):
-    passed_check = not _security_middleware() or settings.SECURE_HSTS_SECONDS
-    return [] if passed_check else [W004]
+    pass
 
 
 @register(Tags.security, deploy=True)
 def check_sts_include_subdomains(app_configs, **kwargs):
-    passed_check = (
-        not _security_middleware()
-        or not settings.SECURE_HSTS_SECONDS
-        or settings.SECURE_HSTS_INCLUDE_SUBDOMAINS is True
-    )
-    return [] if passed_check else [W005]
+    pass
 
 
 @register(Tags.security, deploy=True)
 def check_sts_preload(app_configs, **kwargs):
-    passed_check = (
-        not _security_middleware()
-        or not settings.SECURE_HSTS_SECONDS
-        or settings.SECURE_HSTS_PRELOAD is True
-    )
-    return [] if passed_check else [W021]
+    pass
 
 
 @register(Tags.security, deploy=True)
 def check_content_type_nosniff(app_configs, **kwargs):
-    passed_check = (
-        not _security_middleware() or settings.SECURE_CONTENT_TYPE_NOSNIFF is True
-    )
-    return [] if passed_check else [W006]
+    pass
 
 
 @register(Tags.security, deploy=True)
 def check_ssl_redirect(app_configs, **kwargs):
-    passed_check = not _security_middleware() or settings.SECURE_SSL_REDIRECT is True
-    return [] if passed_check else [W008]
+    pass
 
 
 def _check_secret_key(secret_key):
-    return (
-        len(set(secret_key)) >= SECRET_KEY_MIN_UNIQUE_CHARACTERS
-        and len(secret_key) >= SECRET_KEY_MIN_LENGTH
-        and not secret_key.startswith(SECRET_KEY_INSECURE_PREFIX)
-    )
+    pass
 
 
 @register(Tags.security, deploy=True)
 def check_secret_key(app_configs, **kwargs):
-    try:
-        secret_key = settings.SECRET_KEY
-    except (ImproperlyConfigured, AttributeError):
-        passed_check = False
-    else:
-        passed_check = _check_secret_key(secret_key)
-    return [] if passed_check else [W009]
+    pass
 
 
 @register(Tags.security, deploy=True)
 def check_secret_key_fallbacks(app_configs, **kwargs):
-    warnings = []
-    try:
-        fallbacks = settings.SECRET_KEY_FALLBACKS
-    except (ImproperlyConfigured, AttributeError):
-        warnings.append(Warning(W025.msg % "SECRET_KEY_FALLBACKS", id=W025.id))
-    else:
-        for index, key in enumerate(fallbacks):
-            if not _check_secret_key(key):
-                warnings.append(
-                    Warning(W025.msg % f"SECRET_KEY_FALLBACKS[{index}]", id=W025.id)
-                )
-    return warnings
+    pass
 
 
 @register(Tags.security, deploy=True)
 def check_debug(app_configs, **kwargs):
-    passed_check = not settings.DEBUG
-    return [] if passed_check else [W018]
+    pass
 
 
 @register(Tags.security, deploy=True)
 def check_xframe_deny(app_configs, **kwargs):
-    passed_check = not _xframe_middleware() or settings.X_FRAME_OPTIONS == "DENY"
-    return [] if passed_check else [W019]
+    pass
 
 
 @register(Tags.security, deploy=True)
 def check_allowed_hosts(app_configs, **kwargs):
-    return [] if settings.ALLOWED_HOSTS else [W020]
+    pass
 
 
 @register(Tags.security, deploy=True)
 def check_referrer_policy(app_configs, **kwargs):
-    if _security_middleware():
-        if settings.SECURE_REFERRER_POLICY is None:
-            return [W022]
-        # Support a comma-separated string or iterable of values to allow
-        # fallback.
-        if isinstance(settings.SECURE_REFERRER_POLICY, str):
-            values = {v.strip() for v in settings.SECURE_REFERRER_POLICY.split(",")}
-        else:
-            values = set(settings.SECURE_REFERRER_POLICY)
-        if not values <= REFERRER_POLICY_VALUES:
-            return [E023]
-    return []
+    pass
 
 
 @register(Tags.security, deploy=True)
 def check_cross_origin_opener_policy(app_configs, **kwargs):
-    if (
-        _security_middleware()
-        and settings.SECURE_CROSS_ORIGIN_OPENER_POLICY is not None
-        and settings.SECURE_CROSS_ORIGIN_OPENER_POLICY
-        not in CROSS_ORIGIN_OPENER_POLICY_VALUES
-    ):
-        return [E024]
-    return []
+    pass
 
 
 @register(Tags.security)
@@ -295,10 +235,4 @@ def check_csp_settings(app_configs, **kwargs):
 
     Ensures both SECURE_CSP and SECURE_CSP_REPORT_ONLY are dictionaries.
     """
-    # CSP settings must be a dictionary or None.
-    return [
-        Error(E026.msg % (name, value), id=E026.id)
-        for name in ("SECURE_CSP", "SECURE_CSP_REPORT_ONLY")
-        if (value := getattr(settings, name, None)) is not None
-        and not isinstance(value, dict)
-    ]
+    pass

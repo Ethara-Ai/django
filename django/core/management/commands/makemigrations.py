@@ -97,7 +97,7 @@ class Command(BaseCommand):
 
     @property
     def log_output(self):
-        return self.stderr if self.scriptable else self.stdout
+        pass
 
     def log(self, msg):
         self.log_output.write(msg)
@@ -430,7 +430,7 @@ class Command(BaseCommand):
                 merge_migrations.append(migration)
 
             def all_items_equal(seq):
-                return all(item == seq[0] for item in seq[1:])
+                pass
 
             merge_migrations_generations = zip(*(m.ancestry for m in merge_migrations))
             common_ancestor_count = sum(

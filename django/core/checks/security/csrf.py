@@ -21,45 +21,19 @@ W016 = Warning(
 
 
 def _csrf_middleware():
-    return "django.middleware.csrf.CsrfViewMiddleware" in settings.MIDDLEWARE
+    pass
 
 
 @register(Tags.security, deploy=True)
 def check_csrf_middleware(app_configs, **kwargs):
-    passed_check = _csrf_middleware()
-    return [] if passed_check else [W003]
+    pass
 
 
 @register(Tags.security, deploy=True)
 def check_csrf_cookie_secure(app_configs, **kwargs):
-    passed_check = (
-        settings.CSRF_USE_SESSIONS
-        or not _csrf_middleware()
-        or settings.CSRF_COOKIE_SECURE is True
-    )
-    return [] if passed_check else [W016]
+    pass
 
 
 @register(Tags.security)
 def check_csrf_failure_view(app_configs, **kwargs):
-    from django.middleware.csrf import _get_failure_view
-
-    errors = []
-    try:
-        view = _get_failure_view()
-    except ImportError:
-        msg = (
-            "The CSRF failure view '%s' could not be imported."
-            % settings.CSRF_FAILURE_VIEW
-        )
-        errors.append(Error(msg, id="security.E102"))
-    else:
-        try:
-            signature(view).bind(None, reason=None)
-        except TypeError:
-            msg = (
-                "The CSRF failure view '%s' does not take the correct number of "
-                "arguments." % settings.CSRF_FAILURE_VIEW
-            )
-            errors.append(Error(msg, id="security.E101"))
-    return errors
+    pass

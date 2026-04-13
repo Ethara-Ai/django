@@ -101,23 +101,22 @@ class Field(GDALBase):
     @property
     def name(self):
         "Return the name of this Field."
-        name = capi.get_field_name(self.ptr)
-        return force_str(name, encoding=self._feat.encoding, strings_only=True)
+        pass
 
     @property
     def precision(self):
         "Return the precision of this Field."
-        return capi.get_field_precision(self.ptr)
+        pass
 
     @property
     def type(self):
         "Return the OGR type of this Field."
-        return capi.get_field_type(self.ptr)
+        pass
 
     @property
     def type_name(self):
         "Return the OGR field type name for this Field."
-        return capi.get_field_type_name(self.type)
+        pass
 
     @property
     def value(self):
@@ -128,7 +127,7 @@ class Field(GDALBase):
     @property
     def width(self):
         "Return the width of this Field."
-        return capi.get_field_width(self.ptr)
+        pass
 
 
 # ### The Field sub-classes for each OGR Field type. ###
@@ -147,7 +146,7 @@ class OFTInteger(Field):
         shapefiles -- forcing the type here since the underlying field
         type may actually be OFTReal.
         """
-        return 0
+        pass
 
 
 class OFTReal(Field):

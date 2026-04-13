@@ -99,16 +99,14 @@ class DatabaseCache(BaseDatabaseCache):
         return result
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_and_validate_key(key, version=version)
-        self._base_set("set", key, value, timeout)
+        pass
 
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_and_validate_key(key, version=version)
         return self._base_set("add", key, value, timeout)
 
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_and_validate_key(key, version=version)
-        return self._base_set("touch", key, None, timeout)
+        pass
 
     def _base_set(self, mode, key, value, timeout=DEFAULT_TIMEOUT):
         timeout = self.get_backend_timeout(timeout)
@@ -209,8 +207,7 @@ class DatabaseCache(BaseDatabaseCache):
         return self._base_delete_many([key])
 
     def delete_many(self, keys, version=None):
-        keys = [self.make_and_validate_key(key, version=version) for key in keys]
-        self._base_delete_many(keys)
+        pass
 
     def _base_delete_many(self, keys):
         if not keys:

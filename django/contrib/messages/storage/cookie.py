@@ -16,14 +16,7 @@ class MessageEncoder(json.JSONEncoder):
     message_key = "__json_message"
 
     def default(self, obj):
-        if isinstance(obj, Message):
-            # Using 0/1 here instead of False/True to produce more compact json
-            is_safedata = 1 if isinstance(obj.message, SafeData) else 0
-            message = [self.message_key, is_safedata, obj.level, obj.message]
-            if obj.extra_tags is not None:
-                message.append(obj.extra_tags)
-            return message
-        return super().default(obj)
+        pass
 
 
 class MessageDecoder(json.JSONDecoder):
@@ -192,8 +185,7 @@ class CookieStorage(BaseStorage):
 
         Proxies MessagePartSerializer.dumps and _encoded_parts.
         """
-        serialized_messages = MessagePartSerializer().dumps(messages)
-        return self._encode_parts(serialized_messages, encode_empty=encode_empty)
+        pass
 
     def _decode(self, data):
         """

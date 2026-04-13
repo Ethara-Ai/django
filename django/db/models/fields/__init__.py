@@ -87,7 +87,7 @@ BLANK_CHOICE_DASH = [("", "---------")]
 
 
 def _load_field(app_label, model_name, field_name):
-    return apps.get_model(app_label, model_name)._meta.get_field(field_name)
+    pass
 
 
 # A guide to Field parameters:
@@ -107,13 +107,11 @@ def _load_field(app_label, model_name, field_name):
 
 
 def _empty(of_cls):
-    new = Empty()
-    new.__class__ = of_cls
-    return new
+    pass
 
 
 def return_None():
-    return None
+    pass
 
 
 @total_ordering
@@ -176,9 +174,7 @@ class Field(RegisterLookupMixin):
 
     # Generic field type description, usually overridden by subclasses
     def _description(self):
-        return _("Field of type: %(field_type)s") % {
-            "field_type": self.__class__.__name__
-        }
+        pass
 
     description = property(_description)
 
@@ -574,17 +570,15 @@ class Field(RegisterLookupMixin):
 
     @property
     def choices(self):
-        return self._choices
+        pass
 
     @choices.setter
     def choices(self, value):
-        self._choices = normalize_choices(value)
+        pass
 
     @cached_property
     def cached_col(self):
-        from django.db.models.expressions import Col
-
-        return Col(self.model._meta.db_table, self)
+        pass
 
     def select_format(self, compiler, sql, params):
         """
@@ -797,11 +791,7 @@ class Field(RegisterLookupMixin):
 
     @cached_property
     def error_messages(self):
-        messages = {}
-        for c in reversed(self.__class__.__mro__):
-            messages.update(getattr(c, "default_error_messages", {}))
-        messages.update(self._error_messages or {})
-        return messages
+        pass
 
     @cached_property
     def validators(self):
@@ -809,7 +799,7 @@ class Field(RegisterLookupMixin):
         Some validators can't be created at field initialization time.
         This method provides a way to delay their creation until required.
         """
-        return [*self.default_validators, *self._validators]
+        pass
 
     def run_validators(self, value):
         if value in self.empty_values:
@@ -959,12 +949,12 @@ class Field(RegisterLookupMixin):
 
     @property
     def db_tablespace(self):
-        return self._db_tablespace or settings.DEFAULT_INDEX_TABLESPACE
+        pass
 
     @property
     def db_returning(self):
         """Private API intended only to be used by Django itself."""
-        return self.has_db_default()
+        pass
 
     def set_attributes_from_name(self, name):
         self.name = self.name or name
@@ -1078,12 +1068,7 @@ class Field(RegisterLookupMixin):
 
     @cached_property
     def _db_default_expression(self):
-        db_default = self.db_default
-        if self.has_db_default() and not hasattr(db_default, "resolve_expression"):
-            from django.db.models.expressions import Value
-
-            db_default = Value(db_default, self)
-        return db_default
+        pass
 
     def get_choices(
         self,
@@ -1124,7 +1109,7 @@ class Field(RegisterLookupMixin):
     @property
     def flatchoices(self):
         """Flattened version of choices tuple."""
-        return list(flatten_choices(self.choices))
+        pass
 
     def save_form_data(self, instance, data):
         setattr(instance, self.name, data)
@@ -1242,10 +1227,7 @@ class CharField(Field):
 
     @property
     def description(self):
-        if self.max_length is not None:
-            return _("String (up to %(max_length)s)")
-        else:
-            return _("String (unlimited)")
+        pass
 
     def check(self, **kwargs):
         databases = kwargs.get("databases") or []
@@ -1860,14 +1842,11 @@ class DecimalField(Field):
 
     @cached_property
     def validators(self):
-        return [
-            *super().validators,
-            validators.DecimalValidator(self.max_digits, self.decimal_places),
-        ]
+        pass
 
     @cached_property
     def context(self):
-        return decimal.Context(prec=self.max_digits)
+        pass
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
@@ -2158,36 +2137,7 @@ class IntegerField(Field):
     def validators(self):
         # These validators can't be added at field initialization time since
         # they're based on values retrieved from `connection`.
-        validators_ = super().validators
-        internal_type = self.get_internal_type()
-        min_value, max_value = connection.ops.integer_field_range(internal_type)
-        if min_value is not None and not any(
-            (
-                isinstance(validator, validators.MinValueValidator)
-                and (
-                    validator.limit_value()
-                    if callable(validator.limit_value)
-                    else validator.limit_value
-                )
-                >= min_value
-            )
-            for validator in validators_
-        ):
-            validators_.append(validators.MinValueValidator(min_value))
-        if max_value is not None and not any(
-            (
-                isinstance(validator, validators.MaxValueValidator)
-                and (
-                    validator.limit_value()
-                    if callable(validator.limit_value)
-                    else validator.limit_value
-                )
-                <= max_value
-            )
-            for validator in validators_
-        ):
-            validators_.append(validators.MaxValueValidator(max_value))
-        return validators_
+        pass
 
     def get_prep_value(self, value):
         value = super().get_prep_value(value)
@@ -2926,7 +2876,7 @@ class AutoFieldMeta(type):
 
     @property
     def _subclasses(self):
-        return (BigAutoField, SmallAutoField)
+        pass
 
     def __instancecheck__(self, instance):
         return isinstance(instance, self._subclasses) or super().__instancecheck__(

@@ -18,48 +18,20 @@ task_started = Signal()
 @receiver(setting_changed)
 def clear_tasks_handlers(*, setting, **kwargs):
     """Reset the connection handler whenever the settings change."""
-    if setting == "TASKS":
-        from . import task_backends
-
-        task_backends._settings = task_backends.settings = (
-            task_backends.configure_settings(None)
-        )
-        task_backends._connections = Local()
+    pass
 
 
 @receiver(task_enqueued)
 def log_task_enqueued(sender, task_result, **kwargs):
-    logger.debug(
-        "Task id=%s path=%s enqueued backend=%s",
-        task_result.id,
-        task_result.task.module_path,
-        task_result.backend,
-    )
+    pass
 
 
 @receiver(task_started)
 def log_task_started(sender, task_result, **kwargs):
-    logger.info(
-        "Task id=%s path=%s state=%s",
-        task_result.id,
-        task_result.task.module_path,
-        task_result.status,
-    )
+    pass
 
 
 @receiver(task_finished)
 def log_task_finished(sender, task_result, **kwargs):
     # Signal is sent inside exception handlers, so exc_info() is available.
-    exc_info = sys.exc_info()
-    logger.log(
-        (
-            logging.ERROR
-            if task_result.status == TaskResultStatus.FAILED
-            else logging.INFO
-        ),
-        "Task id=%s path=%s state=%s",
-        task_result.id,
-        task_result.task.module_path,
-        task_result.status,
-        exc_info=exc_info if exc_info[0] else None,
-    )
+    pass

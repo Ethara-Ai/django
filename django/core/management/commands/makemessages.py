@@ -79,10 +79,7 @@ class BuildFile:
 
     @cached_property
     def is_templatized(self):
-        if self.domain == "django":
-            file_ext = os.path.splitext(self.translatable.file)[1]
-            return file_ext != ".py"
-        return False
+        pass
 
     @cached_property
     def path(self):
@@ -94,10 +91,7 @@ class BuildFile:
         Path to a file which is being fed into GNU gettext pipeline. This may
         be either a translatable or its preprocessed version.
         """
-        if not self.is_templatized:
-            return self.path
-        filename = f"{self.translatable.file}.py"
-        return os.path.join(self.translatable.dirpath, filename)
+        pass
 
     def preprocess(self):
         """
@@ -474,25 +468,11 @@ class Command(BaseCommand):
         # Gettext tools will output system-encoded bytestrings instead of
         # UTF-8, when looking up the version. It's especially a problem on
         # Windows.
-        out, err, status = popen_wrapper(
-            ["xgettext", "--version"],
-            stdout_encoding=DEFAULT_LOCALE_ENCODING,
-        )
-        m = re.search(r"(\d+)\.(\d+)\.?(\d+)?", out)
-        if m:
-            return tuple(int(d) for d in m.groups() if d is not None)
-        else:
-            raise CommandError("Unable to get gettext version. Is it installed?")
+        pass
 
     @cached_property
     def settings_available(self):
-        try:
-            settings.LOCALE_PATHS
-        except ImproperlyConfigured:
-            if self.verbosity > 1:
-                self.stderr.write("Running without configured settings.")
-            return False
-        return True
+        pass
 
     def build_potfiles(self):
         """

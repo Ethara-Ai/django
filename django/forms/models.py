@@ -719,52 +719,17 @@ class BaseModelFormSet(BaseFormSet, AltersData):
         return super().initial_form_count()
 
     def _existing_object(self, pk):
-        if not hasattr(self, "_object_dict"):
-            self._object_dict = {o.pk: o for o in self.get_queryset()}
-        return self._object_dict.get(pk)
+        pass
 
     def _get_to_python(self, field):
         """
         If the field is a related field, fetch the concrete field's (that
         is, the ultimate pointed-to field's) to_python.
         """
-        while field.remote_field is not None:
-            field = field.remote_field.get_related_field()
-        return field.to_python
+        pass
 
     def _construct_form(self, i, **kwargs):
-        pk_required = i < self.initial_form_count()
-        if pk_required:
-            if self.is_bound:
-                pk_key = "%s-%s" % (self.add_prefix(i), self.model._meta.pk.name)
-                try:
-                    pk = self.data[pk_key]
-                except KeyError:
-                    # The primary key is missing. The user may have tampered
-                    # with POST data.
-                    pass
-                else:
-                    to_python = self._get_to_python(self.model._meta.pk)
-                    try:
-                        pk = to_python(pk)
-                    except ValidationError:
-                        # The primary key exists but is an invalid value. The
-                        # user may have tampered with POST data.
-                        pass
-                    else:
-                        kwargs["instance"] = self._existing_object(pk)
-            else:
-                kwargs["instance"] = self.get_queryset()[i]
-        elif self.initial_extra:
-            # Set initial values for extra forms
-            try:
-                kwargs["initial"] = self.initial_extra[i - self.initial_form_count()]
-            except IndexError:
-                pass
-        form = super()._construct_form(i, **kwargs)
-        if pk_required:
-            form.fields[self.model._meta.pk.name].required = True
-        return form
+        pass
 
     def get_queryset(self):
         if not hasattr(self, "_queryset"):
@@ -1147,27 +1112,7 @@ class BaseInlineFormSet(BaseModelFormSet):
         return super().initial_form_count()
 
     def _construct_form(self, i, **kwargs):
-        form = super()._construct_form(i, **kwargs)
-        if self.save_as_new:
-            mutable = getattr(form.data, "_mutable", None)
-            # Allow modifying an immutable QueryDict.
-            if mutable is not None:
-                form.data._mutable = True
-            # Remove the primary key from the form's data, we are only
-            # creating new instances
-            form.data[form.add_prefix(self._pk_field.name)] = None
-            # Remove the foreign key from the form's data
-            form.data[form.add_prefix(self.fk.name)] = None
-            if mutable is not None:
-                form.data._mutable = mutable
-
-        # Set the fk value here so that the form can do its validation.
-        fk_value = self.instance.pk
-        if self.fk.remote_field.field_name != self.fk.remote_field.model._meta.pk.name:
-            fk_value = getattr(self.instance, self.fk.remote_field.field_name)
-            fk_value = getattr(fk_value, "pk", fk_value)
-        setattr(form.instance, self.fk.attname, fk_value)
-        return form
+        pass
 
     @classmethod
     def get_default_prefix(cls):
@@ -1538,8 +1483,7 @@ class ModelChoiceField(ChoiceField):
         return self._queryset
 
     def _set_queryset(self, queryset):
-        self._queryset = None if queryset is None else queryset.all()
-        self.widget.choices = self.choices
+        pass
 
     queryset = property(_get_queryset, _set_queryset)
 
@@ -1556,17 +1500,7 @@ class ModelChoiceField(ChoiceField):
     def _get_choices(self):
         # If self._choices is set, then somebody must have manually set
         # the property self.choices. In this case, just return self._choices.
-        if hasattr(self, "_choices"):
-            return self._choices
-
-        # Otherwise, execute the QuerySet in self.queryset to determine the
-        # choices dynamically. Return a fresh ModelChoiceIterator that has not
-        # been consumed. Note that we're instantiating a new
-        # ModelChoiceIterator *each* time _get_choices() is called (and, thus,
-        # each time self.choices is accessed) so that we can ensure the
-        # QuerySet has not been consumed. This construct might look complicated
-        # but it allows for lazy evaluation of the queryset.
-        return self.iterator(self)
+        pass
 
     choices = property(_get_choices, ChoiceField.choices.fset)
 

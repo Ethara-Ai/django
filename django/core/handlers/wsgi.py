@@ -80,32 +80,26 @@ class WSGIRequest(HttpRequest):
         self.resolver_match = None
 
     def _get_scheme(self):
-        return self.environ.get("wsgi.url_scheme")
+        pass
 
     @cached_property
     def GET(self):
         # The WSGI spec says 'QUERY_STRING' may be absent.
-        raw_query_string = get_bytes_from_wsgi(self.environ, "QUERY_STRING", "")
-        return QueryDict(raw_query_string, encoding=self._encoding)
+        pass
 
     def _get_post(self):
-        if not hasattr(self, "_post"):
-            self._load_post_and_files()
-        return self._post
+        pass
 
     def _set_post(self, post):
-        self._post = post
+        pass
 
     @cached_property
     def COOKIES(self):
-        raw_cookie = get_str_from_wsgi(self.environ, "HTTP_COOKIE", "")
-        return parse_cookie(raw_cookie)
+        pass
 
     @property
     def FILES(self):
-        if not hasattr(self, "_files"):
-            self._load_post_and_files()
-        return self._files
+        pass
 
     POST = property(_get_post, _set_post)
 
@@ -203,5 +197,4 @@ def get_str_from_wsgi(environ, key, default):
 
     key and default should be str objects.
     """
-    value = get_bytes_from_wsgi(environ, key, default)
-    return value.decode(errors="replace")
+    pass

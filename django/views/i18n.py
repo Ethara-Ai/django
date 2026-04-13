@@ -38,40 +38,7 @@ def set_language(request):
     redirect to the page in the request (the 'next' parameter) without changing
     any state.
     """
-    next_url = request.POST.get("next", request.GET.get("next"))
-    if (
-        next_url or request.accepts("text/html")
-    ) and not url_has_allowed_host_and_scheme(
-        url=next_url,
-        allowed_hosts={request.get_host()},
-        require_https=request.is_secure(),
-    ):
-        next_url = request.META.get("HTTP_REFERER")
-        if not url_has_allowed_host_and_scheme(
-            url=next_url,
-            allowed_hosts={request.get_host()},
-            require_https=request.is_secure(),
-        ):
-            next_url = "/"
-    response = HttpResponseRedirect(next_url) if next_url else HttpResponse(status=204)
-    if request.method == "POST":
-        lang_code = request.POST.get(LANGUAGE_QUERY_PARAMETER)
-        if lang_code and check_for_language(lang_code):
-            if next_url:
-                next_trans = translate_url(next_url, lang_code)
-                if next_trans != next_url:
-                    response = HttpResponseRedirect(next_trans)
-            response.set_cookie(
-                settings.LANGUAGE_COOKIE_NAME,
-                lang_code,
-                max_age=settings.LANGUAGE_COOKIE_AGE,
-                path=settings.LANGUAGE_COOKIE_PATH,
-                domain=settings.LANGUAGE_COOKIE_DOMAIN,
-                secure=settings.LANGUAGE_COOKIE_SECURE,
-                httponly=settings.LANGUAGE_COOKIE_HTTPONLY,
-                samesite=settings.LANGUAGE_COOKIE_SAMESITE,
-            )
-    return response
+    pass
 
 
 def get_formats():
@@ -146,10 +113,7 @@ class JavaScriptCatalog(View):
         Return the number of plurals for this catalog language, or 2 if no
         plural string is available.
         """
-        match = re.search(r"nplurals=\s*(\d+)", self._plural_string or "")
-        if match:
-            return int(match[1])
-        return 2
+        pass
 
     @property
     def _plural_string(self):
@@ -157,11 +121,7 @@ class JavaScriptCatalog(View):
         Return the plural string (including nplurals) for this catalog
         language, or None if no plural string is available.
         """
-        if "" in self.translation._catalog:
-            for line in self.translation._catalog[""].split("\n"):
-                if line.startswith("Plural-Forms:"):
-                    return line.split(":", 1)[1].strip()
-        return None
+        pass
 
     def get_plural(self):
         plural = self._plural_string

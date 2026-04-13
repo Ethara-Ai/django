@@ -41,10 +41,7 @@ def _multi_decorate(decorators, method):
         # 'self' argument, but it's a closure over self so it can call
         # 'func'. Also, wrap method.__get__() in a function because new
         # attributes can't be set on bound method objects, only on functions.
-        bound_method = wraps(method)(partial(method.__get__(self, type(self))))
-        for dec in decorators:
-            bound_method = dec(bound_method)
-        return bound_method(*args, **kwargs)
+        pass
 
     # Copy any attributes that a decorator adds to the function it decorates.
     for dec in decorators:
@@ -68,22 +65,7 @@ def method_decorator(decorator, name=""):
     # defined on. If 'obj' is a class, the 'name' is required to be the name
     # of the method that will be decorated.
     def _dec(obj):
-        if not isinstance(obj, type):
-            return _multi_decorate(decorator, obj)
-        if not (name and hasattr(obj, name)):
-            raise ValueError(
-                "The keyword argument `name` must be the name of a method "
-                "of the decorated class: %s. Got '%s' instead." % (obj, name)
-            )
-        method = getattr(obj, name)
-        if not callable(method):
-            raise TypeError(
-                "Cannot decorate '%s' as it isn't a callable attribute of "
-                "%s (%s)." % (name, obj, method)
-            )
-        _wrapper = _multi_decorate(decorator, method)
-        setattr(obj, name, _wrapper)
-        return obj
+        pass
 
     # Don't worry about making _dec look similar to a list/tuple as it's rather
     # meaningless.
@@ -122,81 +104,7 @@ def decorator_from_middleware(middleware_class):
 
 def make_middleware_decorator(middleware_class):
     def _make_decorator(*m_args, **m_kwargs):
-        def _decorator(view_func):
-            middleware = middleware_class(view_func, *m_args, **m_kwargs)
-
-            def _pre_process_request(request, *args, **kwargs):
-                if hasattr(middleware, "process_request"):
-                    result = middleware.process_request(request)
-                    if result is not None:
-                        return result
-                if hasattr(middleware, "process_view"):
-                    result = middleware.process_view(request, view_func, args, kwargs)
-                    if result is not None:
-                        return result
-                return None
-
-            def _process_exception(request, exception):
-                if hasattr(middleware, "process_exception"):
-                    result = middleware.process_exception(request, exception)
-                    if result is not None:
-                        return result
-                raise
-
-            def _post_process_request(request, response):
-                if hasattr(response, "render") and callable(response.render):
-                    if hasattr(middleware, "process_template_response"):
-                        response = middleware.process_template_response(
-                            request, response
-                        )
-                    # Defer running of process_response until after the
-                    # template has been rendered:
-                    if hasattr(middleware, "process_response"):
-
-                        def callback(response):
-                            return middleware.process_response(request, response)
-
-                        response.add_post_render_callback(callback)
-                else:
-                    if hasattr(middleware, "process_response"):
-                        return middleware.process_response(request, response)
-                return response
-
-            if iscoroutinefunction(view_func):
-
-                async def _view_wrapper(request, *args, **kwargs):
-                    result = _pre_process_request(request, *args, **kwargs)
-                    if result is not None:
-                        return result
-
-                    try:
-                        response = await view_func(request, *args, **kwargs)
-                    except Exception as e:
-                        result = _process_exception(request, e)
-                        if result is not None:
-                            return result
-
-                    return _post_process_request(request, response)
-
-            else:
-
-                def _view_wrapper(request, *args, **kwargs):
-                    result = _pre_process_request(request, *args, **kwargs)
-                    if result is not None:
-                        return result
-
-                    try:
-                        response = view_func(request, *args, **kwargs)
-                    except Exception as e:
-                        result = _process_exception(request, e)
-                        if result is not None:
-                            return result
-
-                    return _post_process_request(request, response)
-
-            return wraps(view_func)(_view_wrapper)
-
-        return _decorator
+        pass
 
     return _make_decorator
 
@@ -206,9 +114,7 @@ def sync_and_async_middleware(func):
     Mark a middleware factory as returning a hybrid middleware supporting both
     types of request.
     """
-    func.sync_capable = True
-    func.async_capable = True
-    return func
+    pass
 
 
 def sync_only_middleware(func):
@@ -216,13 +122,9 @@ def sync_only_middleware(func):
     Mark a middleware factory as returning a sync middleware.
     This is the default.
     """
-    func.sync_capable = True
-    func.async_capable = False
-    return func
+    pass
 
 
 def async_only_middleware(func):
     """Mark a middleware factory as returning an async middleware."""
-    func.sync_capable = False
-    func.async_capable = True
-    return func
+    pass

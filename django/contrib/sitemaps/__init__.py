@@ -78,7 +78,7 @@ class Sitemap:
         return []
 
     def location(self, item):
-        return item.get_absolute_url()
+        pass
 
     def get_protocol(self, protocol=None):
         # Determine protocol

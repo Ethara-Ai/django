@@ -60,13 +60,11 @@ class AppConfig:
 
     @cached_property
     def default_auto_field(self):
-        from django.conf import settings
-
-        return settings.DEFAULT_AUTO_FIELD
+        pass
 
     @property
     def _is_default_auto_field_overridden(self):
-        return self.__class__.default_auto_field is not AppConfig.default_auto_field
+        pass
 
     def _path_from_module(self, module):
         """Attempt to determine app's filesystem path from its module."""

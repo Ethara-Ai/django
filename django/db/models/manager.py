@@ -84,7 +84,7 @@ class BaseManager:
         def create_method(name, method):
             @wraps(method)
             def manager_method(self, *args, **kwargs):
-                return getattr(self.get_queryset(), name)(*args, **kwargs)
+                pass
 
             return manager_method
 
@@ -141,7 +141,7 @@ class BaseManager:
 
     @property
     def db(self):
-        return self._db or router.db_for_read(self.model, **self._hints)
+        pass
 
     #######################
     # PROXIES TO QUERYSET #
@@ -161,7 +161,7 @@ class BaseManager:
         # copy, all the cached `prefetch_related` lookups are lost. See the
         # implementation of `RelatedManager.get_queryset()` for a better
         # understanding of how this comes into play.
-        return self.get_queryset()
+        pass
 
     def __eq__(self, other):
         return (

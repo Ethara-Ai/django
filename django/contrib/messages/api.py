@@ -45,7 +45,7 @@ def get_messages(request):
     Return the message storage on the request if it exists, otherwise return
     an empty list.
     """
-    return getattr(request, "_messages", [])
+    pass
 
 
 def get_level(request):
@@ -55,8 +55,7 @@ def get_level(request):
     The default level is the ``MESSAGE_LEVEL`` setting. If this is not found,
     use the ``INFO`` level.
     """
-    storage = getattr(request, "_messages", default_storage(request))
-    return storage.level
+    pass
 
 
 def set_level(request, level):
@@ -66,10 +65,7 @@ def set_level(request, level):
 
     If set to ``None``, use the default level (see the get_level() function).
     """
-    if not hasattr(request, "_messages"):
-        return False
-    request._messages.level = level
-    return True
+    pass
 
 
 def debug(request, message, extra_tags="", fail_silently=False):

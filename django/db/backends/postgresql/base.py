@@ -84,15 +84,11 @@ from .schema import DatabaseSchemaEditor  # NOQA isort:skip
 
 
 def _get_varchar_column(data):
-    if data["max_length"] is None:
-        return "varchar"
-    return "varchar(%(max_length)s)" % data
+    pass
 
 
 def _get_decimal_column(data):
-    if data["max_digits"] is None and data["decimal_places"] is None:
-        return "numeric"
-    return "numeric(%(max_digits)s, %(decimal_places)s)" % data
+    pass
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):
@@ -192,44 +188,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @property
     def pool(self):
-        pool_options = self.settings_dict["OPTIONS"].get("pool")
-        if self.alias == NO_DB_ALIAS or not pool_options:
-            return None
-
-        if self.alias not in self._connection_pools:
-            if self.settings_dict.get("CONN_MAX_AGE", 0) != 0:
-                raise ImproperlyConfigured(
-                    "Pooling doesn't support persistent connections."
-                )
-            # Set the default options.
-            if pool_options is True:
-                pool_options = {}
-
-            try:
-                from psycopg_pool import ConnectionPool
-            except ImportError as err:
-                raise ImproperlyConfigured(
-                    "Error loading psycopg_pool module.\nDid you install psycopg[pool]?"
-                ) from err
-
-            connect_kwargs = self.get_connection_params()
-            # Ensure we run in autocommit, Django properly sets it later on.
-            connect_kwargs["autocommit"] = True
-            enable_checks = self.settings_dict["CONN_HEALTH_CHECKS"]
-            pool = ConnectionPool(
-                kwargs=connect_kwargs,
-                open=False,  # Do not open the pool during startup.
-                configure=self._configure_connection,
-                check=ConnectionPool.check_connection if enable_checks else None,
-                **pool_options,
-            )
-            # setdefault() ensures that multiple threads don't set this in
-            # parallel. Since we do not open the pool during it's init above,
-            # this means that at worst during startup multiple threads generate
-            # pool objects and the first to set it wins.
-            self._connection_pools.setdefault(self.alias, pool)
-
-        return self._connection_pools[self.alias]
+        pass
 
     def close_pool(self):
         if self.pool:
@@ -352,10 +311,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def ensure_timezone(self):
         # Close the pool so new connections pick up the correct timezone.
-        self.close_pool()
-        if self.connection is None:
-            return False
-        return self._configure_timezone(self.connection)
+        pass
 
     def _configure_timezone(self, connection):
         conn_timezone_name = connection.info.parameter_status("TimeZone")
@@ -448,7 +404,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return cursor
 
     def tzinfo_factory(self, offset):
-        return self.timezone
+        pass
 
     @async_unsafe
     def chunked_cursor(self):
@@ -549,8 +505,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @cached_property
     def pg_version(self):
-        with self.temporary_connection():
-            return self.connection.info.server_version
+        pass
 
     def make_debug_cursor(self, cursor):
         return CursorDebugWrapper(cursor, self)
@@ -612,9 +567,7 @@ else:
 
     class CursorDebugWrapper(BaseCursorDebugWrapper):
         def copy_expert(self, sql, file, *args):
-            with self.debug_sql(sql):
-                return self.cursor.copy_expert(sql, file, *args)
+            pass
 
         def copy_to(self, file, table, *args, **kwargs):
-            with self.debug_sql(sql="COPY %s TO STDOUT" % table):
-                return self.cursor.copy_to(file, table, *args, **kwargs)
+            pass

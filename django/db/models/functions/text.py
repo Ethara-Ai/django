@@ -7,36 +7,17 @@ from django.db.models.lookups import Transform
 
 class MySQLSHA2Mixin:
     def as_mysql(self, compiler, connection, **extra_context):
-        return super().as_sql(
-            compiler,
-            connection,
-            template="SHA2(%%(expressions)s, %s)" % self.function[3:],
-            **extra_context,
-        )
+        pass
 
 
 class OracleHashMixin:
     def as_oracle(self, compiler, connection, **extra_context):
-        return super().as_sql(
-            compiler,
-            connection,
-            template=(
-                "LOWER(RAWTOHEX(STANDARD_HASH(UTL_I18N.STRING_TO_RAW("
-                "%(expressions)s, 'AL32UTF8'), '%(function)s')))"
-            ),
-            **extra_context,
-        )
+        pass
 
 
 class PostgreSQLSHAMixin:
     def as_postgresql(self, compiler, connection, **extra_context):
-        return super().as_sql(
-            compiler,
-            connection,
-            template="ENCODE(DIGEST(%(expressions)s, '%(function)s'), 'hex')",
-            function=self.function.lower(),
-            **extra_context,
-        )
+        pass
 
 
 class Chr(Transform):
@@ -45,24 +26,13 @@ class Chr(Transform):
     output_field = CharField()
 
     def as_mysql(self, compiler, connection, **extra_context):
-        return super().as_sql(
-            compiler,
-            connection,
-            function="CHAR",
-            template="%(function)s(%(expressions)s USING utf16)",
-            **extra_context,
-        )
+        pass
 
     def as_oracle(self, compiler, connection, **extra_context):
-        return super().as_sql(
-            compiler,
-            connection,
-            template="%(function)s(%(expressions)s USING NCHAR_CS)",
-            **extra_context,
-        )
+        pass
 
     def as_sqlite(self, compiler, connection, **extra_context):
-        return super().as_sql(compiler, connection, function="CHAR", **extra_context)
+        pass
 
 
 class ConcatPair(Func):
@@ -74,52 +44,21 @@ class ConcatPair(Func):
     function = "CONCAT"
 
     def pipes_concat_sql(self, compiler, connection, **extra_context):
-        coalesced = self.coalesce()
-        return super(ConcatPair, coalesced).as_sql(
-            compiler,
-            connection,
-            template="(%(expressions)s)",
-            arg_joiner=" || ",
-            **extra_context,
-        )
+        pass
 
     as_sqlite = pipes_concat_sql
 
     def as_postgresql(self, compiler, connection, **extra_context):
-        c = self.copy()
-        c.set_source_expressions(
-            [
-                (
-                    expression
-                    if isinstance(expression.output_field, (CharField, TextField))
-                    else Cast(expression, TextField())
-                )
-                for expression in c.get_source_expressions()
-            ]
-        )
-        return c.pipes_concat_sql(compiler, connection, **extra_context)
+        pass
 
     def as_mysql(self, compiler, connection, **extra_context):
         # Use CONCAT_WS with an empty separator so that NULLs are ignored.
-        return super().as_sql(
-            compiler,
-            connection,
-            function="CONCAT_WS",
-            template="%(function)s('', %(expressions)s)",
-            **extra_context,
-        )
+        pass
 
     def coalesce(self):
         # null on either side results in null for expression, wrap with
         # coalesce
-        c = self.copy()
-        c.set_source_expressions(
-            [
-                Coalesce(expression, Value(""))
-                for expression in c.get_source_expressions()
-            ]
-        )
-        return c
+        pass
 
 
 class Concat(Func):
@@ -167,13 +106,13 @@ class Left(Func):
         super().__init__(expression, length, **extra)
 
     def get_substr(self):
-        return Substr(self.source_expressions[0], Value(1), self.source_expressions[1])
+        pass
 
     def as_oracle(self, compiler, connection, **extra_context):
-        return self.get_substr().as_oracle(compiler, connection, **extra_context)
+        pass
 
     def as_sqlite(self, compiler, connection, **extra_context):
-        return self.get_substr().as_sqlite(compiler, connection, **extra_context)
+        pass
 
 
 class Length(Transform):
@@ -184,9 +123,7 @@ class Length(Transform):
     output_field = IntegerField()
 
     def as_mysql(self, compiler, connection, **extra_context):
-        return super().as_sql(
-            compiler, connection, function="CHAR_LENGTH", **extra_context
-        )
+        pass
 
 
 class Lower(Transform):
@@ -224,10 +161,10 @@ class Ord(Transform):
     output_field = IntegerField()
 
     def as_mysql(self, compiler, connection, **extra_context):
-        return super().as_sql(compiler, connection, function="ORD", **extra_context)
+        pass
 
     def as_sqlite(self, compiler, connection, **extra_context):
-        return super().as_sql(compiler, connection, function="UNICODE", **extra_context)
+        pass
 
 
 class Repeat(Func):
@@ -244,10 +181,7 @@ class Repeat(Func):
         super().__init__(expression, number, **extra)
 
     def as_oracle(self, compiler, connection, **extra_context):
-        expression, number = self.source_expressions
-        length = None if number is None else Length(expression) * number
-        rpad = RPad(expression, length, expression)
-        return rpad.as_sql(compiler, connection, **extra_context)
+        pass
 
 
 class Replace(Func):
@@ -264,30 +198,14 @@ class Reverse(Transform):
     def as_oracle(self, compiler, connection, **extra_context):
         # REVERSE in Oracle is undocumented and doesn't support multi-byte
         # strings. Use a special subquery instead.
-        suffix = connection.features.bare_select_suffix
-        sql, params = super().as_sql(
-            compiler,
-            connection,
-            template=(
-                "(SELECT LISTAGG(s) WITHIN GROUP (ORDER BY n DESC) FROM "
-                f"(SELECT LEVEL n, SUBSTR(%(expressions)s, LEVEL, 1) s{suffix} "
-                "CONNECT BY LEVEL <= LENGTH(%(expressions)s)) "
-                "GROUP BY %(expressions)s)"
-            ),
-            **extra_context,
-        )
-        return sql, params * 3
+        pass
 
 
 class Right(Left):
     function = "RIGHT"
 
     def get_substr(self):
-        return Substr(
-            self.source_expressions[0],
-            self.source_expressions[1] * Value(-1),
-            self.source_expressions[1],
-        )
+        pass
 
 
 class RPad(LPad):
@@ -339,7 +257,7 @@ class StrIndex(Func):
     output_field = IntegerField()
 
     def as_postgresql(self, compiler, connection, **extra_context):
-        return super().as_sql(compiler, connection, function="STRPOS", **extra_context)
+        pass
 
 
 class Substr(Func):
@@ -361,10 +279,10 @@ class Substr(Func):
         super().__init__(*expressions, **extra)
 
     def as_sqlite(self, compiler, connection, **extra_context):
-        return super().as_sql(compiler, connection, function="SUBSTR", **extra_context)
+        pass
 
     def as_oracle(self, compiler, connection, **extra_context):
-        return super().as_sql(compiler, connection, function="SUBSTR", **extra_context)
+        pass
 
 
 class Trim(Transform):

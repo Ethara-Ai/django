@@ -46,24 +46,11 @@ class UploadedFile(File):
         return "<%s: %s (%s)>" % (self.__class__.__name__, self.name, self.content_type)
 
     def _get_name(self):
-        return self._name
+        pass
 
     def _set_name(self, name):
         # Sanitize the file name so that it can't be dangerous.
-        if name is not None:
-            # Just use the basename of the file -- anything else is dangerous.
-            name = os.path.basename(name)
-
-            # File names longer than 255 characters can cause problems on older
-            # OSes.
-            if len(name) > 255:
-                name, ext = os.path.splitext(name)
-                ext = ext[:255]
-                name = name[: 255 - len(ext)] + ext
-
-            name = validate_file_name(name)
-
-        self._name = name
+        pass
 
     name = property(_get_name, _set_name)
 
@@ -113,8 +100,7 @@ class InMemoryUploadedFile(UploadedFile):
         self.field_name = field_name
 
     def open(self, mode=None):
-        self.file.seek(0)
-        return self
+        pass
 
     def chunks(self, chunk_size=None):
         self.file.seek(0)
@@ -122,7 +108,7 @@ class InMemoryUploadedFile(UploadedFile):
 
     def multiple_chunks(self, chunk_size=None):
         # Since it's in memory, we'll never have multiple chunks.
-        return False
+        pass
 
 
 class SimpleUploadedFile(InMemoryUploadedFile):
@@ -145,8 +131,4 @@ class SimpleUploadedFile(InMemoryUploadedFile):
            - content-type
            - content
         """
-        return cls(
-            file_dict["filename"],
-            file_dict["content"],
-            file_dict.get("content-type", "text/plain"),
-        )
+        pass

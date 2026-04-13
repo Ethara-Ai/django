@@ -114,39 +114,16 @@ class DjangoHTMLTranslator(HTMLTranslator):
 
     # Don't use border=1, which docutils does by default.
     def visit_table(self, node):
-        self.context.append(self.compact_p)
-        self.compact_p = True
-        # Needed by Sphinx.
-        self._table_row_indices.append(0)
-        self.body.append(self.starttag(node, "table", CLASS="docutils"))
+        pass
 
     def depart_table(self, node):
-        self.compact_p = self.context.pop()
-        self._table_row_indices.pop()
-        self.body.append("</table>\n")
+        pass
 
     def visit_desc_parameterlist(self, node):
-        self.body.append("(")  # by default sphinx puts <big> around the "("
-        self.optional_param_level = 0
-        self.param_separator = node.child_text_separator
-        # Counts 'parameter groups' being either a required parameter, or a set
-        # of contiguous optional ones.
-        required_params = [
-            isinstance(c, addnodes.desc_parameter) for c in node.children
-        ]
-        # How many required parameters are left.
-        self.required_params_left = sum(required_params)
-        if sphinx_version < (7, 1):
-            self.first_param = 1
-        else:
-            self.is_first_param = True
-            self.params_left_at_level = 0
-            self.param_group_index = 0
-            self.list_is_required_param = required_params
-            self.multi_line_parameter_list = False
+        pass
 
     def depart_desc_parameterlist(self, node):
-        self.body.append(")")
+        pass
 
     #
     # Turn the "new in version" stuff (versionadded/versionchanged) into a
@@ -163,30 +140,18 @@ class DjangoHTMLTranslator(HTMLTranslator):
     }
 
     def visit_versionmodified(self, node):
-        self.body.append(self.starttag(node, "div", CLASS=node["type"]))
-        version_text = self.version_text.get(node["type"])
-        if version_text:
-            title = "%s%s" % (version_text % node["version"], ":" if len(node) else ".")
-            self.body.append('<span class="title">%s</span> ' % title)
+        pass
 
     def depart_versionmodified(self, node):
-        self.body.append("</div>\n")
+        pass
 
     # Give each section a unique ID -- nice for custom CSS hooks
     def visit_section(self, node):
-        old_ids = node.get("ids", [])
-        node["ids"] = ["s-" + i for i in old_ids]
-        node["ids"].extend(old_ids)
-        super().visit_section(node)
-        node["ids"] = old_ids
+        pass
 
 
 def parse_django_admin_node(env, sig, signode):
-    command = sig.split(" ")[0]
-    env.ref_context["std:program"] = command
-    title = "django-admin %s" % sig
-    signode += addnodes.desc_name(title, title)
-    return command
+    pass
 
 
 class DjangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):
@@ -197,26 +162,7 @@ class DjangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):
     name = "djangohtml"
 
     def finish(self):
-        super().finish()
-        logger.info(bold("writing templatebuiltins.js..."))
-        xrefs = self.env.domaindata["std"]["objects"]
-        templatebuiltins = {
-            "ttags": [
-                n
-                for ((t, n), (k, a)) in xrefs.items()
-                if t == "templatetag" and k == "ref/templates/builtins"
-            ],
-            "tfilters": [
-                n
-                for ((t, n), (k, a)) in xrefs.items()
-                if t == "templatefilter" and k == "ref/templates/builtins"
-            ],
-        }
-        outfilename = os.path.join(self.outdir, "templatebuiltins.js")
-        with open(outfilename, "w") as fp:
-            fp.write("var django_template_builtins = ")
-            json.dump(templatebuiltins, fp)
-            fp.write(";\n")
+        pass
 
 
 class ConsoleNode(nodes.literal_block):
@@ -238,54 +184,17 @@ class ConsoleNode(nodes.literal_block):
 
 def visit_console_dummy(self, node):
     """Defer to the corresponding parent's handler."""
-    self.visit_literal_block(node)
+    pass
 
 
 def depart_console_dummy(self, node):
     """Defer to the corresponding parent's handler."""
-    self.depart_literal_block(node)
+    pass
 
 
 def visit_console_html(self, node):
     """Generate HTML for the console directive."""
-    if self.builder.name in ("djangohtml", "json") and node["win_console_text"]:
-        # Put a mark on the document object signaling the fact the directive
-        # has been used on it.
-        self.document._console_directive_used_flag = True
-        uid = node["uid"]
-        self.body.append("""\
-<div class="console-block" id="console-block-%(id)s">
-<input class="c-tab-unix" id="c-tab-%(id)s-unix" type="radio" name="console-%(id)s" \
-checked>
-<label for="c-tab-%(id)s-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
-<input class="c-tab-win" id="c-tab-%(id)s-win" type="radio" name="console-%(id)s">
-<label for="c-tab-%(id)s-win" title="Windows">&#xf17a</label>
-<section class="c-content-unix" id="c-content-%(id)s-unix">\n""" % {"id": uid})
-        try:
-            self.visit_literal_block(node)
-        except nodes.SkipNode:
-            pass
-        self.body.append("</section>\n")
-
-        self.body.append(
-            '<section class="c-content-win" id="c-content-%(id)s-win">\n' % {"id": uid}
-        )
-        win_text = node["win_console_text"]
-        highlight_args = {"force": True}
-        linenos = node.get("linenos", False)
-
-        def warner(msg):
-            self.builder.warn(msg, (self.builder.current_docname, node.line))
-
-        highlighted = self.highlighter.highlight_block(
-            win_text, "doscon", warn=warner, linenos=linenos, **highlight_args
-        )
-        self.body.append(highlighted)
-        self.body.append("</section>\n")
-        self.body.append("</div>\n")
-        raise nodes.SkipNode
-    else:
-        self.visit_literal_block(node)
+    pass
 
 
 class ConsoleDirective(CodeBlock):
@@ -388,17 +297,10 @@ def html_page_context_hook(app, pagename, templatename, context, doctree):
     # control inclusion of console-tabs.css and activation of the JavaScript.
     # This way it's include only from HTML files rendered from reST files where
     # the ConsoleDirective is used.
-    context["include_console_assets"] = getattr(
-        doctree, "_console_directive_used_flag", False
-    )
+    pass
 
 
 def default_role_error(
     name, rawtext, text, lineno, inliner, options=None, content=None
 ):
-    msg = (
-        "Default role used (`single backticks`): %s. Did you mean to use two "
-        "backticks for ``code``, or miss an underscore for a `link`_ ?" % rawtext
-    )
-    logger.warning(msg, location=(inliner.document.current_source, lineno))
-    return [nodes.Text(text)], []
+    pass

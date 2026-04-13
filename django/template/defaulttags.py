@@ -317,7 +317,7 @@ class IfNode(Node):
 
     @property
     def nodelist(self):
-        return NodeList(self)
+        pass
 
     def render(self, context):
         for condition, nodelist in self.conditions_nodelists:
@@ -586,17 +586,7 @@ def autoescape(parser, token):
     """
     Force autoescape behavior for this block.
     """
-    # token.split_contents() isn't useful here because this tag doesn't accept
-    # variable as arguments.
-    args = token.contents.split()
-    if len(args) != 2:
-        raise TemplateSyntaxError("'autoescape' tag requires exactly one argument.")
-    arg = args[1]
-    if arg not in ("on", "off"):
-        raise TemplateSyntaxError("'autoescape' argument should be 'on' or 'off'")
-    nodelist = parser.parse(("endautoescape",))
-    parser.delete_first_token()
-    return AutoEscapeControlNode((arg == "on"), nodelist)
+    pass
 
 
 @register.tag
@@ -604,8 +594,7 @@ def comment(parser, token):
     """
     Ignore everything between ``{% comment %}`` and ``{% endcomment %}``.
     """
-    parser.skip_past("endcomment")
-    return CommentNode()
+    pass
 
 
 @register.tag
@@ -703,7 +692,7 @@ def cycle(parser, token):
 
 @register.tag
 def csrf_token(parser, token):
-    return CsrfTokenNode()
+    pass
 
 
 @register.tag
@@ -739,20 +728,7 @@ def do_filter(parser, token):
     Instead, use the ``autoescape`` tag to manage autoescaping for blocks of
     template code.
     """
-    # token.split_contents() isn't useful here because this tag doesn't accept
-    # variable as arguments.
-    _, rest = token.contents.split(None, 1)
-    filter_expr = parser.compile_filter("var|%s" % (rest))
-    for func, unused in filter_expr.filters:
-        filter_name = getattr(func, "_filter_name", None)
-        if filter_name in ("escape", "safe"):
-            raise TemplateSyntaxError(
-                '"filter %s" is not permitted. Use the "autoescape" tag instead.'
-                % filter_name
-            )
-    nodelist = parser.parse(("endfilter",))
-    parser.delete_first_token()
-    return FilterNode(filter_expr, nodelist)
+    pass
 
 
 @register.tag
@@ -793,15 +769,7 @@ def firstof(parser, token):
 
         {% firstof var1 var2|safe var3 "<strong>fallback</strong>"|safe %}
     """
-    bits = token.split_contents()[1:]
-    asvar = None
-    if not bits:
-        raise TemplateSyntaxError("'firstof' statement requires at least one argument")
-
-    if len(bits) >= 2 and bits[-2] == "as":
-        asvar = bits[-1]
-        bits = bits[:-2]
-    return FirstOfNode([parser.compile_filter(bit) for bit in bits], asvar)
+    pass
 
 
 @register.tag("for")
@@ -868,42 +836,7 @@ def do_for(parser, token):
                                  current one
         =======================  ==============================================
     """
-    bits = token.split_contents()
-    if len(bits) < 4:
-        raise TemplateSyntaxError(
-            "'for' statements should have at least four words: %s" % token.contents
-        )
-
-    is_reversed = bits[-1] == "reversed"
-    in_index = -3 if is_reversed else -2
-    if bits[in_index] != "in":
-        raise TemplateSyntaxError(
-            "'for' statements should use the format"
-            " 'for x in y': %s" % token.contents
-        )
-
-    invalid_chars = frozenset((" ", '"', "'", FILTER_SEPARATOR))
-    loopvars = re.split(r" *, *", " ".join(bits[1:in_index]))
-    for var in loopvars:
-        if not var or not invalid_chars.isdisjoint(var):
-            raise TemplateSyntaxError(
-                "'for' tag received an invalid argument: %s" % token.contents
-            )
-
-    sequence = parser.compile_filter(bits[in_index + 1])
-    nodelist_loop = parser.parse(
-        (
-            "empty",
-            "endfor",
-        )
-    )
-    token = parser.next_token()
-    if token.contents == "empty":
-        nodelist_empty = parser.parse(("endfor",))
-        parser.delete_first_token()
-    else:
-        nodelist_empty = None
-    return ForNode(loopvars, sequence, is_reversed, nodelist_loop, nodelist_empty)
+    pass
 
 
 class TemplateLiteral(Literal):
@@ -988,36 +921,7 @@ def do_if(parser, token):
 
     Operator precedence follows Python.
     """
-    # {% if ... %}
-    bits = token.split_contents()[1:]
-    condition = TemplateIfParser(parser, bits).parse()
-    nodelist = parser.parse(("elif", "else", "endif"))
-    conditions_nodelists = [(condition, nodelist)]
-    token = parser.next_token()
-
-    # {% elif ... %} (repeatable)
-    while token.contents.startswith("elif"):
-        bits = token.split_contents()[1:]
-        condition = TemplateIfParser(parser, bits).parse()
-        nodelist = parser.parse(("elif", "else", "endif"))
-        conditions_nodelists.append((condition, nodelist))
-        token = parser.next_token()
-
-    # {% else %} (optional)
-    if token.contents == "else":
-        nodelist = parser.parse(("endif",))
-        conditions_nodelists.append((None, nodelist))
-        token = parser.next_token()
-
-    # {% endif %}
-    if token.contents != "endif":
-        raise TemplateSyntaxError(
-            'Malformed template tag at line {}: "{}"'.format(
-                token.lineno, token.contents
-            )
-        )
-
-    return IfNode(conditions_nodelists)
+    pass
 
 
 @register.tag
@@ -1050,16 +954,7 @@ def ifchanged(parser, token):
                 {% endifchanged %}
             {% endfor %}
     """
-    bits = token.split_contents()
-    nodelist_true = parser.parse(("else", "endifchanged"))
-    token = parser.next_token()
-    if token.contents == "else":
-        nodelist_false = parser.parse(("endifchanged",))
-        parser.delete_first_token()
-    else:
-        nodelist_false = NodeList()
-    values = [parser.compile_filter(bit) for bit in bits[1:]]
-    return IfChangedNode(nodelist_true, nodelist_false, *values)
+    pass
 
 
 def find_library(parser, name):
@@ -1156,26 +1051,7 @@ def lorem(parser, token):
       and two random paragraphs each wrapped in HTML ``<p>`` tags
     * ``{% lorem 2 w random %}`` outputs two random latin words
     """
-    bits = list(token.split_contents())
-    tagname = bits[0]
-    # Random bit
-    common = bits[-1] != "random"
-    if not common:
-        bits.pop()
-    # Method bit
-    if bits[-1] in ("w", "p", "b"):
-        method = bits.pop()
-    else:
-        method = "b"
-    # Count bit
-    if len(bits) > 1:
-        count = bits.pop()
-    else:
-        count = "1"
-    count = parser.compile_filter(count)
-    if len(bits) != 1:
-        raise TemplateSyntaxError("Incorrect format for %r tag" % tagname)
-    return LoremNode(count, method, common)
+    pass
 
 
 @register.tag
@@ -1218,51 +1094,7 @@ def partialdef_func(parser, token):
     The optional ``inline`` argument renders the partial's contents
     immediately, at the point where it is defined.
     """
-    match token.split_contents():
-        case "partialdef", partial_name, "inline":
-            inline = True
-        case "partialdef", partial_name, _:
-            raise TemplateSyntaxError(
-                "The 'inline' argument does not have any parameters; either use "
-                "'inline' or remove it completely."
-            )
-        case "partialdef", partial_name:
-            inline = False
-        case ["partialdef"]:
-            raise TemplateSyntaxError("'partialdef' tag requires a name")
-        case _:
-            raise TemplateSyntaxError("'partialdef' tag takes at most 2 arguments")
-
-    # Parse the content until the end tag.
-    valid_endpartials = ("endpartialdef", f"endpartialdef {partial_name}")
-
-    pos_open = getattr(token, "position", None)
-    source_start = pos_open[0] if isinstance(pos_open, tuple) else None
-
-    nodelist = parser.parse(valid_endpartials)
-    endpartial = parser.next_token()
-    if endpartial.contents not in valid_endpartials:
-        parser.invalid_block_tag(endpartial, "endpartialdef", valid_endpartials)
-
-    pos_close = getattr(endpartial, "position", None)
-    source_end = pos_close[1] if isinstance(pos_close, tuple) else None
-
-    # Store the partial nodelist in the parser.extra_data attribute.
-    partials = parser.extra_data.setdefault("partials", {})
-    if partial_name in partials:
-        raise TemplateSyntaxError(
-            f"Partial '{partial_name}' is already defined in the "
-            f"'{parser.origin.name}' template."
-        )
-    partials[partial_name] = PartialTemplate(
-        nodelist,
-        parser.origin,
-        partial_name,
-        source_start=source_start,
-        source_end=source_end,
-    )
-
-    return PartialDefNode(partial_name, inline, nodelist)
+    pass
 
 
 @register.tag(name="partial")
@@ -1274,13 +1106,7 @@ def partial_func(parser, token):
 
         {% partial partial_name %}
     """
-    match token.split_contents():
-        case "partial", partial_name:
-            extra_data = parser.extra_data
-            partial_mapping = DeferredSubDict(extra_data, "partials")
-            return PartialNode(partial_name, partial_mapping=partial_mapping)
-        case _:
-            raise TemplateSyntaxError("'partial' tag requires a single argument")
+    pass
 
 
 @register.simple_tag(name="querystring", takes_context=True)
@@ -1322,31 +1148,7 @@ def querystring(context, *args, **kwargs):
         {# Use multiple positional and keyword arguments #}
         {% querystring my_query_dict my_dict foo=3 bar=None %}
     """
-    if not args:
-        args = [context.request.GET]
-    params = QueryDict(mutable=True)
-    for d in [*args, kwargs]:
-        if not isinstance(d, Mapping):
-            raise TemplateSyntaxError(
-                "querystring requires mappings for positional arguments (got "
-                "%r instead)." % d
-            )
-        items = d.lists() if isinstance(d, QueryDict) else d.items()
-        for key, value in items:
-            if not isinstance(key, str):
-                raise TemplateSyntaxError(
-                    "querystring requires strings for mapping keys (got %r "
-                    "instead)." % key
-                )
-            if value is None:
-                params.pop(key, None)
-            elif isinstance(value, Iterable) and not isinstance(value, str):
-                # Drop None values; if no values remain, the key is removed.
-                params.setlist(key, [v for v in value if v is not None])
-            else:
-                params[key] = value
-    query_string = params.urlencode() if params else ""
-    return f"?{query_string}"
+    pass
 
 
 @register.tag
@@ -1396,25 +1198,7 @@ def regroup(parser, token):
 
         {% regroup musicians|dictsort:"instrument" by instrument as grouped %}
     """
-    bits = token.split_contents()
-    if len(bits) != 6:
-        raise TemplateSyntaxError("'regroup' tag takes five arguments")
-    target = parser.compile_filter(bits[1])
-    if bits[2] != "by":
-        raise TemplateSyntaxError("second argument to 'regroup' tag must be 'by'")
-    if bits[4] != "as":
-        raise TemplateSyntaxError("next-to-last argument to 'regroup' tag must be 'as'")
-    var_name = bits[5]
-    # RegroupNode will take each item in 'target', put it in the context under
-    # 'var_name', evaluate 'var_name'.'expression' in the current context, and
-    # group by the resulting value. After all items are processed, it will
-    # save the final result in the context under 'var_name', thus clearing the
-    # temporary values. This hack is necessary because the template engine
-    # doesn't provide a context-aware equivalent of Python's getattr.
-    expression = parser.compile_filter(
-        var_name + VARIABLE_ATTRIBUTE_SEPARATOR + bits[3]
-    )
-    return RegroupNode(target, expression, var_name)
+    pass
 
 
 @register.tag
@@ -1426,21 +1210,7 @@ def resetcycle(parser, token):
     matches the argument, else reset the last rendered cycle tag (named or
     unnamed).
     """
-    args = token.split_contents()
-
-    if len(args) > 2:
-        raise TemplateSyntaxError("%r tag accepts at most one argument." % args[0])
-
-    if len(args) == 2:
-        name = args[1]
-        try:
-            return ResetCycleNode(parser._named_cycle_nodes[name])
-        except (AttributeError, KeyError):
-            raise TemplateSyntaxError("Named cycle '%s' does not exist." % name)
-    try:
-        return ResetCycleNode(parser._last_cycle_node)
-    except AttributeError:
-        raise TemplateSyntaxError("No cycles in template.")
+    pass
 
 
 @register.tag
@@ -1469,9 +1239,7 @@ def spaceless(parser, token):
             </strong>
         {% endspaceless %}
     """
-    nodelist = parser.parse(("endspaceless",))
-    parser.delete_first_token()
-    return SpacelessNode(nodelist)
+    pass
 
 
 @register.tag
@@ -1497,18 +1265,7 @@ def templatetag(parser, token):
         ``closecomment``    ``#}``
         ==================  =======
     """
-    # token.split_contents() isn't useful here because this tag doesn't accept
-    # variable as arguments.
-    bits = token.contents.split()
-    if len(bits) != 2:
-        raise TemplateSyntaxError("'templatetag' statement takes one argument")
-    tag = bits[1]
-    if tag not in TemplateTagNode.mapping:
-        raise TemplateSyntaxError(
-            "Invalid templatetag argument: '%s'."
-            " Must be one of: %s" % (tag, list(TemplateTagNode.mapping))
-        )
-    return TemplateTagNode(tag)
+    pass
 
 
 @register.tag
@@ -1602,9 +1359,7 @@ def verbatim(parser, token):
             ...
         {% endverbatim myblock %}
     """
-    nodelist = parser.parse(("endverbatim",))
-    parser.delete_first_token()
-    return VerbatimNode(nodelist.render(Context()))
+    pass
 
 
 @register.tag
@@ -1629,25 +1384,7 @@ def widthratio(parser, token):
         {% widthratio this_value max_value max_width as width %}
         {% blocktranslate %}The width is: {{ width }}{% endblocktranslate %}
     """
-    bits = token.split_contents()
-    if len(bits) == 4:
-        tag, this_value_expr, max_value_expr, max_width = bits
-        asvar = None
-    elif len(bits) == 6:
-        tag, this_value_expr, max_value_expr, max_width, as_, asvar = bits
-        if as_ != "as":
-            raise TemplateSyntaxError(
-                "Invalid syntax in widthratio tag. Expecting 'as' keyword"
-            )
-    else:
-        raise TemplateSyntaxError("widthratio takes at least three arguments")
-
-    return WidthRatioNode(
-        parser.compile_filter(this_value_expr),
-        parser.compile_filter(max_value_expr),
-        parser.compile_filter(max_width),
-        asvar=asvar,
-    )
+    pass
 
 
 @register.tag("with")
@@ -1671,17 +1408,4 @@ def do_with(parser, token):
     The legacy format of ``{% with person.some_sql_method as total %}`` is
     still accepted.
     """
-    bits = token.split_contents()
-    remaining_bits = bits[1:]
-    extra_context = token_kwargs(remaining_bits, parser, support_legacy=True)
-    if not extra_context:
-        raise TemplateSyntaxError(
-            "%r expected at least one variable assignment" % bits[0]
-        )
-    if remaining_bits:
-        raise TemplateSyntaxError(
-            "%r received an invalid token: %r" % (bits[0], remaining_bits[0])
-        )
-    nodelist = parser.parse(("endwith",))
-    parser.delete_first_token()
-    return WithNode(None, None, nodelist, extra_context=extra_context)
+    pass

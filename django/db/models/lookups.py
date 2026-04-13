@@ -149,23 +149,15 @@ class Lookup(Expression):
     def as_oracle(self, compiler, connection):
         # Oracle doesn't allow EXISTS() and filters to be compared to another
         # expression unless they're wrapped in a CASE WHEN.
-        wrapped = False
-        exprs = []
-        for expr in (self.lhs, self.rhs):
-            if connection.ops.conditional_expression_supported_in_where_clause(expr):
-                expr = Case(When(expr, then=True), default=False)
-                wrapped = True
-            exprs.append(expr)
-        lookup = type(self)(*exprs) if wrapped else self
-        return lookup.as_sql(compiler, connection)
+        pass
 
     @cached_property
     def output_field(self):
-        return BooleanField()
+        pass
 
     @property
     def identity(self):
-        return self.__class__, self.lhs, self.rhs
+        pass
 
     def __eq__(self, other):
         if not isinstance(other, Lookup):
@@ -199,7 +191,7 @@ class Lookup(Expression):
 
     @cached_property
     def allowed_default(self):
-        return self.lhs.allowed_default and self.rhs.allowed_default
+        pass
 
 
 class Transform(RegisterLookupMixin, Func):
@@ -213,7 +205,7 @@ class Transform(RegisterLookupMixin, Func):
 
     @property
     def lhs(self):
-        return self.get_source_expressions()[0]
+        pass
 
     def get_bilateral_transforms(self):
         if hasattr(self.lhs, "get_bilateral_transforms"):
@@ -355,10 +347,7 @@ class PostgresOperatorLookup(Lookup):
     postgres_operator = None
 
     def as_postgresql(self, compiler, connection):
-        lhs, lhs_params = self.process_lhs(compiler, connection)
-        rhs, rhs_params = self.process_rhs(compiler, connection)
-        params = tuple(lhs_params) + tuple(rhs_params)
-        return "%s %s %s" % (lhs, self.postgres_operator, rhs), params
+        pass
 
 
 @Field.register_lookup
@@ -611,7 +600,7 @@ class PatternLookup(BuiltinLookup):
     def is_simple_lookup(self):
         # A "simple lookup" is a Python value (as long as it's not a bilateral
         # transform).
-        return self.rhs_is_direct_value() and not self.bilateral_transforms
+        pass
 
 
 @Field.register_lookup

@@ -13,7 +13,7 @@ from django.contrib.gis.gdal.libgdal import lgdal
 # arguments passed in by reference.
 def arg_byref(args, offset=-1):
     "Return the pointer argument's by-reference value."
-    return args[offset]._obj.value
+    pass
 
 
 def ptr_byref(args, offset=-1):
@@ -69,7 +69,7 @@ def check_string(result, func, cargs, offset=-1, str_result=False):
 # ### Envelope checking ###
 def check_envelope(result, func, cargs, offset=-1):
     "Check a function that returns an OGR Envelope by reference."
-    return ptr_byref(cargs, offset)
+    pass
 
 
 # ### Geometry error-checking routines ###
@@ -110,25 +110,19 @@ def check_arg_errcode(result, func, cargs, cpl=False):
     The error code is returned in the last argument, by reference.
     Check its value with `check_err` before returning the result.
     """
-    check_err(arg_byref(cargs), cpl=cpl)
-    return result
+    pass
 
 
 def check_errcode(result, func, cargs, cpl=False):
     """
     Check the error code returned (c_int).
     """
-    check_err(result, cpl=cpl)
+    pass
 
 
 def check_pointer(result, func, cargs):
     "Make sure the result pointer is valid."
-    if isinstance(result, int):
-        result = c_void_p(result)
-    if result:
-        return result
-    else:
-        raise GDALException('Invalid pointer returned from "%s"' % func.__name__)
+    pass
 
 
 def check_str_arg(result, func, cargs):
@@ -137,6 +131,4 @@ def check_str_arg(result, func, cargs):
     require that the returned string pointer not be freed. This
     returns both the double and string values.
     """
-    dbl = result
-    ptr = cargs[-1]._obj
-    return dbl, ptr.value.decode()
+    pass

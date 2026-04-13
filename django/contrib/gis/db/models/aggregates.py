@@ -16,7 +16,7 @@ class GeoAggregate(Aggregate):
 
     @cached_property
     def output_field(self):
-        return self.output_field_class(self.source_expressions[0].output_field.srid)
+        pass
 
     def as_sql(self, compiler, connection, function=None, **extra_context):
         # this will be called again in parent, but it's needed now - before
@@ -30,20 +30,7 @@ class GeoAggregate(Aggregate):
         )
 
     def as_oracle(self, compiler, connection, **extra_context):
-        if not self.is_extent:
-            tolerance = self.extra.get("tolerance") or getattr(self, "tolerance", 0.05)
-            clone = self.copy()
-            *source_exprs, filter_expr, order_by_expr = self.get_source_expressions()
-            spatial_type_expr = Func(
-                *source_exprs,
-                Value(tolerance),
-                function="SDOAGGRTYPE",
-                output_field=self.output_field,
-            )
-            source_expressions = [spatial_type_expr, filter_expr, order_by_expr]
-            clone.set_source_expressions(source_expressions)
-            return clone.as_sql(compiler, connection, **extra_context)
-        return self.as_sql(compiler, connection, **extra_context)
+        pass
 
     def resolve_expression(
         self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
@@ -70,7 +57,7 @@ class Extent(GeoAggregate):
         super().__init__(expression, output_field=ExtentField(), **extra)
 
     def convert_value(self, value, expression, connection):
-        return connection.ops.convert_extent(value)
+        pass
 
 
 class Extent3D(GeoAggregate):
@@ -81,7 +68,7 @@ class Extent3D(GeoAggregate):
         super().__init__(expression, output_field=ExtentField(), **extra)
 
     def convert_value(self, value, expression, connection):
-        return connection.ops.convert_extent3d(value)
+        pass
 
 
 class MakeLine(GeoAggregate):

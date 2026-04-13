@@ -19,7 +19,7 @@ class Storage:
 
     def open(self, name, mode="rb"):
         """Retrieve the specified file from storage."""
-        return self._open(name, mode)
+        pass
 
     def save(self, name, content, max_length=None):
         """

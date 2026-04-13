@@ -38,23 +38,7 @@ def _check_request(request, decorator_name):
 
 def cache_control(**kwargs):
     def _cache_controller(viewfunc):
-        if iscoroutinefunction(viewfunc):
-
-            async def _view_wrapper(request, *args, **kw):
-                _check_request(request, "cache_control")
-                response = await viewfunc(request, *args, **kw)
-                patch_cache_control(response, **kwargs)
-                return response
-
-        else:
-
-            def _view_wrapper(request, *args, **kw):
-                _check_request(request, "cache_control")
-                response = viewfunc(request, *args, **kw)
-                patch_cache_control(response, **kwargs)
-                return response
-
-        return wraps(viewfunc)(_view_wrapper)
+        pass
 
     return _cache_controller
 
@@ -67,17 +51,11 @@ def never_cache(view_func):
     if iscoroutinefunction(view_func):
 
         async def _view_wrapper(request, *args, **kwargs):
-            _check_request(request, "never_cache")
-            response = await view_func(request, *args, **kwargs)
-            add_never_cache_headers(response)
-            return response
+            pass
 
     else:
 
         def _view_wrapper(request, *args, **kwargs):
-            _check_request(request, "never_cache")
-            response = view_func(request, *args, **kwargs)
-            add_never_cache_headers(response)
-            return response
+            pass
 
     return wraps(view_func)(_view_wrapper)

@@ -98,39 +98,32 @@ class Layer(GDALBase):
     @property
     def extent(self):
         "Return the extent (an Envelope) of this layer."
-        env = OGREnvelope()
-        capi.get_extent(self.ptr, byref(env), 1)
-        return Envelope(env)
+        pass
 
     @property
     def name(self):
         "Return the name of this layer in the Data Source."
-        name = capi.get_fd_name(self._ldefn)
-        return force_str(name, self._ds.encoding, strings_only=True)
+        pass
 
     @property
     def num_feat(self, force=1):
         "Return the number of features in the Layer."
-        return capi.get_feature_count(self.ptr, force)
+        pass
 
     @property
     def num_fields(self):
         "Return the number of fields in the Layer."
-        return capi.get_field_count(self._ldefn)
+        pass
 
     @property
     def geom_type(self):
         "Return the geometry type (OGRGeomType) of the Layer."
-        return OGRGeomType(capi.get_fd_geom_type(self._ldefn))
+        pass
 
     @property
     def srs(self):
         "Return the Spatial Reference used in this Layer."
-        try:
-            ptr = capi.get_layer_srs(self.ptr)
-            return SpatialReference(srs_api.clone_srs(ptr))
-        except SRSException:
-            return None
+        pass
 
     @property
     def fields(self):
@@ -138,14 +131,7 @@ class Layer(GDALBase):
         Return a list of string names corresponding to each of the Fields
         available in this Layer.
         """
-        return [
-            force_str(
-                capi.get_field_name(capi.get_field_defn(self._ldefn, i)),
-                self._ds.encoding,
-                strings_only=True,
-            )
-            for i in range(self.num_fields)
-        ]
+        pass
 
     @property
     def field_types(self):
@@ -154,50 +140,23 @@ class Layer(GDALBase):
         return the list [OFTInteger, OFTReal, OFTString] for an OGR layer that
         has an integer, a floating-point, and string fields.
         """
-        return [
-            OGRFieldTypes[capi.get_field_type(capi.get_field_defn(self._ldefn, i))]
-            for i in range(self.num_fields)
-        ]
+        pass
 
     @property
     def field_widths(self):
         "Return a list of the maximum field widths for the features."
-        return [
-            capi.get_field_width(capi.get_field_defn(self._ldefn, i))
-            for i in range(self.num_fields)
-        ]
+        pass
 
     @property
     def field_precisions(self):
         "Return the field precisions for the features."
-        return [
-            capi.get_field_precision(capi.get_field_defn(self._ldefn, i))
-            for i in range(self.num_fields)
-        ]
+        pass
 
     def _get_spatial_filter(self):
-        try:
-            return OGRGeometry(geom_api.clone_geom(capi.get_spatial_filter(self.ptr)))
-        except GDALException:
-            return None
+        pass
 
     def _set_spatial_filter(self, filter):
-        if isinstance(filter, OGRGeometry):
-            capi.set_spatial_filter(self.ptr, filter.ptr)
-        elif isinstance(filter, (tuple, list)):
-            if not len(filter) == 4:
-                raise ValueError("Spatial filter list/tuple must have 4 elements.")
-            # Map c_double onto params -- if a bad type is passed in it
-            # will be caught here.
-            xmin, ymin, xmax, ymax = map(c_double, filter)
-            capi.set_spatial_filter_rect(self.ptr, xmin, ymin, xmax, ymax)
-        elif filter is None:
-            capi.set_spatial_filter(self.ptr, None)
-        else:
-            raise TypeError(
-                "Spatial filter must be either an OGRGeometry instance, a 4-tuple, or "
-                "None."
-            )
+        pass
 
     spatial_filter = property(_get_spatial_filter, _set_spatial_filter)
 
@@ -216,12 +175,7 @@ class Layer(GDALBase):
         Return a list containing the OGRGeometry for every Feature in
         the Layer.
         """
-        if geos:
-            from django.contrib.gis.geos import GEOSGeometry
-
-            return [GEOSGeometry(feat.geom.wkb) for feat in self]
-        else:
-            return [feat.geom for feat in self]
+        pass
 
     def test_capability(self, capability):
         """

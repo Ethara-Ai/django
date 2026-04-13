@@ -99,7 +99,7 @@ class RunSQL(Operation):
 
     @property
     def reversible(self):
-        return self.reverse_sql is not None
+        pass
 
     def state_forwards(self, app_label, state):
         for state_operation in self.state_operations:
@@ -181,7 +181,7 @@ class RunPython(Operation):
 
     @property
     def reversible(self):
-        return self.reverse_code is not None
+        pass
 
     def state_forwards(self, app_label, state):
         # RunPython objects have no state effect. To add some, combine this
@@ -215,4 +215,4 @@ class RunPython(Operation):
 
     @staticmethod
     def noop(apps, schema_editor):
-        return None
+        pass

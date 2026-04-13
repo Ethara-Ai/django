@@ -54,9 +54,7 @@ def reset_format_cache():
     This method is provided primarily for testing purposes,
     so that the effects of cached formats can be removed.
     """
-    global _format_cache, _format_modules_cache
-    _format_cache = {}
-    _format_modules_cache = {}
+    pass
 
 
 def iter_format_modules(lang, format_module_path=None):

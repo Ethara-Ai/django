@@ -68,7 +68,7 @@ class CreateExtension(Operation):
 
     @property
     def migration_name_fragment(self):
-        return "create_extension_%s" % self.name
+        pass
 
 
 class BloomExtension(CreateExtension):
@@ -238,7 +238,7 @@ class CreateCollation(CollationOperation):
 
     @property
     def migration_name_fragment(self):
-        return "create_collation_%s" % self.name.lower()
+        pass
 
     def reduce(self, operation, app_label):
         if isinstance(operation, RemoveCollation) and self.name == operation.name:
@@ -268,7 +268,7 @@ class RemoveCollation(CollationOperation):
 
     @property
     def migration_name_fragment(self):
-        return "remove_collation_%s" % self.name.lower()
+        pass
 
 
 class AddConstraintNotValid(AddConstraint):
@@ -304,7 +304,7 @@ class AddConstraintNotValid(AddConstraint):
 
     @property
     def migration_name_fragment(self):
-        return super().migration_name_fragment + "_not_valid"
+        pass
 
 
 class ValidateConstraint(Operation):
@@ -339,7 +339,7 @@ class ValidateConstraint(Operation):
 
     @property
     def migration_name_fragment(self):
-        return "%s_validate_%s" % (self.model_name.lower(), self.name.lower())
+        pass
 
     def deconstruct(self):
         return (

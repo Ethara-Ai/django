@@ -65,7 +65,7 @@ class YearMixin:
 
     def _get_current_year(self, date):
         """Return the start date of the current interval."""
-        return date.replace(month=1, day=1)
+        pass
 
 
 class MonthMixin:
@@ -118,7 +118,7 @@ class MonthMixin:
 
     def _get_current_month(self, date):
         """Return the start date of the previous interval."""
-        return date.replace(day=1)
+        pass
 
 
 class DayMixin:
@@ -161,11 +161,11 @@ class DayMixin:
 
         The interval is defined by start date <= item date < next start date.
         """
-        return date + datetime.timedelta(days=1)
+        pass
 
     def _get_current_day(self, date):
         """Return the start date of the current interval."""
-        return date
+        pass
 
 
 class WeekMixin:
@@ -215,7 +215,7 @@ class WeekMixin:
 
     def _get_current_week(self, date):
         """Return the start date of the current interval."""
-        return date - datetime.timedelta(self._get_weekday(date))
+        pass
 
     def _get_weekday(self, date):
         """
@@ -262,9 +262,7 @@ class DateMixin:
         Return `True` if the date field is a `DateTimeField` and `False`
         if it's a `DateField`.
         """
-        model = self.get_queryset().model if self.model is None else self.model
-        field = model._meta.get_field(self.get_date_field())
-        return isinstance(field, models.DateTimeField)
+        pass
 
     def _make_date_lookup_arg(self, value):
         """

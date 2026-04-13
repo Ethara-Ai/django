@@ -555,16 +555,7 @@ class BaseDatabaseOperations:
         cases where the target type isn't known, such as .raw() SQL queries.
         As a consequence it may not work perfectly in all circumstances.
         """
-        if isinstance(value, datetime.datetime):  # must be before date
-            return self.adapt_datetimefield_value(value)
-        elif isinstance(value, datetime.date):
-            return self.adapt_datefield_value(value)
-        elif isinstance(value, datetime.time):
-            return self.adapt_timefield_value(value)
-        elif isinstance(value, decimal.Decimal):
-            return self.adapt_decimalfield_value(value)
-        else:
-            return value
+        pass
 
     def adapt_integerfield_value(self, value, internal_type):
         return value
@@ -681,27 +672,10 @@ class BaseDatabaseOperations:
         return []
 
     def convert_durationfield_value(self, value, expression, connection):
-        if value is not None:
-            return datetime.timedelta(0, 0, value)
+        pass
 
     def convert_trunc_expression(self, value, expression):
-        if isinstance(expression.output_field, models.DateTimeField):
-            if not settings.USE_TZ:
-                pass
-            elif value is not None:
-                value = value.replace(tzinfo=None)
-                value = timezone.make_aware(value, expression.tzinfo)
-            elif not self.connection.features.has_zoneinfo_database:
-                raise ValueError(
-                    "Database returned an invalid datetime value. Are time "
-                    "zone definitions for your database installed?"
-                )
-        elif isinstance(value, datetime.datetime):
-            if isinstance(expression.output_field, models.DateField):
-                value = value.date()
-            elif isinstance(expression.output_field, models.TimeField):
-                value = value.time()
-        return value
+        pass
 
     def check_expression_support(self, expression):
         """
@@ -856,7 +830,7 @@ class BaseDatabaseOperations:
 
     def format_debug_sql(self, sql):
         # Hook for backends (e.g. NoSQL) to customize formatting.
-        return sqlparse.format(sql, reindent=True, keyword_case="upper")
+        pass
 
     def format_json_path_numeric_index(self, num):
         """

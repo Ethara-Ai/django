@@ -38,29 +38,23 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
 
     @cached_property
     def base_location(self):
-        return self._value_or_setting(self._location, settings.MEDIA_ROOT)
+        pass
 
     @cached_property
     def location(self):
-        return os.path.abspath(self.base_location)
+        pass
 
     @cached_property
     def base_url(self):
-        if self._base_url is not None and not self._base_url.endswith("/"):
-            self._base_url += "/"
-        return self._value_or_setting(self._base_url, settings.MEDIA_URL)
+        pass
 
     @cached_property
     def file_permissions_mode(self):
-        return self._value_or_setting(
-            self._file_permissions_mode, settings.FILE_UPLOAD_PERMISSIONS
-        )
+        pass
 
     @cached_property
     def directory_permissions_mode(self):
-        return self._value_or_setting(
-            self._directory_permissions_mode, settings.FILE_UPLOAD_DIRECTORY_PERMISSIONS
-        )
+        pass
 
     def _open(self, name, mode="rb"):
         return File(open(self.path(name), mode))
@@ -211,14 +205,13 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
         If timezone support is enabled, make an aware datetime object in UTC;
         otherwise make a naive one in the local timezone.
         """
-        tz = UTC if settings.USE_TZ else None
-        return datetime.fromtimestamp(ts, tz=tz)
+        pass
 
     def get_accessed_time(self, name):
-        return self._datetime_from_timestamp(os.path.getatime(self.path(name)))
+        pass
 
     def get_created_time(self, name):
-        return self._datetime_from_timestamp(os.path.getctime(self.path(name)))
+        pass
 
     def get_modified_time(self, name):
-        return self._datetime_from_timestamp(os.path.getmtime(self.path(name)))
+        pass

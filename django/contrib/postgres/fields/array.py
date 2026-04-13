@@ -109,7 +109,7 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
 
     @property
     def description(self):
-        return "Array of %s" % self.base_field.description
+        pass
 
     def db_type(self, connection):
         size = self.size or ""
@@ -161,12 +161,7 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
         return value
 
     def _from_db_value(self, value, expression, connection):
-        if value is None:
-            return value
-        return [
-            self.base_field.from_db_value(item, expression, connection)
-            for item in value
-        ]
+        pass
 
     def value_to_string(self, obj):
         values = []
@@ -347,7 +342,7 @@ class IndexTransform(Transform):
 
     @property
     def output_field(self):
-        return self.base_field
+        pass
 
 
 class IndexTransformFactory:

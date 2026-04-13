@@ -33,9 +33,7 @@ PathInfo = namedtuple(
 
 
 def subclasses(cls):
-    yield cls
-    for subclass in cls.__subclasses__():
-        yield from subclasses(subclass)
+    pass
 
 
 class Q(tree.Node):
@@ -63,17 +61,7 @@ class Q(tree.Node):
         )
 
     def _combine(self, other, conn):
-        if getattr(other, "conditional", False) is False:
-            raise TypeError(other)
-        if not self:
-            return other.copy()
-        if not other and isinstance(other, Q):
-            return self.copy()
-
-        obj = self.create(connector=conn)
-        obj.add(self, conn)
-        obj.add(other, conn)
-        return obj
+        pass
 
     def __or__(self, other):
         return self._combine(other, self.OR)
@@ -209,16 +197,7 @@ class Q(tree.Node):
 
     @cached_property
     def identity(self):
-        path, args, kwargs = self.deconstruct()
-        identity = [path, *kwargs.items()]
-        for child in args:
-            if isinstance(child, tuple):
-                arg, value = child
-                value = make_hashable(value)
-                identity.append((arg, value))
-            else:
-                identity.append(child)
-        return tuple(identity)
+        pass
 
     def __eq__(self, other):
         if not isinstance(other, Q):
@@ -234,12 +213,7 @@ class Q(tree.Node):
         Retrieve all base fields referenced directly or through F expressions
         excluding any fields referenced through joins.
         """
-        # Avoid circular imports.
-        from django.db.models.sql import query
-
-        return {
-            child.split(LOOKUP_SEP, 1)[0] for child in query.get_children_from_q(self)
-        }
+        pass
 
 
 class DeferredAttribute:
@@ -331,10 +305,7 @@ class RegisterLookupMixin:
         return cls.merge_dicts(class_lookups)
 
     def get_instance_lookups(self):
-        class_lookups = self.get_class_lookups()
-        if instance_lookups := getattr(self, "instance_lookups", None):
-            return {**class_lookups, **instance_lookups}
-        return class_lookups
+        pass
 
     get_lookups = class_or_instance_method(get_class_lookups, get_instance_lookups)
     get_class_lookups = classmethod(get_class_lookups)
@@ -373,25 +344,13 @@ class RegisterLookupMixin:
 
     @classmethod
     def _clear_cached_class_lookups(cls):
-        for subclass in subclasses(cls):
-            subclass.get_class_lookups.cache_clear()
+        pass
 
     def register_class_lookup(cls, lookup, lookup_name=None):
-        if lookup_name is None:
-            lookup_name = lookup.lookup_name
-        if "class_lookups" not in cls.__dict__:
-            cls.class_lookups = {}
-        cls.class_lookups[lookup_name] = lookup
-        cls._clear_cached_class_lookups()
-        return lookup
+        pass
 
     def register_instance_lookup(self, lookup, lookup_name=None):
-        if lookup_name is None:
-            lookup_name = lookup.lookup_name
-        if "instance_lookups" not in self.__dict__:
-            self.instance_lookups = {}
-        self.instance_lookups[lookup_name] = lookup
-        return lookup
+        pass
 
     register_lookup = class_or_instance_method(
         register_class_lookup, register_instance_lookup
@@ -403,19 +362,14 @@ class RegisterLookupMixin:
         Remove given lookup from cls lookups. For use in tests only as it's
         not thread-safe.
         """
-        if lookup_name is None:
-            lookup_name = lookup.lookup_name
-        del cls.class_lookups[lookup_name]
-        cls._clear_cached_class_lookups()
+        pass
 
     def _unregister_instance_lookup(self, lookup, lookup_name=None):
         """
         Remove given lookup from instance lookups. For use in tests only as
         it's not thread-safe.
         """
-        if lookup_name is None:
-            lookup_name = lookup.lookup_name
-        del self.instance_lookups[lookup_name]
+        pass
 
     _unregister_lookup = class_or_instance_method(
         _unregister_class_lookup, _unregister_instance_lookup

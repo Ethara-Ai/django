@@ -613,20 +613,7 @@ class BaseDatabaseSchemaEditor:
         unique_togethers must be doubly-nested, not the single-nested
         ["foo", "bar"] format.
         """
-        olds = {tuple(fields) for fields in old_unique_together}
-        news = {tuple(fields) for fields in new_unique_together}
-        # Deleted uniques
-        for fields in olds.difference(news):
-            self._delete_composed_index(
-                model,
-                fields,
-                {"unique": True, "primary_key": False},
-                self.sql_delete_unique,
-            )
-        # Created uniques
-        for field_names in news.difference(olds):
-            fields = [model._meta.get_field(field) for field in field_names]
-            self.execute(self._create_unique_sql(model, fields))
+        pass
 
     def alter_index_together(self, model, old_index_together, new_index_together):
         """
@@ -714,14 +701,7 @@ class BaseDatabaseSchemaEditor:
 
     def alter_db_tablespace(self, model, old_db_tablespace, new_db_tablespace):
         """Move a model's table between tablespaces."""
-        self.execute(
-            self.sql_retablespace_table
-            % {
-                "table": self.quote_name(model._meta.db_table),
-                "old_tablespace": self.quote_name(old_db_tablespace),
-                "new_tablespace": self.quote_name(new_db_tablespace),
-            }
-        )
+        pass
 
     def add_field(self, model, field):
         """
@@ -1597,10 +1577,7 @@ class BaseDatabaseSchemaEditor:
         table = model._meta.db_table
 
         def create_index_name(*args, **kwargs):
-            nonlocal name
-            if name is None:
-                name = self._create_index_name(*args, **kwargs)
-            return self.quote_name(name)
+            pass
 
         return Statement(
             sql_create_index,
@@ -1775,7 +1752,7 @@ class BaseDatabaseSchemaEditor:
 
     def _fk_constraint_name(self, model, field, suffix):
         def create_fk_name(*args, **kwargs):
-            return self.quote_name(self._create_index_name(*args, **kwargs))
+            pass
 
         return ForeignKeyName(
             model._meta.db_table,
@@ -1935,7 +1912,7 @@ class BaseDatabaseSchemaEditor:
         if quote:
 
             def create_unique_name(*args, **kwargs):
-                return self.quote_name(self._create_index_name(*args, **kwargs))
+                pass
 
         else:
             create_unique_name = self._create_index_name
@@ -2079,8 +2056,4 @@ class BaseDatabaseSchemaEditor:
         return "COLLATE " + self.quote_name(collation) if collation else ""
 
     def remove_procedure(self, procedure_name, param_types=()):
-        sql = self.sql_delete_procedure % {
-            "procedure": self.quote_name(procedure_name),
-            "param_types": ",".join(param_types),
-        }
-        self.execute(sql)
+        pass

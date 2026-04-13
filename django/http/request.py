@@ -88,23 +88,14 @@ class HttpRequest:
 
     @cached_property
     def headers(self):
-        return HttpHeaders(self.META)
+        pass
 
     @cached_property
     def accepted_types(self):
         """
         Return a list of MediaType instances, in order of preference (quality).
         """
-        header_value = self.headers.get("Accept", "*/*")
-        return sorted(
-            (
-                media_type
-                for token in header_value.split(",")
-                if token.strip() and (media_type := MediaType(token)).quality != 0
-            ),
-            key=operator.attrgetter("quality", "specificity"),
-            reverse=True,
-        )
+        pass
 
     @cached_property
     def accepted_types_by_precedence(self):
@@ -112,11 +103,7 @@ class HttpRequest:
         Return a list of MediaType instances, in order of precedence
         (specificity).
         """
-        return sorted(
-            self.accepted_types,
-            key=operator.attrgetter("specificity", "quality"),
-            reverse=True,
-        )
+        pass
 
     def accepted_type(self, media_type):
         """
@@ -151,7 +138,7 @@ class HttpRequest:
 
     def accepts(self, media_type):
         """Does the client accept a response in the given media type?"""
-        return self.accepted_type(media_type) is not None
+        pass
 
     def _set_content_type_params(self, meta):
         """Set content_type, content_params, and encoding."""
@@ -218,7 +205,7 @@ class HttpRequest:
         return self._get_full_path(self.path, force_append_slash)
 
     def get_full_path_info(self, force_append_slash=False):
-        return self._get_full_path(self.path_info, force_append_slash)
+        pass
 
     def _get_full_path(self, path, force_append_slash):
         # RFC 3986 requires query string arguments to be in the ASCII range.
@@ -239,23 +226,7 @@ class HttpRequest:
         cookie has expired, raise an exception, unless the `default` argument
         is provided, in which case return that value.
         """
-        try:
-            cookie_value = self.COOKIES[key]
-        except KeyError:
-            if default is not RAISE_ERROR:
-                return default
-            else:
-                raise
-        try:
-            value = signing.get_cookie_signer(salt=key + salt).unsign(
-                cookie_value, max_age=max_age
-            )
-        except signing.BadSignature:
-            if default is not RAISE_ERROR:
-                return default
-            else:
-                raise
-        return value
+        pass
 
     def build_absolute_uri(self, location=None):
         """
@@ -298,37 +269,25 @@ class HttpRequest:
 
     @cached_property
     def _current_scheme_host(self):
-        return "{}://{}".format(self.scheme, self.get_host())
+        pass
 
     def _get_scheme(self):
         """
         Hook for subclasses like WSGIRequest to implement. Return 'http' by
         default.
         """
-        return "http"
+        pass
 
     @property
     def scheme(self):
-        if settings.SECURE_PROXY_SSL_HEADER:
-            try:
-                header, secure_value = settings.SECURE_PROXY_SSL_HEADER
-            except ValueError:
-                raise ImproperlyConfigured(
-                    "The SECURE_PROXY_SSL_HEADER setting must be a tuple containing "
-                    "two values."
-                )
-            header_value = self.META.get(header)
-            if header_value is not None:
-                header_value, *_ = header_value.split(",", 1)
-                return "https" if header_value.strip() == secure_value else "http"
-        return self._get_scheme()
+        pass
 
     def is_secure(self):
         return self.scheme == "https"
 
     @property
     def encoding(self):
-        return self._encoding
+        pass
 
     @encoding.setter
     def encoding(self, val):
@@ -337,100 +296,37 @@ class HttpRequest:
         dictionary has already been created, remove and recreate it on the
         next access (so that it is decoded correctly).
         """
-        self._encoding = val
-        if hasattr(self, "GET"):
-            del self.GET
-        if hasattr(self, "_post"):
-            del self._post
+        pass
 
     def _initialize_handlers(self):
-        self._upload_handlers = [
-            uploadhandler.load_handler(handler, self)
-            for handler in settings.FILE_UPLOAD_HANDLERS
-        ]
+        pass
 
     @property
     def upload_handlers(self):
-        if not self._upload_handlers:
-            # If there are no upload handlers defined, initialize them from
-            # settings.
-            self._initialize_handlers()
-        return self._upload_handlers
+        pass
 
     @upload_handlers.setter
     def upload_handlers(self, upload_handlers):
-        if hasattr(self, "_files"):
-            raise AttributeError(
-                "You cannot set the upload handlers after the upload has been "
-                "processed."
-            )
-        self._upload_handlers = upload_handlers
+        pass
 
     @property
     def multipart_parser_class(self):
-        return self._multipart_parser_class
+        pass
 
     @multipart_parser_class.setter
     def multipart_parser_class(self, multipart_parser_class):
-        if hasattr(self, "_files"):
-            raise RuntimeError(
-                "You cannot set the multipart parser class after the upload has been "
-                "processed."
-            )
-        self._multipart_parser_class = multipart_parser_class
+        pass
 
     def parse_file_upload(self, META, post_data):
         """Return a tuple of (POST QueryDict, FILES MultiValueDict)."""
-        self.upload_handlers = ImmutableList(
-            self.upload_handlers,
-            warning=(
-                "You cannot alter upload handlers after the upload has been "
-                "processed."
-            ),
-        )
-        parser = self.multipart_parser_class(
-            META, post_data, self.upload_handlers, self.encoding
-        )
-        return parser.parse()
+        pass
 
     @property
     def body(self):
-        if not hasattr(self, "_body"):
-            if self._read_started:
-                raise RawPostDataException(
-                    "You cannot access body after reading from request's data stream"
-                )
-
-            # Limit the maximum request data size that will be handled
-            # in-memory. Reject early when Content-Length is present and
-            # already exceeds the limit, avoiding reading the body at all.
-            self._check_data_too_big(int(self.META.get("CONTENT_LENGTH") or 0))
-
-            # Content-Length can be absent or understated (e.g.
-            # `Transfer-Encoding: chunked` on ASGI), so for seekable
-            # streams (e.g. SpooledTemporaryFile on ASGI), check the actual
-            # buffered size before reading it all into memory.
-            if self._stream.seekable():
-                stream_size = self._stream.seek(0, os.SEEK_END)
-                self._check_data_too_big(stream_size)
-                self._stream.seek(0)
-
-            try:
-                self._body = self.read()
-            except OSError as e:
-                raise UnreadablePostError(*e.args) from e
-            finally:
-                self._stream.close()
-            self._stream = BytesIO(self._body)
-        return self._body
+        pass
 
     def _check_data_too_big(self, length):
-        if (
-            settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None
-            and length > settings.DATA_UPLOAD_MAX_MEMORY_SIZE
-        ):
-            msg = "Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE."
-            raise RequestDataTooBig(msg)
+        pass
 
     def _mark_post_parse_error(self):
         self._post = QueryDict()
@@ -440,47 +336,7 @@ class HttpRequest:
         """
         Populate self._post and self._files if the content-type is a form type
         """
-        if self.method != "POST":
-            self._post, self._files = (
-                QueryDict(encoding=self._encoding),
-                MultiValueDict(),
-            )
-            return
-        if self._read_started and not hasattr(self, "_body"):
-            self._mark_post_parse_error()
-            return
-
-        if self.content_type == "multipart/form-data":
-            if hasattr(self, "_body"):
-                # Use already read data
-                data = BytesIO(self._body)
-            else:
-                data = self
-            try:
-                self._post, self._files = self.parse_file_upload(self.META, data)
-            except (MultiPartParserError, TooManyFilesSent):
-                # An error occurred while parsing POST data. Since when
-                # formatting the error the request handler might access
-                # self.POST, set self._post and self._file to prevent
-                # attempts to parse POST data again.
-                self._mark_post_parse_error()
-                raise
-        elif self.content_type == "application/x-www-form-urlencoded":
-            # According to RFC 1866, the "application/x-www-form-urlencoded"
-            # content type does not have a charset and should be always treated
-            # as UTF-8.
-            if self._encoding is not None and self._encoding.lower() != "utf-8":
-                raise BadRequest(
-                    "HTTP requests with the 'application/x-www-form-urlencoded' "
-                    "content type must be UTF-8 encoded."
-                )
-            self._post = QueryDict(self.body, encoding="utf-8")
-            self._files = MultiValueDict()
-        else:
-            self._post, self._files = (
-                QueryDict(encoding=self._encoding),
-                MultiValueDict(),
-            )
+        pass
 
     def close(self):
         if hasattr(self, "_files"):
@@ -513,7 +369,7 @@ class HttpRequest:
         return iter(self.readline, b"")
 
     def readlines(self):
-        return list(self)
+        pass
 
 
 class HttpHeaders(CaseInsensitiveMapping):
@@ -633,13 +489,11 @@ class QueryDict(MultiValueDict):
 
     @property
     def encoding(self):
-        if self._encoding is None:
-            self._encoding = settings.DEFAULT_CHARSET
-        return self._encoding
+        pass
 
     @encoding.setter
     def encoding(self, value):
-        self._encoding = value
+        pass
 
     def _assert_mutable(self):
         if not self._mutable:
@@ -759,9 +613,7 @@ class MediaType:
 
     @cached_property
     def range_params(self):
-        params = self.params.copy()
-        params.pop("q", None)
-        return params
+        pass
 
     def match(self, other):
         if not other:
@@ -794,30 +646,14 @@ class MediaType:
 
     @cached_property
     def quality(self):
-        try:
-            quality = float(self.params.get("q", 1))
-        except ValueError:
-            # Discard invalid values.
-            return 1
-
-        # Valid quality values must be between 0 and 1.
-        if quality < 0 or quality > 1:
-            return 1
-
-        return round(quality, 3)
+        pass
 
     @property
     def specificity(self):
         """
         Return a value from 0-3 for how specific the media type is.
         """
-        if self.main_type == "*":
-            return 0
-        elif self.sub_type == "*":
-            return 1
-        elif not self.range_params:
-            return 2
-        return 3
+        pass
 
 
 # It's neither necessary nor appropriate to use

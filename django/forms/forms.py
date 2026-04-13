@@ -197,9 +197,7 @@ class BaseForm(RenderableFormMixin):
     @property
     def errors(self):
         """Return an ErrorDict for the data provided for the form."""
-        if self._errors is None:
-            self.full_clean()
-        return self._errors
+        pass
 
     def is_valid(self):
         """Return True if the form has no errors, or False otherwise."""
@@ -226,7 +224,7 @@ class BaseForm(RenderableFormMixin):
 
     @property
     def template_name(self):
-        return self.renderer.form_template_name
+        pass
 
     def get_context(self):
         fields = []
@@ -316,10 +314,7 @@ class BaseForm(RenderableFormMixin):
                 del self.cleaned_data[field]
 
     def has_error(self, field, code=None):
-        return field in self.errors and (
-            code is None
-            or any(error.code == code for error in self.errors.as_data()[field])
-        )
+        pass
 
     def full_clean(self):
         """
@@ -380,36 +375,33 @@ class BaseForm(RenderableFormMixin):
 
     @cached_property
     def changed_data(self):
-        return [name for name, bf in self._bound_items() if bf._has_changed()]
+        pass
 
     @property
     def media(self):
         """Return all media required to render the widgets on this form."""
-        media = Media()
-        for field in self.fields.values():
-            media += field.widget.media
-        return media
+        pass
 
     def is_multipart(self):
         """
         Return True if the form needs to be multipart-encoded, i.e. it has
         FileInput, or False otherwise.
         """
-        return any(field.widget.needs_multipart_form for field in self.fields.values())
+        pass
 
     def hidden_fields(self):
         """
         Return a list of all the BoundField objects that are hidden fields.
         Useful for manual form layout in templates.
         """
-        return [field for field in self if field.is_hidden]
+        pass
 
     def visible_fields(self):
         """
         Return a list of BoundField objects that aren't hidden fields.
         The opposite of the hidden_fields() method.
         """
-        return [field for field in self if not field.is_hidden]
+        pass
 
     def get_initial_for_field(self, field, field_name):
         """

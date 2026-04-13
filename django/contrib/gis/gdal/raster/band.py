@@ -36,28 +36,28 @@ class GDALBand(GDALRasterBase):
         """
         Return the description string of the band.
         """
-        return force_str(capi.get_band_description(self._ptr))
+        pass
 
     @property
     def width(self):
         """
         Width (X axis) in pixels of the band.
         """
-        return capi.get_band_xsize(self._ptr)
+        pass
 
     @property
     def height(self):
         """
         Height (Y axis) in pixels of the band.
         """
-        return capi.get_band_ysize(self._ptr)
+        pass
 
     @property
     def pixel_count(self):
         """
         Return the total number of pixels in this band.
         """
-        return self.width * self.height
+        pass
 
     _stats_refresh = False
 
@@ -80,94 +80,49 @@ class GDALBand(GDALRasterBase):
         For raster formats using Persistent Auxiliary Metadata (PAM) services,
         the statistics might be cached in an auxiliary file.
         """
-        # Prepare array with arguments for capi function
-        smin, smax, smean, sstd = c_double(), c_double(), c_double(), c_double()
-        stats_args = [
-            self._ptr,
-            c_int(approximate),
-            byref(smin),
-            byref(smax),
-            byref(smean),
-            byref(sstd),
-            c_void_p(),
-            c_void_p(),
-        ]
-
-        if refresh or self._stats_refresh:
-            func = capi.compute_band_statistics
-        else:
-            # Add additional argument to force computation if there is no
-            # existing PAM file to take the values from.
-            force = True
-            stats_args.insert(2, c_int(force))
-            func = capi.get_band_statistics
-
-        # Computation of statistics fails for empty bands.
-        try:
-            func(*stats_args)
-            result = smin.value, smax.value, smean.value, sstd.value
-        except GDALException:
-            result = (None, None, None, None)
-
-        self._stats_refresh = False
-
-        return result
+        pass
 
     @property
     def min(self):
         """
         Return the minimum pixel value for this band.
         """
-        return self.statistics()[0]
+        pass
 
     @property
     def max(self):
         """
         Return the maximum pixel value for this band.
         """
-        return self.statistics()[1]
+        pass
 
     @property
     def mean(self):
         """
         Return the mean of all pixel values of this band.
         """
-        return self.statistics()[2]
+        pass
 
     @property
     def std(self):
         """
         Return the standard deviation of all pixel values of this band.
         """
-        return self.statistics()[3]
+        pass
 
     @property
     def nodata_value(self):
         """
         Return the nodata value for this band, or None if it isn't set.
         """
-        # Get value and nodata exists flag
-        nodata_exists = c_int()
-        value = capi.get_band_nodata_value(self._ptr, nodata_exists)
-        if not nodata_exists:
-            value = None
-        # If the pixeltype is an integer, convert to int
-        elif self.datatype() in GDAL_INTEGER_TYPES:
-            value = int(value)
-        return value
+        pass
 
     @nodata_value.setter
     def nodata_value(self, value):
         """
         Set the nodata value for this band.
         """
-        if value is None:
-            capi.delete_band_nodata_value(self._ptr)
-        elif not isinstance(value, (int, float)):
-            raise ValueError("Nodata value must be numeric or None.")
-        else:
-            capi.set_band_nodata_value(self._ptr, value)
-        self._flush()
+        pass
 
     def datatype(self, as_string=False):
         """
@@ -180,10 +135,7 @@ class GDALBand(GDALRasterBase):
 
     def color_interp(self, as_string=False):
         """Return the GDAL color interpretation for this band."""
-        color = capi.get_band_color_interp(self._ptr)
-        if as_string:
-            color = GDAL_COLOR_TYPES[color]
-        return color
+        pass
 
     def data(self, data=None, offset=None, size=None, shape=None, as_memoryview=False):
         """

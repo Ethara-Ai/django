@@ -34,17 +34,15 @@ class ChoicesType(EnumType):
 
     @property
     def names(cls):
-        empty = ["__empty__"] if hasattr(cls, "__empty__") else []
-        return empty + [member.name for member in cls]
+        pass
 
     @property
     def choices(cls):
-        empty = [(None, cls.__empty__)] if hasattr(cls, "__empty__") else []
-        return empty + [(member.value, member.label) for member in cls]
+        pass
 
     @property
     def labels(cls):
-        return [label for _, label in cls.choices]
+        pass
 
     @property
     def values(cls):
@@ -58,7 +56,7 @@ class Choices(enum.Enum, metaclass=ChoicesType):
 
     @enum_property
     def label(self):
-        return self._label_
+        pass
 
     # A similar format was proposed for Python 3.10.
     def __repr__(self):
@@ -76,4 +74,4 @@ class TextChoices(Choices, StrEnum):
 
     @staticmethod
     def _generate_next_value_(name, start, count, last_values):
-        return name
+        pass

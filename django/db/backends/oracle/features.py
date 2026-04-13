@@ -95,148 +95,57 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def supports_json_negative_indexing(self):
-        return self.connection.oracle_version >= (21,)
+        pass
 
     @cached_property
     def django_test_skips(self):
-        skips = {
-            "Oracle doesn't support SHA224.": {
-                "db_functions.text.test_sha224.SHA224Tests.test_basic",
-                "db_functions.text.test_sha224.SHA224Tests.test_transform",
-            },
-            "Oracle doesn't correctly calculate ISO 8601 week numbering before "
-            "1583 (the Gregorian calendar was introduced in 1582).": {
-                "db_functions.datetime.test_extract_trunc.DateFunctionTests."
-                "test_trunc_week_before_1000",
-                "db_functions.datetime.test_extract_trunc."
-                "DateFunctionWithTimeZoneTests.test_trunc_week_before_1000",
-            },
-            "Oracle doesn't support bitwise XOR.": {
-                "expressions.tests.ExpressionOperatorTests.test_lefthand_bitwise_xor",
-                "expressions.tests.ExpressionOperatorTests."
-                "test_lefthand_bitwise_xor_null",
-                "expressions.tests.ExpressionOperatorTests."
-                "test_lefthand_bitwise_xor_right_null",
-            },
-            "Oracle requires ORDER BY in row_number, ANSI:SQL doesn't.": {
-                "expressions_window.tests.WindowFunctionTests."
-                "test_row_number_no_ordering",
-                "prefetch_related.tests.PrefetchLimitTests.test_empty_order",
-            },
-            "Oracle doesn't support changing collations on indexed columns (#33671).": {
-                "migrations.test_operations.OperationTests."
-                "test_alter_field_pk_fk_db_collation",
-            },
-            "Oracle doesn't support comparing NCLOB to NUMBER.": {
-                "generic_relations_regress.tests.GenericRelationTests."
-                "test_textlink_filter",
-            },
-            "Oracle doesn't support casting filters to NUMBER.": {
-                "lookup.tests.LookupQueryingTests.test_aggregate_combined_lookup",
-            },
-            "Oracle doesn't support some data types (e.g. BOOLEAN, BLOB) in "
-            "GeneratedField expressions (ORA-54003).": {
-                "schema.tests.SchemaTests.test_add_generated_field_contains",
-                "schema.tests.SchemaTests.test_add_generated_field_with_kt_model",
-            },
-        }
-        if self.connection.oracle_version < (23,):
-            skips.update(
-                {
-                    "Raises ORA-00600 on Oracle < 23c: internal error code.": {
-                        "model_fields.test_jsonfield.TestQuerying."
-                        "test_usage_in_subquery",
-                    },
-                }
-            )
-        if self.connection.is_pool:
-            skips.update(
-                {
-                    "Pooling does not support persistent connections": {
-                        "backends.base.test_base.ConnectionHealthChecksTests."
-                        "test_health_checks_enabled",
-                        "backends.base.test_base.ConnectionHealthChecksTests."
-                        "test_health_checks_enabled_errors_occurred",
-                        "backends.base.test_base.ConnectionHealthChecksTests."
-                        "test_health_checks_disabled",
-                        "backends.base.test_base.ConnectionHealthChecksTests."
-                        "test_set_autocommit_health_checks_enabled",
-                        "servers.tests.LiveServerTestCloseConnectionTest."
-                        "test_closes_connections",
-                        "backends.oracle.tests.TransactionalTests."
-                        "test_password_with_at_sign",
-                    },
-                }
-            )
-        return skips
+        pass
 
     @cached_property
     def introspected_field_types(self):
-        return {
-            **super().introspected_field_types,
-            "GenericIPAddressField": "CharField",
-            "PositiveBigIntegerField": "BigIntegerField",
-            "PositiveIntegerField": "IntegerField",
-            "PositiveSmallIntegerField": "IntegerField",
-            "SmallIntegerField": "IntegerField",
-            "TimeField": "DateTimeField",
-        }
+        pass
 
     @cached_property
     def test_collations(self):
-        return {
-            "ci": "BINARY_CI",
-            "cs": "BINARY",
-            "non_default": "SWEDISH_CI",
-            "swedish_ci": "SWEDISH_CI",
-            "virtual": "SWEDISH_CI" if self.supports_collation_on_charfield else None,
-        }
+        pass
 
     @cached_property
     def supports_collation_on_charfield(self):
-        sql = "SELECT CAST('a' AS VARCHAR2(4001))" + self.bare_select_suffix
-        with self.connection.cursor() as cursor:
-            try:
-                cursor.execute(sql)
-            except DatabaseError as e:
-                if e.args[0].code == 910:
-                    return False
-                raise
-            return True
+        pass
 
     @cached_property
     def supports_primitives_in_json_field(self):
-        return self.connection.oracle_version >= (21,)
+        pass
 
     @cached_property
     def supports_frame_exclusion(self):
-        return self.connection.oracle_version >= (21,)
+        pass
 
     @cached_property
     def supports_boolean_expr_in_select_clause(self):
-        return self.connection.oracle_version >= (23,)
+        pass
 
     @cached_property
     def supports_comparing_boolean_expr(self):
-        return self.connection.oracle_version >= (23,)
+        pass
 
     @cached_property
     def supports_aggregation_over_interval_types(self):
-        return self.connection.oracle_version >= (23,)
+        pass
 
     @cached_property
     def bare_select_suffix(self):
-        return "" if self.connection.oracle_version >= (23,) else " FROM DUAL"
+        pass
 
     @cached_property
     def supports_tuple_lookups(self):
         # Support is known to be missing on 23.2 but available on 23.4.
-        return self.connection.oracle_version >= (23, 4)
+        pass
 
     @cached_property
     def supports_uuid4_function(self):
-        return self.connection.oracle_version >= (23, 9)
+        pass
 
     @cached_property
     def supports_stored_generated_columns(self):
-        return self.connection.oracle_version >= (23, 7)
+        pass

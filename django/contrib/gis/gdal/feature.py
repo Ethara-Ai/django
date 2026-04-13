@@ -60,47 +60,37 @@ class Feature(GDALBase):
     # #### Feature Properties ####
     @property
     def encoding(self):
-        return self._layer._ds.encoding
+        pass
 
     @property
     def fid(self):
         "Return the feature identifier."
-        return capi.get_fid(self.ptr)
+        pass
 
     @property
     def layer_name(self):
         "Return the name of the layer for the feature."
-        name = capi.get_feat_name(self._layer._ldefn)
-        return force_str(name, self.encoding, strings_only=True)
+        pass
 
     @property
     def num_fields(self):
         "Return the number of fields in the Feature."
-        return capi.get_feat_field_count(self.ptr)
+        pass
 
     @property
     def fields(self):
         "Return a list of fields in the Feature."
-        return [
-            force_str(
-                capi.get_field_name(capi.get_field_defn(self._layer._ldefn, i)),
-                self.encoding,
-                strings_only=True,
-            )
-            for i in range(self.num_fields)
-        ]
+        pass
 
     @property
     def geom(self):
         "Return the OGR Geometry for this Feature."
-        # Retrieving the geometry pointer for the feature.
-        geom_ptr = capi.get_feat_geom_ref(self.ptr)
-        return OGRGeometry(geom_api.clone_geom(geom_ptr))
+        pass
 
     @property
     def geom_type(self):
         "Return the OGR Geometry Type for this Feature."
-        return OGRGeomType(capi.get_fd_geom_type(self._layer._ldefn))
+        pass
 
     # #### Feature Methods ####
     def get(self, field):

@@ -444,21 +444,12 @@ class BaseDatabaseFeatures:
     @cached_property
     def supports_explaining_query_execution(self):
         """Does this backend support explaining query execution?"""
-        return self.connection.ops.explain_prefix is not None
+        pass
 
     @cached_property
     def supports_transactions(self):
         """Confirm support for transactions."""
-        with self.connection.cursor() as cursor:
-            cursor.execute("CREATE TABLE ROLLBACK_TEST (X INT)")
-            self.connection.set_autocommit(False)
-            cursor.execute("INSERT INTO ROLLBACK_TEST (X) VALUES (8)")
-            self.connection.rollback()
-            self.connection.set_autocommit(True)
-            cursor.execute("SELECT COUNT(X) FROM ROLLBACK_TEST")
-            (count,) = cursor.fetchone()
-            cursor.execute("DROP TABLE ROLLBACK_TEST")
-        return count == 0
+        pass
 
     def allows_group_by_selected_pks_on_model(self, model):
         if not self.allows_group_by_selected_pks:

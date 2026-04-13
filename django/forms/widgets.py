@@ -132,15 +132,11 @@ class Media:
 
     @property
     def _css(self):
-        css = defaultdict(list)
-        for css_list in self._css_lists:
-            for medium, sublist in css_list.items():
-                css[medium].append(sublist)
-        return {medium: self.merge(*lists) for medium, lists in css.items()}
+        pass
 
     @property
     def _js(self):
-        return self.merge(*self._js_lists)
+        pass
 
     def render(self):
         return mark_safe(
@@ -152,34 +148,12 @@ class Media:
         )
 
     def render_js(self):
-        return [
-            (
-                path.__html__()
-                if hasattr(path, "__html__")
-                else format_html('<script src="{}"></script>', self.absolute_path(path))
-            )
-            for path in self._js
-        ]
+        pass
 
     def render_css(self):
         # To keep rendering order consistent, we can't just iterate over
         # items(). We need to sort the keys, and iterate over the sorted list.
-        media = sorted(self._css)
-        return chain.from_iterable(
-            [
-                (
-                    path.__html__()
-                    if hasattr(path, "__html__")
-                    else format_html(
-                        '<link href="{}" media="{}" rel="stylesheet">',
-                        self.absolute_path(path),
-                        medium,
-                    )
-                )
-                for path in self._css[medium]
-            ]
-            for medium in media
-        )
+        pass
 
     def absolute_path(self, path):
         """
@@ -187,9 +161,7 @@ class Media:
         path. An absolute path will be returned unchanged while a relative path
         will be passed to django.templatetags.static.static().
         """
-        if path.startswith(("http://", "https://", "/")):
-            return path
-        return static(path)
+        pass
 
     def __getitem__(self, name):
         """Return a Media object that only contains media of the given type."""
@@ -241,26 +213,7 @@ class Media:
 def media_property(cls):
     def _media(self):
         # Get the media property of the superclass, if it exists
-        sup_cls = super(cls, self)
-        try:
-            base = sup_cls.media
-        except AttributeError:
-            base = Media()
-
-        # Get the media definition for this class
-        definition = getattr(cls, "Media", None)
-        if definition:
-            extend = getattr(definition, "extend", True)
-            if extend:
-                if extend is True:
-                    m = base
-                else:
-                    m = Media()
-                    for medium in extend:
-                        m += base[medium]
-                return m + Media(definition)
-            return Media(definition)
-        return base
+        pass
 
     return property(_media)
 
@@ -297,11 +250,10 @@ class Widget(metaclass=MediaDefiningClass):
 
     @property
     def is_hidden(self):
-        return self.input_type == "hidden" if hasattr(self, "input_type") else False
+        pass
 
     def subwidgets(self, name, value, attrs=None):
-        context = self.get_context(name, value, attrs)
-        yield context["widget"]
+        pass
 
     def format_value(self, value):
         """
@@ -362,7 +314,7 @@ class Widget(metaclass=MediaDefiningClass):
         return id_
 
     def use_required_attribute(self, initial):
-        return not self.is_hidden
+        pass
 
 
 class Input(Widget):
@@ -518,7 +470,7 @@ class FileInput(Input):
         return name not in files
 
     def use_required_attribute(self, initial):
-        return super().use_required_attribute(initial) and not initial
+        pass
 
 
 FILE_INPUT_CONTRADICTION = object()
@@ -641,7 +593,7 @@ class TimeInput(DateTimeBaseInput):
 
 # Defined at module level so that CheckboxInput is picklable (#17976)
 def boolean_check(v):
-    return not (v is False or v is None or v == "")
+    pass
 
 
 class CheckboxInput(Input):
@@ -708,13 +660,11 @@ class ChoiceWidget(Widget):
         Yield all "subwidgets" of this widget. Used to enable iterating
         options from a BoundField for choice widgets.
         """
-        value = self.format_value(value)
-        yield from self.options(name, value, attrs)
+        pass
 
     def options(self, name, value, attrs=None):
         """Yield a flat list of options for this widget."""
-        for group in self.optgroups(name, value, attrs):
-            yield from group[1]
+        pass
 
     def optgroups(self, name, value, attrs=None):
         """Return a list of optgroups for this widget."""
@@ -814,11 +764,11 @@ class ChoiceWidget(Widget):
 
     @property
     def choices(self):
-        return self._choices
+        pass
 
     @choices.setter
     def choices(self, value):
-        self._choices = normalize_choices(value)
+        pass
 
 
 class Select(ChoiceWidget):
@@ -838,25 +788,14 @@ class Select(ChoiceWidget):
     @staticmethod
     def _choice_has_empty_value(choice):
         """Return True if the choice's value is empty string or None."""
-        value, _ = choice
-        return value is None or value == ""
+        pass
 
     def use_required_attribute(self, initial):
         """
         Don't render 'required' if the first <option> has a value, as that's
         invalid HTML.
         """
-        use_required_attribute = super().use_required_attribute(initial)
-        # 'required' is always okay for <select multiple>.
-        if self.allow_multiple_selected:
-            return use_required_attribute
-
-        first_choice = next(iter(self.choices), None)
-        return (
-            use_required_attribute
-            and first_choice is not None
-            and self._choice_has_empty_value(first_choice)
-        )
+        pass
 
 
 class NullBooleanSelect(Select):
@@ -943,7 +882,7 @@ class CheckboxSelectMultiple(RadioSelect):
     def use_required_attribute(self, initial):
         # Don't use the 'required' attribute because browser validation would
         # require all checkboxes to be checked instead of at least one.
-        return False
+        pass
 
     def value_omitted_from_data(self, data, files, name):
         # HTML checkboxes don't appear in POST data if not checked, so it's
@@ -976,7 +915,7 @@ class MultiWidget(Widget):
 
     @property
     def is_hidden(self):
-        return all(w.is_hidden for w in self.widgets)
+        pass
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
@@ -1041,10 +980,7 @@ class MultiWidget(Widget):
         Media for a multiwidget is the combination of all media of the
         subwidgets.
         """
-        media = Media()
-        for w in self.widgets:
-            media += w.media
-        return media
+        pass
 
     media = property(_get_media)
 
@@ -1055,7 +991,7 @@ class MultiWidget(Widget):
 
     @property
     def needs_multipart_form(self):
-        return any(w.needs_multipart_form for w in self.widgets)
+        pass
 
 
 class SplitDateTimeWidget(MultiWidget):

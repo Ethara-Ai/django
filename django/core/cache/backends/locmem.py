@@ -50,32 +50,13 @@ class LocMemCache(BaseCache):
         self._expire_info[key] = self.get_backend_timeout(timeout)
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_and_validate_key(key, version=version)
-        pickled = pickle.dumps(value, self.pickle_protocol)
-        with self._lock:
-            self._set(key, pickled, timeout)
+        pass
 
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_and_validate_key(key, version=version)
-        with self._lock:
-            if self._has_expired(key):
-                return False
-            self._expire_info[key] = self.get_backend_timeout(timeout)
-            return True
+        pass
 
     def incr(self, key, delta=1, version=None):
-        key = self.make_and_validate_key(key, version=version)
-        with self._lock:
-            if self._has_expired(key):
-                self._delete(key)
-                raise ValueError("Key '%s' not found" % key)
-            pickled = self._cache[key]
-            value = pickle.loads(pickled)
-            new_value = value + delta
-            pickled = pickle.dumps(new_value, self.pickle_protocol)
-            self._cache[key] = pickled
-            self._cache.move_to_end(key, last=False)
-        return new_value
+        pass
 
     def has_key(self, key, version=None):
         key = self.make_and_validate_key(key, version=version)

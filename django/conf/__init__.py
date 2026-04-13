@@ -126,26 +126,15 @@ class LazySettings(LazyObject):
         Useful when the app is being served at a subpath and manually prefixing
         subpath to STATIC_URL and MEDIA_URL in settings is inconvenient.
         """
-        # Don't apply prefix to absolute paths and URLs.
-        if value.startswith(("http://", "https://", "/")):
-            return value
-        from django.urls import get_script_prefix
-
-        return "%s%s" % (get_script_prefix(), value)
+        pass
 
     @property
     def configured(self):
         """Return True if the settings have already been configured."""
-        return self._wrapped is not empty
+        pass
 
     def _show_deprecation_warning(self, message, category):
-        stack = traceback.extract_stack()
-        # Show a warning if the setting is used outside of Django.
-        # Stack index: -1 this line, -2 the property, -3 the
-        # LazyObject __getattribute__(), -4 the caller.
-        filename, _, _, _ = stack[-4]
-        if not filename.startswith(os.path.dirname(django.__file__)):
-            warnings.warn(message, category, stacklevel=2)
+        pass
 
 
 class Settings:
@@ -195,7 +184,7 @@ class Settings:
             time.tzset()
 
     def is_overridden(self, setting):
-        return setting in self._explicit_settings
+        pass
 
     def __repr__(self):
         return '<%(cls)s "%(settings_module)s">' % {
@@ -241,12 +230,7 @@ class UserSettingsHolder:
         )
 
     def is_overridden(self, setting):
-        deleted = setting in self._deleted
-        set_locally = setting in self.__dict__
-        set_on_default = getattr(
-            self.default_settings, "is_overridden", lambda s: False
-        )(setting)
-        return deleted or set_locally or set_on_default
+        pass
 
     def __repr__(self):
         return "<%(cls)s>" % {

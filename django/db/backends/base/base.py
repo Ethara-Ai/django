@@ -129,7 +129,7 @@ class BaseDatabaseWrapper:
         Ensure the connection's timezone is set to `self.timezone_name` and
         return whether it changed or not.
         """
-        return False
+        pass
 
     @cached_property
     def timezone(self):
@@ -159,26 +159,15 @@ class BaseDatabaseWrapper:
         """
         Name of the time zone of the database connection.
         """
-        if not settings.USE_TZ:
-            return settings.TIME_ZONE
-        elif self.settings_dict["TIME_ZONE"] is None:
-            return "UTC"
-        else:
-            return self.settings_dict["TIME_ZONE"]
+        pass
 
     @property
     def queries_logged(self):
-        return self.force_debug_cursor or settings.DEBUG
+        pass
 
     @property
     def queries(self):
-        if len(self.queries_log) == self.queries_log.maxlen:
-            warnings.warn(
-                "Limit for query logging exceeded, only the last {} queries "
-                "will be returned.".format(self.queries_log.maxlen),
-                stacklevel=2,
-            )
-        return list(self.queries_log)
+        pass
 
     def get_database_version(self):
         """Return a tuple of the database's version."""
@@ -435,7 +424,7 @@ class BaseDatabaseWrapper:
         """
         Reset the counter used to generate unique savepoint ids in this thread.
         """
-        self.savepoint_state = 0
+        pass
 
     # ##### Backend-specific transaction management methods #####
 
@@ -493,11 +482,7 @@ class BaseDatabaseWrapper:
 
     def get_rollback(self):
         """Get the "needs rollback" flag -- for *advanced use* only."""
-        if not self.in_atomic_block:
-            raise TransactionManagementError(
-                "The rollback flag doesn't work outside of an 'atomic' block."
-            )
-        return self.needs_rollback
+        pass
 
     def set_rollback(self, rollback):
         """
@@ -619,20 +604,13 @@ class BaseDatabaseWrapper:
 
     @property
     def allow_thread_sharing(self):
-        with self._thread_sharing_lock:
-            return self._thread_sharing_count > 0
+        pass
 
     def inc_thread_sharing(self):
-        with self._thread_sharing_lock:
-            self._thread_sharing_count += 1
+        pass
 
     def dec_thread_sharing(self):
-        with self._thread_sharing_lock:
-            if self._thread_sharing_count <= 0:
-                raise RuntimeError(
-                    "Cannot decrement the thread sharing count below zero."
-                )
-            self._thread_sharing_count -= 1
+        pass
 
     def validate_thread_sharing(self):
         """
@@ -664,7 +642,7 @@ class BaseDatabaseWrapper:
         Context manager and decorator that re-throws backend-specific database
         exceptions using Django's common wrappers.
         """
-        return DatabaseErrorWrapper(self)
+        pass
 
     def chunked_cursor(self):
         """
@@ -690,13 +668,7 @@ class BaseDatabaseWrapper:
 
         Provide a cursor: with self.temporary_connection() as cursor: ...
         """
-        must_close = self.connection is None
-        try:
-            with self.cursor() as cursor:
-                yield cursor
-        finally:
-            if must_close:
-                self.close()
+        pass
 
     @contextmanager
     def _nodb_cursor(self):
@@ -725,26 +697,7 @@ class BaseDatabaseWrapper:
         return self.SchemaEditorClass(self, *args, **kwargs)
 
     def on_commit(self, func, robust=False):
-        if not callable(func):
-            raise TypeError("on_commit()'s callback must be a callable.")
-        if self.in_atomic_block:
-            # Transaction in progress; save for execution on commit.
-            self.run_on_commit.append((set(self.savepoint_ids), func, robust))
-        elif not self.get_autocommit():
-            raise TransactionManagementError(
-                "on_commit() cannot be used in manual transaction management"
-            )
-        else:
-            # No transaction in progress and in autocommit mode; execute
-            # immediately.
-            if robust:
-                try:
-                    func()
-                except Exception as e:
-                    name = getattr(func, "__qualname__", func)
-                    logger.exception("Error calling %s in on_commit() (%s).", name, e)
-            else:
-                func()
+        pass
 
     def run_and_clear_commit_hooks(self):
         self.validate_no_atomic_block()
@@ -771,11 +724,7 @@ class BaseDatabaseWrapper:
         Return a context manager under which the wrapper is applied to suitable
         database query executions.
         """
-        self.execute_wrappers.append(wrapper)
-        try:
-            yield
-        finally:
-            self.execute_wrappers.pop()
+        pass
 
     def copy(self, alias=None):
         """

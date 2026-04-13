@@ -24,10 +24,10 @@ except ImportError:
 
 class DjangoSafeDumper(SafeDumper):
     def represent_decimal(self, data):
-        return self.represent_scalar("tag:yaml.org,2002:str", str(data))
+        pass
 
     def represent_ordered_dict(self, data):
-        return self.represent_mapping("tag:yaml.org,2002:map", data.items())
+        pass
 
 
 DjangoSafeDumper.add_representer(decimal.Decimal, DjangoSafeDumper.represent_decimal)

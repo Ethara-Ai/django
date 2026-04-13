@@ -45,7 +45,7 @@ class Point(GEOSGeometry):
         return None if self.empty else super()._to_pickle_wkb()
 
     def _from_pickle_wkb(self, wkb):
-        return self._create_empty() if wkb is None else super()._from_pickle_wkb(wkb)
+        pass
 
     def _ogr_ptr(self):
         return (
@@ -119,45 +119,43 @@ class Point(GEOSGeometry):
     @property
     def x(self):
         "Return the X component of the Point."
-        return self._cs.getOrdinate(0, 0)
+        pass
 
     @x.setter
     def x(self, value):
         "Set the X component of the Point."
-        self._cs.setOrdinate(0, 0, value)
+        pass
 
     @property
     def y(self):
         "Return the Y component of the Point."
-        return self._cs.getOrdinate(1, 0)
+        pass
 
     @y.setter
     def y(self, value):
         "Set the Y component of the Point."
-        self._cs.setOrdinate(1, 0, value)
+        pass
 
     @property
     def z(self):
         "Return the Z component of the Point."
-        return self._cs.getOrdinate(2, 0) if self.hasz else None
+        pass
 
     @z.setter
     def z(self, value):
         "Set the Z component of the Point."
-        if not self.hasz:
-            raise GEOSException("Cannot set Z on 2D Point.")
-        self._cs.setOrdinate(2, 0, value)
+        pass
 
     # ### Tuple setting and retrieval routines. ###
     @property
     def tuple(self):
         "Return a tuple of the point."
-        return self._cs.tuple
+        pass
 
     @tuple.setter
     def tuple(self, tup):
         "Set the coordinates of the point with the given tuple."
-        self._cs[0] = tup
+        pass
 
     # The tuple and coords properties
     coords = tuple

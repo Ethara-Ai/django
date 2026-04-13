@@ -48,23 +48,19 @@ class TransformPoint(list):
 
     @property
     def x(self):
-        return self[0]
+        pass
 
     @x.setter
     def x(self, value):
-        gtf = self._raster.geotransform
-        gtf[self.indices[self._prop][0]] = value
-        self._raster.geotransform = gtf
+        pass
 
     @property
     def y(self):
-        return self[1]
+        pass
 
     @y.setter
     def y(self, value):
-        gtf = self._raster.geotransform
-        gtf[self.indices[self._prop][1]] = value
-        self._raster.geotransform = gtf
+        pass
 
 
 class GDALRaster(GDALRasterBase):
@@ -243,24 +239,11 @@ class GDALRaster(GDALRasterBase):
 
     @property
     def vsi_buffer(self):
-        if not (
-            self.is_vsi_based and self.name.startswith(VSI_MEM_FILESYSTEM_BASE_PATH)
-        ):
-            return None
-        # Prepare an integer that will contain the buffer length.
-        out_length = c_int()
-        # Get the data using the vsi file name.
-        dat = capi.get_mem_buffer_from_vsi_file(
-            force_bytes(self.name),
-            byref(out_length),
-            VSI_DELETE_BUFFER_ON_READ,
-        )
-        # Read the full buffer pointer.
-        return string_at(dat, out_length.value)
+        pass
 
     @cached_property
     def is_vsi_based(self):
-        return self._ptr and self.name.startswith(VSI_FILESYSTEM_PREFIX)
+        pass
 
     @property
     def name(self):
@@ -268,42 +251,35 @@ class GDALRaster(GDALRasterBase):
         Return the name of this raster. Corresponds to filename
         for file-based rasters.
         """
-        return force_str(capi.get_ds_description(self._ptr))
+        pass
 
     @cached_property
     def driver(self):
         """
         Return the GDAL Driver used for this raster.
         """
-        ds_driver = capi.get_ds_driver(self._ptr)
-        return Driver(ds_driver)
+        pass
 
     @property
     def width(self):
         """
         Width (X axis) in pixels.
         """
-        return capi.get_ds_xsize(self._ptr)
+        pass
 
     @property
     def height(self):
         """
         Height (Y axis) in pixels.
         """
-        return capi.get_ds_ysize(self._ptr)
+        pass
 
     @property
     def srs(self):
         """
         Return the SpatialReference used in this GDALRaster.
         """
-        try:
-            wkt = capi.get_ds_projection_ref(self._ptr)
-            if not wkt:
-                return None
-            return SpatialReference(wkt, srs_type="wkt")
-        except SRSException:
-            return None
+        pass
 
     @srs.setter
     def srs(self, value):
@@ -312,28 +288,21 @@ class GDALRaster(GDALRasterBase):
         a SpatialReference or any parameter accepted by the SpatialReference
         constructor.
         """
-        if isinstance(value, SpatialReference):
-            srs = value
-        elif isinstance(value, (int, str)):
-            srs = SpatialReference(value)
-        else:
-            raise ValueError("Could not create a SpatialReference from input.")
-        capi.set_ds_projection_ref(self._ptr, srs.wkt.encode())
-        self._flush()
+        pass
 
     @property
     def srid(self):
         """
         Shortcut to access the srid of this GDALRaster.
         """
-        return self.srs.srid
+        pass
 
     @srid.setter
     def srid(self, value):
         """
         Shortcut to set this GDALRaster's srs from an srid.
         """
-        self.srs = value
+        pass
 
     @property
     def geotransform(self):
@@ -342,61 +311,44 @@ class GDALRaster(GDALRasterBase):
         Return the default geotransform if it does not exist or has not been
         set previously. The default is [0.0, 1.0, 0.0, 0.0, 0.0, -1.0].
         """
-        # Create empty ctypes double array for data
-        gtf = (c_double * 6)()
-        capi.get_ds_geotransform(self._ptr, byref(gtf))
-        return list(gtf)
+        pass
 
     @geotransform.setter
     def geotransform(self, values):
         "Set the geotransform for the data source."
-        if len(values) != 6 or not all(isinstance(x, (int, float)) for x in values):
-            raise ValueError("Geotransform must consist of 6 numeric values.")
-        # Create ctypes double array with input and write data
-        values = (c_double * 6)(*values)
-        capi.set_ds_geotransform(self._ptr, byref(values))
-        self._flush()
+        pass
 
     @property
     def origin(self):
         """
         Coordinates of the raster origin.
         """
-        return TransformPoint(self, "origin")
+        pass
 
     @property
     def scale(self):
         """
         Pixel scale in units of the raster projection.
         """
-        return TransformPoint(self, "scale")
+        pass
 
     @property
     def skew(self):
         """
         Skew of pixels (rotation parameters).
         """
-        return TransformPoint(self, "skew")
+        pass
 
     @property
     def extent(self):
         """
         Return the extent as a 4-tuple (xmin, ymin, xmax, ymax).
         """
-        # Calculate boundary values based on scale and size
-        xval = self.origin.x + self.scale.x * self.width
-        yval = self.origin.y + self.scale.y * self.height
-        # Calculate min and max values
-        xmin = min(xval, self.origin.x)
-        xmax = max(xval, self.origin.x)
-        ymin = min(yval, self.origin.y)
-        ymax = max(yval, self.origin.y)
-
-        return xmin, ymin, xmax, ymax
+        pass
 
     @property
     def bands(self):
-        return BandList(self)
+        pass
 
     def warp(self, ds_input, resampling="NearestNeighbour", max_error=0.0):
         """

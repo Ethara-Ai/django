@@ -38,7 +38,7 @@ def default_key_func(key, key_prefix, version):
     the `key_prefix`. KEY_FUNCTION can be used to specify an alternate
     function with custom key making behavior.
     """
-    return "%s:%s:%s" % (key_prefix, version, key)
+    pass
 
 
 def get_key_func(key_func):
@@ -137,9 +137,7 @@ class BaseCache:
         )
 
     async def aadd(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        return await sync_to_async(self.add, thread_sensitive=True)(
-            key, value, timeout, version
-        )
+        pass
 
     def get(self, key, default=None, version=None):
         """
@@ -175,9 +173,7 @@ class BaseCache:
         )
 
     async def atouch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
-        return await sync_to_async(self.touch, thread_sensitive=True)(
-            key, timeout, version
-        )
+        pass
 
     def delete(self, key, version=None):
         """
@@ -208,16 +204,7 @@ class BaseCache:
 
     async def aget_many(self, keys, version=None):
         """See get_many()."""
-        if self.get_many.__func__ is not BaseCache.get_many:
-            return await sync_to_async(self.get_many, thread_sensitive=True)(
-                keys, version=version
-            )
-        d = {}
-        for k in keys:
-            val = await self.aget(k, self._missing_key, version=version)
-            if val is not self._missing_key:
-                d[k] = val
-        return d
+        pass
 
     def get_or_set(self, key, default, timeout=DEFAULT_TIMEOUT, version=None):
         """
@@ -228,31 +215,11 @@ class BaseCache:
 
         Return the value of the key stored or retrieved.
         """
-        val = self.get(key, self._missing_key, version=version)
-        if val is self._missing_key:
-            if callable(default):
-                default = default()
-            self.add(key, default, timeout=timeout, version=version)
-            # Fetch the value again to avoid a race condition if another caller
-            # added a value between the first get() and the add() above.
-            return self.get(key, default, version=version)
-        return val
+        pass
 
     async def aget_or_set(self, key, default, timeout=DEFAULT_TIMEOUT, version=None):
         """See get_or_set()."""
-        if self.get_or_set.__func__ is not BaseCache.get_or_set:
-            return await sync_to_async(self.get_or_set, thread_sensitive=True)(
-                key, default, timeout=timeout, version=version
-            )
-        val = await self.aget(key, self._missing_key, version=version)
-        if val is self._missing_key:
-            if callable(default):
-                default = default()
-            await self.aadd(key, default, timeout=timeout, version=version)
-            # Fetch the value again to avoid a race condition if another caller
-            # added a value between the first aget() and the aadd() above.
-            return await self.aget(key, default, version=version)
-        return val
+        pass
 
     def has_key(self, key, version=None):
         """
@@ -277,35 +244,21 @@ class BaseCache:
         Add delta to value in the cache. If the key does not exist, raise a
         ValueError exception.
         """
-        value = self.get(key, self._missing_key, version=version)
-        if value is self._missing_key:
-            raise ValueError("Key '%s' not found" % key)
-        new_value = value + delta
-        self.set(key, new_value, version=version)
-        return new_value
+        pass
 
     async def aincr(self, key, delta=1, version=None):
         """See incr()."""
-        if self.incr.__func__ is not BaseCache.incr:
-            return await sync_to_async(self.incr, thread_sensitive=True)(
-                key, delta=delta, version=version
-            )
-        value = await self.aget(key, self._missing_key, version=version)
-        if value is self._missing_key:
-            raise ValueError("Key '%s' not found" % key)
-        new_value = value + delta
-        await self.aset(key, new_value, version=version)
-        return new_value
+        pass
 
     def decr(self, key, delta=1, version=None):
         """
         Subtract delta from value in the cache. If the key does not exist,
         raise a ValueError exception.
         """
-        return self.incr(key, -delta, version=version)
+        pass
 
     async def adecr(self, key, delta=1, version=None):
-        return await self.aincr(key, -delta, version=version)
+        pass
 
     def __contains__(self, key):
         """
@@ -328,18 +281,10 @@ class BaseCache:
         On backends that support it, return a list of keys that failed
         insertion, or an empty list if all keys were inserted successfully.
         """
-        for key, value in data.items():
-            self.set(key, value, timeout=timeout, version=version)
-        return []
+        pass
 
     async def aset_many(self, data, timeout=DEFAULT_TIMEOUT, version=None):
-        if self.set_many.__func__ is not BaseCache.set_many:
-            return await sync_to_async(self.set_many, thread_sensitive=True)(
-                data, timeout=timeout, version=version
-            )
-        for key, value in data.items():
-            await self.aset(key, value, timeout=timeout, version=version)
-        return []
+        pass
 
     def delete_many(self, keys, version=None):
         """
@@ -347,16 +292,10 @@ class BaseCache:
         (memcached), this is much more efficient than calling delete() multiple
         times.
         """
-        for key in keys:
-            self.delete(key, version=version)
+        pass
 
     async def adelete_many(self, keys, version=None):
-        if self.delete_many.__func__ is not BaseCache.delete_many:
-            return await sync_to_async(self.delete_many, thread_sensitive=True)(
-                keys, version=version
-            )
-        for key in keys:
-            await self.adelete(key, version=version)
+        pass
 
     def clear(self):
         """Remove *all* values from the cache at once."""
@@ -365,57 +304,35 @@ class BaseCache:
         )
 
     async def aclear(self):
-        return await sync_to_async(self.clear, thread_sensitive=True)()
+        pass
 
     def incr_version(self, key, delta=1, version=None):
         """
         Add delta to the cache version for the supplied key. Return the new
         version.
         """
-        if version is None:
-            version = self.version
-
-        value = self.get(key, self._missing_key, version=version)
-        if value is self._missing_key:
-            raise ValueError("Key '%s' not found" % key)
-
-        self.set(key, value, version=version + delta)
-        self.delete(key, version=version)
-        return version + delta
+        pass
 
     async def aincr_version(self, key, delta=1, version=None):
         """See incr_version()."""
-        if self.incr_version.__func__ is not BaseCache.incr_version:
-            return await sync_to_async(self.incr_version, thread_sensitive=True)(
-                key, delta=delta, version=version
-            )
-        if version is None:
-            version = self.version
-
-        value = await self.aget(key, self._missing_key, version=version)
-        if value is self._missing_key:
-            raise ValueError("Key '%s' not found" % key)
-
-        await self.aset(key, value, version=version + delta)
-        await self.adelete(key, version=version)
-        return version + delta
+        pass
 
     def decr_version(self, key, delta=1, version=None):
         """
         Subtract delta from the cache version for the supplied key. Return the
         new version.
         """
-        return self.incr_version(key, -delta, version)
+        pass
 
     async def adecr_version(self, key, delta=1, version=None):
-        return await self.aincr_version(key, -delta, version)
+        pass
 
     def close(self, **kwargs):
         """Close the cache connection"""
         pass
 
     async def aclose(self, **kwargs):
-        return await sync_to_async(self.close, thread_sensitive=True)(**kwargs)
+        pass
 
 
 memcached_error_chars_re = _lazy_re_compile(r"[\x00-\x20\x7f]")

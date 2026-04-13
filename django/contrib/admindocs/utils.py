@@ -113,56 +113,18 @@ def split_explicit_title(text):
     From sphinx.util.nodes.split_explicit_title. See:
     https://github.com/sphinx-doc/sphinx/blob/230ccf2/sphinx/util/nodes.py#L389
     """
-    match = explicit_title_re.match(text)
-    if match:
-        return True, match.group(1), match.group(2)
-    return False, text, text
+    pass
 
 
 def create_reference_role(rolename, urlbase):
     # Views and template names are case-sensitive.
-    is_case_sensitive = rolename in ["template", "view"]
-
-    def _role(name, rawtext, text, lineno, inliner, options=None, content=None):
-        if options is None:
-            options = {}
-        _, title, target = split_explicit_title(text)
-        node = docutils.nodes.reference(
-            rawtext,
-            title,
-            refuri=(
-                urlbase
-                % (
-                    inliner.document.settings.link_base,
-                    target if is_case_sensitive else target.lower(),
-                )
-            ),
-            **options,
-        )
-        return [node], []
-
-    docutils.parsers.rst.roles.register_canonical_role(rolename, _role)
+    pass
 
 
 def default_reference_role(
     name, rawtext, text, lineno, inliner, options=None, content=None
 ):
-    if options is None:
-        options = {}
-    context = inliner.document.settings.default_reference_context
-    node = docutils.nodes.reference(
-        rawtext,
-        text,
-        refuri=(
-            ROLES[context]
-            % (
-                inliner.document.settings.link_base,
-                text.lower(),
-            )
-        ),
-        **options,
-    )
-    return [node], []
+    pass
 
 
 if docutils_is_available:

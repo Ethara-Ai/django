@@ -109,38 +109,19 @@ class TruncateHTMLParser(HTMLParser):
 
     @cached_property
     def void_elements(self):
-        from django.utils.html import VOID_ELEMENTS
-
-        return VOID_ELEMENTS
+        pass
 
     def handle_startendtag(self, tag, attrs):
-        self.handle_starttag(tag, attrs)
-        if tag not in self.void_elements:
-            self.handle_endtag(tag)
+        pass
 
     def handle_starttag(self, tag, attrs):
-        self.output.append(self.get_starttag_text())
-        if tag not in self.void_elements:
-            self.tags.appendleft(tag)
+        pass
 
     def handle_endtag(self, tag):
-        if tag not in self.void_elements:
-            self.output.append(f"</{tag}>")
-            # Remove from the stack only if the tag matches the most recently
-            # opened tag (LIFO). This avoids O(n) linear scans for unmatched
-            # end tags if `deque.remove()` would be called.
-            if self.tags and self.tags[0] == tag:
-                self.tags.popleft()
+        pass
 
     def handle_data(self, data):
-        data, output = self.process(data)
-        data_len = len(data)
-        if self.remaining < data_len:
-            self.remaining = 0
-            self.output.append(add_truncation_text(output, self.replacement))
-            raise self.TruncationCompleted
-        self.remaining -= data_len
-        self.output.append(output)
+        pass
 
     def feed(self, data):
         try:
@@ -165,21 +146,12 @@ class TruncateCharsHTMLParser(TruncateHTMLParser):
         )
 
     def process(self, data):
-        self.processed_chars += len(data)
-        if (self.processed_chars == self.length) and (
-            sum(len(p) for p in self.output) + len(data) == len(self.rawdata)
-        ):
-            self.output.append(data)
-            raise self.TruncationCompleted
-        output = escape("".join(data[: self.remaining]))
-        return data, output
+        pass
 
 
 class TruncateWordsHTMLParser(TruncateHTMLParser):
     def process(self, data):
-        data = re.split(r"(?<=\S)\s+(?=\S)", data)
-        output = escape(" ".join(data[: self.remaining]))
-        return data, output
+        pass
 
 
 class Truncator(SimpleLazyObject):
@@ -307,41 +279,13 @@ def get_text_list(list_, last_word=gettext_lazy("or")):
 @keep_lazy_text
 def normalize_newlines(text):
     """Normalize CRLF and CR newlines to just LF."""
-    return re_newlines.sub("\n", str(text))
+    pass
 
 
 @keep_lazy_text
 def phone2numeric(phone):
     """Convert a phone number with letters into its numeric equivalent."""
-    char2number = {
-        "a": "2",
-        "b": "2",
-        "c": "2",
-        "d": "3",
-        "e": "3",
-        "f": "3",
-        "g": "4",
-        "h": "4",
-        "i": "4",
-        "j": "5",
-        "k": "5",
-        "l": "5",
-        "m": "6",
-        "n": "6",
-        "o": "6",
-        "p": "7",
-        "q": "7",
-        "r": "7",
-        "s": "7",
-        "t": "8",
-        "u": "8",
-        "v": "8",
-        "w": "9",
-        "x": "9",
-        "y": "9",
-        "z": "9",
-    }
-    return "".join(char2number.get(c, c) for c in phone.lower())
+    pass
 
 
 def _get_random_filename(max_random_bytes):
@@ -470,17 +414,7 @@ def slugify(value, allow_unicode=False):
     underscores, or hyphens. Convert to lowercase. Also strip leading and
     trailing whitespace, dashes, and underscores.
     """
-    value = str(value)
-    if allow_unicode:
-        value = unicodedata.normalize("NFKC", value)
-    else:
-        value = (
-            unicodedata.normalize("NFKD", value)
-            .encode("ascii", "ignore")
-            .decode("ascii")
-        )
-    value = re.sub(r"[^\w\s-]", "", value.lower())
-    return re.sub(r"[-\s]+", "-", value).strip("-_")
+    pass
 
 
 def camel_case_to_spaces(value):
@@ -495,7 +429,7 @@ def _format_lazy(format_string, *args, **kwargs):
     Apply str.format() on 'format_string' where format_string, args,
     and/or kwargs might be lazy.
     """
-    return format_string.format(*args, **kwargs)
+    pass
 
 
 format_lazy = lazy(_format_lazy, str)

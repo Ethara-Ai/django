@@ -154,12 +154,7 @@ class AdminSite:
 
         If a model isn't already registered, raise NotRegistered.
         """
-        if isinstance(model_or_iterable, ModelBase):
-            model_or_iterable = [model_or_iterable]
-        for model in model_or_iterable:
-            if not self.is_registered(model):
-                raise NotRegistered("The model %s is not registered" % model.__name__)
-            del self._registry[model]
+        pass
 
     def is_registered(self, model):
         """
@@ -177,15 +172,13 @@ class AdminSite:
         """
         Register an action to be available globally.
         """
-        name = name or action.__name__
-        self._actions[name] = action
-        self._global_actions[name] = action
+        pass
 
     def disable_action(self, name):
         """
         Disable a globally-registered action. Raise KeyError for invalid names.
         """
-        del self._actions[name]
+        pass
 
     def get_action(self, name):
         """
@@ -199,7 +192,7 @@ class AdminSite:
         """
         Get all the enabled actions as an iterable of (name, func).
         """
-        return self._actions.items()
+        pass
 
     def has_permission(self, request):
         """
@@ -323,7 +316,7 @@ class AdminSite:
 
     @property
     def urls(self):
-        return self.get_urls(), "admin", self.name
+        pass
 
     def each_context(self, request):
         """
@@ -352,33 +345,13 @@ class AdminSite:
         """
         Handle the "change password" task -- both form display and validation.
         """
-        from django.contrib.admin.forms import AdminPasswordChangeForm
-        from django.contrib.auth.views import PasswordChangeView
-
-        url = reverse("admin:password_change_done", current_app=self.name)
-        defaults = {
-            "form_class": self.password_change_form or AdminPasswordChangeForm,
-            "success_url": url,
-            "extra_context": {**self.each_context(request), **(extra_context or {})},
-        }
-        if self.password_change_template is not None:
-            defaults["template_name"] = self.password_change_template
-        request.current_app = self.name
-        return PasswordChangeView.as_view(**defaults)(request)
+        pass
 
     def password_change_done(self, request, extra_context=None):
         """
         Display the "success" page after a password change.
         """
-        from django.contrib.auth.views import PasswordChangeDoneView
-
-        defaults = {
-            "extra_context": {**self.each_context(request), **(extra_context or {})},
-        }
-        if self.password_change_done_template is not None:
-            defaults["template_name"] = self.password_change_done_template
-        request.current_app = self.name
-        return PasswordChangeDoneView.as_view(**defaults)(request)
+        pass
 
     def i18n_javascript(self, request, extra_context=None):
         """
@@ -387,7 +360,7 @@ class AdminSite:
         `extra_context` is unused but present for consistency with the other
         admin views.
         """
-        return JavaScriptCatalog.as_view(packages=["django.contrib.admin"])(request)
+        pass
 
     def logout(self, request, extra_context=None):
         """
@@ -449,22 +422,11 @@ class AdminSite:
         return LoginView.as_view(**defaults)(request)
 
     def autocomplete_view(self, request):
-        return AutocompleteJsonView.as_view(admin_site=self)(request)
+        pass
 
     @no_append_slash
     def catch_all_view(self, request, url):
-        if settings.APPEND_SLASH and not url.endswith("/"):
-            urlconf = getattr(request, "urlconf", None)
-            try:
-                match = resolve("%s/" % request.path_info, urlconf)
-            except Resolver404:
-                pass
-            else:
-                if getattr(match.func, "should_append_slash", True):
-                    return HttpResponsePermanentRedirect(
-                        request.get_full_path(force_append_slash=True)
-                    )
-        raise Http404
+        pass
 
     def _build_app_dict(self, request, label=None):
         """
@@ -576,28 +538,7 @@ class AdminSite:
         )
 
     def app_index(self, request, app_label, extra_context=None):
-        app_list = self.get_app_list(request, app_label)
-
-        if not app_list:
-            raise Http404("The requested admin page does not exist.")
-
-        context = {
-            **self.each_context(request),
-            "title": _("%(app)s administration") % {"app": app_list[0]["name"]},
-            "subtitle": None,
-            "app_list": app_list,
-            "app_label": app_label,
-            **(extra_context or {}),
-        }
-
-        request.current_app = self.name
-
-        return TemplateResponse(
-            request,
-            self.app_index_template
-            or ["admin/%s/app_index.html" % app_label, "admin/app_index.html"],
-            context,
-        )
+        pass
 
     def get_log_entries(self, request):
         from django.contrib.admin.models import LogEntry

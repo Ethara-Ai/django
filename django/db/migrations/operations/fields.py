@@ -14,11 +14,11 @@ class FieldOperation(Operation):
 
     @cached_property
     def model_name_lower(self):
-        return self.model_name.lower()
+        pass
 
     @cached_property
     def name_lower(self):
-        return self.name.lower()
+        pass
 
     def is_same_model_operation(self, operation):
         return self.model_name_lower == operation.model_name_lower
@@ -134,7 +134,7 @@ class AddField(FieldOperation):
 
     @property
     def migration_name_fragment(self):
-        return "%s_%s" % (self.model_name_lower, self.name_lower)
+        pass
 
     def reduce(self, operation, app_label):
         if isinstance(operation, FieldOperation) and self.is_same_field_operation(
@@ -188,7 +188,7 @@ class RemoveField(FieldOperation):
 
     @property
     def migration_name_fragment(self):
-        return "remove_%s_%s" % (self.model_name_lower, self.name_lower)
+        pass
 
     def reduce(self, operation, app_label):
         from .models import DeleteModel
@@ -252,7 +252,7 @@ class AlterField(FieldOperation):
 
     @property
     def migration_name_fragment(self):
-        return "alter_%s_%s" % (self.model_name_lower, self.name_lower)
+        pass
 
     def reduce(self, operation, app_label):
         if isinstance(
@@ -283,11 +283,11 @@ class RenameField(FieldOperation):
 
     @cached_property
     def old_name_lower(self):
-        return self.old_name.lower()
+        pass
 
     @cached_property
     def new_name_lower(self):
-        return self.new_name.lower()
+        pass
 
     def deconstruct(self):
         kwargs = {
@@ -331,11 +331,7 @@ class RenameField(FieldOperation):
 
     @property
     def migration_name_fragment(self):
-        return "rename_%s_%s_%s" % (
-            self.old_name_lower,
-            self.model_name_lower,
-            self.new_name_lower,
-        )
+        pass
 
     def references_field(self, model_name, name, app_label):
         return self.references_model(model_name, app_label) and (

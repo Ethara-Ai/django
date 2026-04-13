@@ -35,9 +35,7 @@ class GeneratedField(Field):
 
     @cached_property
     def cached_col(self):
-        from django.db.models.expressions import Col
-
-        return Col(self.model._meta.db_table, self, self.output_field)
+        pass
 
     def get_col(self, alias, output_field=None):
         if alias != self.model._meta.db_table and output_field in (None, self):
@@ -69,13 +67,7 @@ class GeneratedField(Field):
 
     @cached_property
     def referenced_fields(self):
-        resolved_expression = self.expression.resolve_expression(
-            self._query, allow_joins=False
-        )
-        referenced_fields = []
-        for col in self._query._gen_cols([resolved_expression]):
-            referenced_fields.append(col.target)
-        return frozenset(referenced_fields)
+        pass
 
     def check(self, **kwargs):
         databases = kwargs.get("databases") or []

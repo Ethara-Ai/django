@@ -198,14 +198,14 @@ def lazy(func, *resultclasses):
 
 
 def _lazy_proxy_unpickle(func, args, kwargs, *resultclasses):
-    return lazy(func, *resultclasses)(*args, **kwargs)
+    pass
 
 
 def lazystr(text):
     """
     Shortcut for the common case of a lazy callable that returns str.
     """
-    return lazy(str, str)(text)
+    pass
 
 
 def keep_lazy(*resultclasses):
@@ -239,7 +239,7 @@ def keep_lazy_text(func):
     """
     A decorator for functions that accept lazy arguments and return text.
     """
-    return keep_lazy(str)(func)
+    pass
 
 
 empty = object()
@@ -377,7 +377,7 @@ def unpickle_lazyobject(wrapped):
     Used to unpickle lazy objects. Just return its argument, which will be the
     wrapped object.
     """
-    return wrapped
+    pass
 
 
 class SimpleLazyObject(LazyObject):

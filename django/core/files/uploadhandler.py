@@ -250,4 +250,4 @@ def load_handler(path, *args, **kwargs):
         ... )
         <TemporaryFileUploadHandler object at 0x...>
     """
-    return import_string(path)(*args, **kwargs)
+    pass

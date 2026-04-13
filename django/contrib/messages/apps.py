@@ -7,8 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 def update_level_tags(setting, **kwargs):
-    if setting == "MESSAGE_TAGS":
-        base.LEVEL_TAGS = SimpleLazyObject(get_level_tags)
+    pass
 
 
 class MessagesConfig(AppConfig):

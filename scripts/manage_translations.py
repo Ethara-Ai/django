@@ -191,17 +191,7 @@ def _check_diff(cat_name, base_path):
     """
     Output the approximate number of changed/added strings in the en catalog.
     """
-    po_path = "%(path)s/en/LC_MESSAGES/django%(ext)s.po" % {
-        "path": base_path,
-        "ext": "js" if cat_name.endswith("-js") else "",
-    }
-    p = run(
-        "git diff -U0 %s | egrep '^[-+]msgid' | wc -l" % po_path,
-        capture_output=True,
-        shell=True,
-    )
-    num_changes = int(p.stdout.strip())
-    print("%d changed/added messages in '%s' catalog." % (num_changes, cat_name))
+    pass
 
 
 def update_catalogs(resources=None, languages=None, verbosity=0):
@@ -209,22 +199,7 @@ def update_catalogs(resources=None, languages=None, verbosity=0):
     Update the en/LC_MESSAGES/django.po (main and contrib) files with
     new/updated translatable strings.
     """
-    settings.configure()
-    django.setup()
-    if resources is not None:
-        print("`update_catalogs` will always process all resources.")
-    contrib_dirs = _get_locale_dirs(None, include_core=False)
-
-    os.chdir(os.path.join(os.getcwd(), "django"))
-    print("Updating en catalogs for Django and contrib apps...")
-    call_command("makemessages", locale=["en"], verbosity=verbosity)
-    print("Updating en JS catalogs for Django and contrib apps...")
-    call_command("makemessages", locale=["en"], domain="djangojs", verbosity=verbosity)
-
-    # Output changed stats
-    _check_diff("core", os.path.join(os.getcwd(), "conf", "locale"))
-    for name, dir_ in contrib_dirs:
-        _check_diff(name, dir_)
+    pass
 
 
 def lang_stats(resources=None, languages=None, verbosity=0):
@@ -234,33 +209,7 @@ def lang_stats(resources=None, languages=None, verbosity=0):
     If resources is provided, it should be a list of translation resource to
     limit the output (e.g. ['core', 'gis']).
     """
-    locale_dirs = _get_locale_dirs(resources)
-
-    for name, dir_ in locale_dirs:
-        print("\nShowing translations stats for '%s':" % name)
-        langs = sorted(d for d in os.listdir(dir_) if not d.startswith("_"))
-        for lang in langs:
-            if languages and lang not in languages:
-                continue
-            # TODO: merge first with the latest en catalog
-            po_path = "{path}/{lang}/LC_MESSAGES/django{ext}.po".format(
-                path=dir_, lang=lang, ext="js" if name.endswith("-js") else ""
-            )
-            p = run(
-                ["msgfmt", "-vc", "-o", "/dev/null", po_path],
-                capture_output=True,
-                env={"LANG": "C"},
-                encoding="utf-8",
-                verbosity=verbosity,
-            )
-            if p.returncode == 0:
-                # msgfmt output stats on stderr
-                print("%s: %s" % (lang, p.stderr.strip()))
-            else:
-                print(
-                    "Errors happened when checking %s translation for %s:\n%s"
-                    % (lang, name, p.stderr)
-                )
+    pass
 
 
 def fetch(resources=None, languages=None, date_since=None, verbosity=0):

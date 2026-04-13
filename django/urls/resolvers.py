@@ -393,15 +393,11 @@ class LocalePrefixPattern:
     @property
     def regex(self):
         # This is only used by reverse() and cached in _reverse_dict.
-        return re.compile(re.escape(self.language_prefix))
+        pass
 
     @property
     def language_prefix(self):
-        language_code = get_language() or settings.LANGUAGE_CODE
-        if language_code == settings.LANGUAGE_CODE and not self.prefix_default_language:
-            return ""
-        else:
-            return "%s/" % language_code
+        pass
 
     def match(self, path):
         language_prefix = self.language_prefix
@@ -490,14 +486,7 @@ class URLPattern:
         A string that identifies the view (e.g. 'path.to.view_function' or
         'path.to.ClassBasedView').
         """
-        callback = self.callback
-        if isinstance(callback, functools.partial):
-            callback = callback.func
-        if hasattr(callback, "view_class"):
-            callback = callback.view_class
-        elif not hasattr(callback, "__name__"):
-            return callback.__module__ + "." + callback.__class__.__name__
-        return callback.__module__ + "." + callback.__qualname__
+        pass
 
 
 class URLResolver:
@@ -628,24 +617,15 @@ class URLResolver:
 
     @property
     def reverse_dict(self):
-        language_code = get_language()
-        if language_code not in self._reverse_dict:
-            self._populate()
-        return self._reverse_dict[language_code]
+        pass
 
     @property
     def namespace_dict(self):
-        language_code = get_language()
-        if language_code not in self._namespace_dict:
-            self._populate()
-        return self._namespace_dict[language_code]
+        pass
 
     @property
     def app_dict(self):
-        language_code = get_language()
-        if language_code not in self._app_dict:
-            self._populate()
-        return self._app_dict[language_code]
+        pass
 
     @staticmethod
     def _extend_tried(tried, pattern, sub_tried=None):
@@ -718,26 +698,12 @@ class URLResolver:
 
     @cached_property
     def urlconf_module(self):
-        if isinstance(self.urlconf_name, str):
-            return import_module(self.urlconf_name)
-        else:
-            return self.urlconf_name
+        pass
 
     @cached_property
     def url_patterns(self):
         # urlconf_module might be a valid set of patterns, so we default to it
-        patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
-        try:
-            iter(patterns)
-        except TypeError as e:
-            msg = (
-                "The included URLconf '{name}' does not appear to have "
-                "any patterns in it. If you see the 'urlpatterns' variable "
-                "with valid patterns in the file then the issue is probably "
-                "caused by a circular import."
-            )
-            raise ImproperlyConfigured(msg.format(name=self.urlconf_name)) from e
-        return patterns
+        pass
 
     def resolve_error_handler(self, view_type):
         callback = getattr(self.urlconf_module, "handler%s" % view_type, None)

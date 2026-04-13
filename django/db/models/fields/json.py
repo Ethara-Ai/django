@@ -84,16 +84,7 @@ class JSONField(CheckFieldDefaultMixin, Field):
         return name, path, args, kwargs
 
     def from_db_value(self, value, expression, connection):
-        if value is None:
-            return value
-        # Some backends (SQLite at least) extract non-string values in their
-        # SQL datatypes.
-        if isinstance(expression, KeyTransform) and not isinstance(value, str):
-            return value
-        try:
-            return json.loads(value, cls=self.decoder)
-        except json.JSONDecodeError:
-            return value
+        pass
 
     def get_internal_type(self):
         return "JSONField"
@@ -230,39 +221,18 @@ class HasKeyLookup(PostgresOperatorLookup):
         return self._combine_sql_parts(sql_parts), tuple(params)
 
     def as_mysql(self, compiler, connection):
-        return self.as_sql(
-            compiler, connection, template="JSON_CONTAINS_PATH(%s, 'one', %s)"
-        )
+        pass
 
     def as_oracle(self, compiler, connection):
         # Use a custom delimiter to prevent the JSON path from escaping the SQL
         # literal. See comment in KeyTransform.
-        template = "JSON_EXISTS(%s, q'\uffff%s\uffff')"
-        sql_parts = []
-        params = []
-        for lhs_sql, lhs_params, rhs_json_path in self._as_sql_parts(
-            compiler, connection
-        ):
-            # Add right-hand-side directly into SQL because it cannot be passed
-            # as bind variables to JSON_EXISTS. It might result in invalid
-            # queries but it is assumed that it cannot be evaded because the
-            # path is JSON serialized.
-            sql_parts.append(template % (lhs_sql, rhs_json_path))
-            params.extend(lhs_params)
-        return self._combine_sql_parts(sql_parts), tuple(params)
+        pass
 
     def as_postgresql(self, compiler, connection):
-        if isinstance(self.rhs, KeyTransform):
-            *_, rhs_key_transforms = self.rhs.preprocess_lhs(compiler, connection)
-            for key in rhs_key_transforms[:-1]:
-                self.lhs = KeyTransform(key, self.lhs)
-            self.rhs = rhs_key_transforms[-1]
-        return super().as_postgresql(compiler, connection)
+        pass
 
     def as_sqlite(self, compiler, connection):
-        return self.as_sql(
-            compiler, connection, template="JSON_TYPE(%s, %s) IS NOT NULL"
-        )
+        pass
 
 
 class HasKey(HasKeyLookup):
@@ -342,12 +312,7 @@ class JSONExact(lookups.Exact):
         return rhs, rhs_params
 
     def as_oracle(self, compiler, connection):
-        lhs, lhs_params = self.process_lhs(compiler, connection)
-        rhs, rhs_params = self.process_rhs(compiler, connection)
-        if connection.features.supports_primitives_in_json_field:
-            lhs = f"JSON({lhs})"
-            rhs = f"JSON({rhs})"
-        return f"JSON_EQUAL({lhs}, {rhs} ERROR ON ERROR)", (*lhs_params, *rhs_params)
+        pass
 
 
 class JSONIContains(CaseInsensitiveMixin, lookups.IContains):
@@ -440,25 +405,7 @@ class JSONIn(ProcessJSONLHSMixin, lookups.In):
         return sql, params
 
     def as_oracle(self, compiler, connection):
-        if (
-            connection.features.supports_primitives_in_json_field
-            and isinstance(self.rhs, expressions.ExpressionList)
-            and expressions.JSONNull() in self.rhs.get_source_expressions()
-        ):
-            # Break the lookup into multiple exact lookups combined with OR, as
-            # Oracle does not support directly extracting JSON scalar null as a
-            # value in the right-hand side of an IN clause.
-            exact_lookup = self.lhs.get_lookup("exact")
-            sql_parts = []
-            all_params = ()
-            for expr in self.rhs.get_source_expressions():
-                lookup = exact_lookup(self.lhs, expr)
-                sql, params = lookup.as_oracle(compiler, connection)
-                sql_parts.append(f"({sql})")
-                all_params = (*all_params, *params)
-            sql = " OR ".join(sql_parts)
-            return sql, all_params
-        return self.as_sql(compiler, connection)
+        pass
 
 
 JSONField.register_lookup(DataContains)
@@ -492,27 +439,16 @@ class KeyTransform(ProcessJSONLHSMixin, Transform):
         return lhs, params, key_transforms
 
     def as_mysql(self, compiler, connection):
-        lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
-        return self._process_as_mysql(lhs, params, connection, key_transforms)
+        pass
 
     def as_oracle(self, compiler, connection):
-        lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
-        return self._process_as_oracle(lhs, params, connection, key_transforms)
+        pass
 
     def as_postgresql(self, compiler, connection):
-        lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
-        if len(key_transforms) > 1:
-            sql = "(%s %s %%s)" % (lhs, self.postgres_nested_operator)
-            return sql, (*params, key_transforms)
-        try:
-            lookup = int(self.key_name)
-        except ValueError:
-            lookup = self.key_name
-        return "(%s %s %%s)" % (lhs, self.postgres_operator), (*params, lookup)
+        pass
 
     def as_sqlite(self, compiler, connection):
-        lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
-        return self._process_as_sqlite(lhs, params, connection, key_transforms)
+        pass
 
 
 class KeyTextTransform(KeyTransform):
@@ -523,25 +459,11 @@ class KeyTextTransform(KeyTransform):
     def as_mysql(self, compiler, connection):
         # The ->> operator is not supported on MariaDB (see MDEV-13594) and
         # only supported against columns on MySQL.
-        if (
-            connection.mysql_is_mariadb
-            or getattr(self.lhs.output_field, "model", None) is None
-        ):
-            sql, params = super().as_mysql(compiler, connection)
-            return "JSON_UNQUOTE(%s)" % sql, params
-        else:
-            lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
-            json_path = connection.ops.compile_json_path(key_transforms)
-            return "(%s ->> %%s)" % lhs, (*params, json_path)
+        pass
 
     @classmethod
     def from_lookup(cls, lookup):
-        transform, *keys = lookup.split(LOOKUP_SEP)
-        if not keys:
-            raise ValueError("Lookup must contain key or index transforms.")
-        for key in keys:
-            transform = cls(key, transform)
-        return transform
+        pass
 
 
 KT = KeyTextTransform.from_lookup
@@ -572,25 +494,10 @@ class KeyTransformTextLookupMixin:
 class KeyTransformIsNull(lookups.IsNull):
     # key__isnull=False is the same as has_key='key'
     def as_oracle(self, compiler, connection):
-        sql, params = HasKeyOrArrayIndex(
-            self.lhs.lhs,
-            self.lhs.key_name,
-        ).as_oracle(compiler, connection)
-        if not self.rhs:
-            return sql, params
-        # Column doesn't have a key or IS NULL.
-        lhs, lhs_params, _ = self.lhs.preprocess_lhs(compiler, connection)
-        return "(NOT %s OR %s IS NULL)" % (sql, lhs), tuple(params) + tuple(lhs_params)
+        pass
 
     def as_sqlite(self, compiler, connection):
-        template = "JSON_TYPE(%s, %s) IS NULL"
-        if not self.rhs:
-            template = "JSON_TYPE(%s, %s) IS NOT NULL"
-        return HasKeyOrArrayIndex(self.lhs.lhs, self.lhs.key_name).as_sql(
-            compiler,
-            connection,
-            template=template,
-        )
+        pass
 
 
 class KeyTransformIn(JSONIn):
@@ -627,18 +534,7 @@ class KeyTransformExact(JSONExact):
         return rhs, rhs_params
 
     def as_oracle(self, compiler, connection):
-        rhs, rhs_params = super().process_rhs(compiler, connection)
-        if rhs_params and (*rhs_params,) == ("null",):
-            # Field has key and it's NULL.
-            has_key_expr = HasKeyOrArrayIndex(self.lhs.lhs, self.lhs.key_name)
-            has_key_sql, has_key_params = has_key_expr.as_oracle(compiler, connection)
-            is_null_expr = self.lhs.get_lookup("isnull")(self.lhs, True)
-            is_null_sql, is_null_params = is_null_expr.as_sql(compiler, connection)
-            return (
-                "%s AND %s" % (has_key_sql, is_null_sql),
-                tuple(has_key_params) + tuple(is_null_params),
-            )
-        return super().as_sql(compiler, connection)
+        pass
 
 
 class KeyTransformIExact(

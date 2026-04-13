@@ -11,4 +11,4 @@ class ArraySubquery(Subquery):
 
     @cached_property
     def output_field(self):
-        return ArrayField(self.query.output_field)
+        pass

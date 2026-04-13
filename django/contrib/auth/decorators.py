@@ -38,27 +38,12 @@ def user_passes_test(
         if iscoroutinefunction(view_func):
 
             async def _view_wrapper(request, *args, **kwargs):
-                auser = await request.auser()
-                if iscoroutinefunction(test_func):
-                    test_pass = await test_func(auser)
-                else:
-                    test_pass = await sync_to_async(test_func)(auser)
-
-                if test_pass:
-                    return await view_func(request, *args, **kwargs)
-                return _redirect_to_login(request)
+                pass
 
         else:
 
             def _view_wrapper(request, *args, **kwargs):
-                if iscoroutinefunction(test_func):
-                    test_pass = async_to_sync(test_func)(request.user)
-                else:
-                    test_pass = test_func(request.user)
-
-                if test_pass:
-                    return view_func(request, *args, **kwargs)
-                return _redirect_to_login(request)
+                pass
 
         # Attributes used by LoginRequiredMiddleware.
         _view_wrapper.login_url = login_url
@@ -90,8 +75,7 @@ def login_not_required(view_func):
     """
     Decorator for views that allows access to unauthenticated requests.
     """
-    view_func.login_required = False
-    return view_func
+    pass
 
 
 def permission_required(perm, login_url=None, raise_exception=False):
@@ -111,25 +95,13 @@ def permission_required(perm, login_url=None, raise_exception=False):
 
             async def check_perms(user):
                 # First check if the user has the permission (even anon users).
-                if await user.ahas_perms(perms):
-                    return True
-                # In case the 403 handler should be called raise the exception.
-                if raise_exception:
-                    raise PermissionDenied
-                # As the last resort, show the login form.
-                return False
+                pass
 
         else:
 
             def check_perms(user):
                 # First check if the user has the permission (even anon users).
-                if user.has_perms(perms):
-                    return True
-                # In case the 403 handler should be called raise the exception.
-                if raise_exception:
-                    raise PermissionDenied
-                # As the last resort, show the login form.
-                return False
+                pass
 
         return user_passes_test(check_perms, login_url=login_url)(view_func)
 

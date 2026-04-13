@@ -203,7 +203,7 @@ integer_validator = RegexValidator(
 
 
 def validate_integer(value):
-    return integer_validator(value)
+    pass
 
 
 @deconstructible
@@ -637,19 +637,11 @@ class FileExtensionValidator:
 
 
 def get_available_image_extensions():
-    try:
-        from PIL import Image
-    except ImportError:
-        return []
-    else:
-        Image.init()
-        return [ext.lower()[1:] for ext in Image.EXTENSION]
+    pass
 
 
 def validate_image_file_extension(value):
-    return FileExtensionValidator(allowed_extensions=get_available_image_extensions())(
-        value
-    )
+    pass
 
 
 @deconstructible

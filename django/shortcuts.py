@@ -45,13 +45,7 @@ def redirect(to, *args, permanent=False, preserve_request=False, **kwargs):
     permanent redirect. Set preserve_request=True to instruct the user agent
     to preserve the original HTTP method and body when following the redirect.
     """
-    redirect_class = (
-        HttpResponsePermanentRedirect if permanent else HttpResponseRedirect
-    )
-    return redirect_class(
-        resolve_url(to, *args, **kwargs),
-        preserve_request=preserve_request,
-    )
+    pass
 
 
 def _get_queryset(klass):
@@ -100,21 +94,7 @@ def get_object_or_404(klass, *args, **kwargs):
 
 async def aget_object_or_404(klass, *args, **kwargs):
     """See get_object_or_404()."""
-    queryset = _get_queryset(klass)
-    if not hasattr(queryset, "aget"):
-        klass__name = (
-            klass.__name__ if isinstance(klass, type) else klass.__class__.__name__
-        )
-        raise ValueError(
-            "First argument to aget_object_or_404() must be a Model, Manager, or "
-            f"QuerySet, not '{klass__name}'."
-        )
-    try:
-        return await queryset.aget(*args, **kwargs)
-    except queryset.model.DoesNotExist:
-        raise Http404(
-            _("No %s matches the given query.") % queryset.model._meta.object_name
-        )
+    pass
 
 
 def get_list_or_404(klass, *args, **kwargs):
@@ -125,40 +105,12 @@ def get_list_or_404(klass, *args, **kwargs):
     klass may be a Model, Manager, or QuerySet object. All other passed
     arguments and keyword arguments are used in the filter() query.
     """
-    queryset = _get_queryset(klass)
-    if not hasattr(queryset, "filter"):
-        klass__name = (
-            klass.__name__ if isinstance(klass, type) else klass.__class__.__name__
-        )
-        raise ValueError(
-            "First argument to get_list_or_404() must be a Model, Manager, or "
-            "QuerySet, not '%s'." % klass__name
-        )
-    obj_list = list(queryset.filter(*args, **kwargs))
-    if not obj_list:
-        raise Http404(
-            _("No %s matches the given query.") % queryset.model._meta.object_name
-        )
-    return obj_list
+    pass
 
 
 async def aget_list_or_404(klass, *args, **kwargs):
     """See get_list_or_404()."""
-    queryset = _get_queryset(klass)
-    if not hasattr(queryset, "filter"):
-        klass__name = (
-            klass.__name__ if isinstance(klass, type) else klass.__class__.__name__
-        )
-        raise ValueError(
-            "First argument to aget_list_or_404() must be a Model, Manager, or "
-            f"QuerySet, not '{klass__name}'."
-        )
-    obj_list = [obj async for obj in queryset.filter(*args, **kwargs)]
-    if not obj_list:
-        raise Http404(
-            _("No %s matches the given query.") % queryset.model._meta.object_name
-        )
-    return obj_list
+    pass
 
 
 def resolve_url(to, *args, **kwargs):

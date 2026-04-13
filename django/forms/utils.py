@@ -28,18 +28,7 @@ def flatatt(attrs):
 
     The result is passed through 'mark_safe' (by way of 'format_html_join').
     """
-    key_value_attrs = []
-    boolean_attrs = []
-    for attr, value in attrs.items():
-        if isinstance(value, bool):
-            if value:
-                boolean_attrs.append((attr,))
-        elif value is not None:
-            key_value_attrs.append((attr, value))
-
-    return format_html_join("", ' {}="{}"', sorted(key_value_attrs)) + format_html_join(
-        "", " {}", sorted(boolean_attrs)
-    )
+    pass
 
 
 class RenderableMixin:
@@ -60,7 +49,7 @@ class RenderableMixin:
 
 class RenderableFieldMixin(RenderableMixin):
     def as_field_group(self):
-        return self.render()
+        pass
 
     def as_hidden(self):
         raise NotImplementedError(
@@ -84,30 +73,30 @@ class RenderableFieldMixin(RenderableMixin):
 class RenderableFormMixin(RenderableMixin):
     def as_p(self):
         """Render as <p> elements."""
-        return self.render(self.template_name_p)
+        pass
 
     def as_table(self):
         """Render as <tr> elements excluding the surrounding <table> tag."""
-        return self.render(self.template_name_table)
+        pass
 
     def as_ul(self):
         """Render as <li> elements excluding the surrounding <ul> tag."""
-        return self.render(self.template_name_ul)
+        pass
 
     def as_div(self):
         """Render as <div> elements."""
-        return self.render(self.template_name_div)
+        pass
 
 
 class RenderableErrorMixin(RenderableMixin):
     def as_json(self, escape_html=False):
-        return json.dumps(self.get_json_data(escape_html))
+        pass
 
     def as_text(self):
-        return self.render(self.template_name_text)
+        pass
 
     def as_ul(self):
-        return self.render(self.template_name_ul)
+        pass
 
 
 class ErrorDict(dict, RenderableErrorMixin):
@@ -126,10 +115,10 @@ class ErrorDict(dict, RenderableErrorMixin):
         self.renderer = renderer or get_default_renderer()
 
     def as_data(self):
-        return {f: e.as_data() for f, e in self.items()}
+        pass
 
     def get_json_data(self, escape_html=False):
-        return {f: e.get_json_data(escape_html) for f, e in self.items()}
+        pass
 
     def get_context(self):
         return {
@@ -158,7 +147,7 @@ class ErrorList(UserList, list, RenderableErrorMixin):
         self.field_id = field_id
 
     def as_data(self):
-        return ValidationError(self.data).error_list
+        pass
 
     def copy(self):
         copy = super().copy()
@@ -167,16 +156,7 @@ class ErrorList(UserList, list, RenderableErrorMixin):
         return copy
 
     def get_json_data(self, escape_html=False):
-        errors = []
-        for error in self.as_data():
-            message = next(iter(error))
-            errors.append(
-                {
-                    "message": escape(message) if escape_html else message,
-                    "code": error.code or "",
-                }
-            )
-        return errors
+        pass
 
     def get_context(self):
         return {

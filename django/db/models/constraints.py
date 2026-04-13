@@ -36,7 +36,7 @@ class BaseConstraint:
 
     @property
     def contains_expressions(self):
-        return False
+        pass
 
     def constraint_sql(self, model, schema_editor):
         raise NotImplementedError("This method must be implemented by a subclass.")
@@ -333,7 +333,7 @@ class UniqueConstraint(BaseConstraint):
 
     @property
     def contains_expressions(self):
-        return bool(self.expressions)
+        pass
 
     def check(self, model, connection):
         errors = model._check_local_fields({*self.fields, *self.include}, "constraints")

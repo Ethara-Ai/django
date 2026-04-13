@@ -14,12 +14,12 @@ def no_append_slash(view_func):
     if iscoroutinefunction(view_func):
 
         async def _view_wrapper(request, *args, **kwargs):
-            return await view_func(request, *args, **kwargs)
+            pass
 
     else:
 
         def _view_wrapper(request, *args, **kwargs):
-            return view_func(request, *args, **kwargs)
+            pass
 
     _view_wrapper.should_append_slash = False
 

@@ -142,7 +142,7 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
     @property
     def tuple(self):
         "Return a tuple version of the geometry from the coordinate sequence."
-        return self._cs.tuple
+        pass
 
     coords = tuple
 
@@ -151,34 +151,27 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
         Return a sequence (list) corresponding with the given function.
         Return a numpy array if possible.
         """
-        lst = [func(i) for i in range(len(self))]
-        if numpy:
-            return numpy.array(lst)  # ARRRR!
-        else:
-            return lst
+        pass
 
     @property
     def array(self):
         "Return a numpy array for the LineString."
-        return self._listarr(self._cs.__getitem__)
+        pass
 
     @property
     def x(self):
         "Return a list or numpy array of the X variable."
-        return self._listarr(self._cs.getX)
+        pass
 
     @property
     def y(self):
         "Return a list or numpy array of the Y variable."
-        return self._listarr(self._cs.getY)
+        pass
 
     @property
     def z(self):
         "Return a list or numpy array of the Z variable."
-        if not self.hasz:
-            return None
-        else:
-            return self._listarr(self._cs.getZ)
+        pass
 
 
 # LinearRings are LineStrings used within Polygons.
@@ -188,6 +181,4 @@ class LinearRing(LineString):
 
     @property
     def is_counterclockwise(self):
-        if self.empty:
-            raise ValueError("Orientation of an empty LinearRing cannot be determined.")
-        return self._cs.is_counterclockwise
+        pass

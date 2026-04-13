@@ -123,19 +123,12 @@ class OGRGeomType:
     @property
     def name(self):
         "Return a short-hand string form of the OGR Geometry type."
-        return self._types[self.num]
+        pass
 
     @property
     def django(self):
         "Return the Django GeometryField for this OGR Type."
-        s = self.name.replace("25D", "")
-        if s in ("LinearRing", "None"):
-            return None
-        elif s == "Unknown":
-            s = "Geometry"
-        elif s == "PointZ":
-            s = "Point"
-        return s + "Field"
+        pass
 
     def to_multi(self):
         """

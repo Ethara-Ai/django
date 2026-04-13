@@ -140,9 +140,7 @@ def get_hashers_by_algorithm():
 
 @receiver(setting_changed)
 def reset_hashers(*, setting, **kwargs):
-    if setting == "PASSWORD_HASHERS":
-        get_hashers.cache_clear()
-        get_hashers_by_algorithm.cache_clear()
+    pass
 
 
 def get_hasher(algorithm="default"):
@@ -197,9 +195,7 @@ def mask_hash(hash, show=6, char="*"):
     Return the given hash, with only the first ``show`` number shown. The
     rest are masked with ``char`` for security reasons.
     """
-    masked = hash[:show]
-    masked += char * len(hash[show:])
-    return masked
+    pass
 
 
 def must_update_salt(salt, expected_entropy):
@@ -352,13 +348,7 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
         return constant_time_compare(encoded, encoded_2)
 
     def safe_summary(self, encoded):
-        decoded = self.decode(encoded)
-        return {
-            _("algorithm"): decoded["algorithm"],
-            _("iterations"): decoded["iterations"],
-            _("salt"): mask_hash(decoded["salt"]),
-            _("hash"): mask_hash(decoded["hash"]),
-        }
+        pass
 
     def must_update(self, encoded):
         decoded = self.decode(encoded)
@@ -445,17 +435,7 @@ class Argon2PasswordHasher(BasePasswordHasher):
             return False
 
     def safe_summary(self, encoded):
-        decoded = self.decode(encoded)
-        return {
-            _("algorithm"): decoded["algorithm"],
-            _("variety"): decoded["variety"],
-            _("version"): decoded["version"],
-            _("memory cost"): decoded["memory_cost"],
-            _("time cost"): decoded["time_cost"],
-            _("parallelism"): decoded["parallelism"],
-            _("salt"): mask_hash(decoded["salt"]),
-            _("hash"): mask_hash(decoded["hash"]),
-        }
+        pass
 
     def must_update(self, encoded):
         decoded = self.decode(encoded)
@@ -536,13 +516,7 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
         return constant_time_compare(encoded, encoded_2)
 
     def safe_summary(self, encoded):
-        decoded = self.decode(encoded)
-        return {
-            _("algorithm"): decoded["algorithm"],
-            _("work factor"): decoded["work_factor"],
-            _("salt"): mask_hash(decoded["salt"]),
-            _("checksum"): mask_hash(decoded["checksum"]),
-        }
+        pass
 
     def must_update(self, encoded):
         decoded = self.decode(encoded)
@@ -631,15 +605,7 @@ class ScryptPasswordHasher(BasePasswordHasher):
         return constant_time_compare(encoded, encoded_2)
 
     def safe_summary(self, encoded):
-        decoded = self.decode(encoded)
-        return {
-            _("algorithm"): decoded["algorithm"],
-            _("work factor"): decoded["work_factor"],
-            _("block size"): decoded["block_size"],
-            _("parallelism"): decoded["parallelism"],
-            _("salt"): mask_hash(decoded["salt"]),
-            _("hash"): mask_hash(decoded["hash"]),
-        }
+        pass
 
     def must_update(self, encoded):
         decoded = self.decode(encoded)
@@ -684,12 +650,7 @@ class MD5PasswordHasher(BasePasswordHasher):
         return constant_time_compare(encoded, encoded_2)
 
     def safe_summary(self, encoded):
-        decoded = self.decode(encoded)
-        return {
-            _("algorithm"): decoded["algorithm"],
-            _("salt"): mask_hash(decoded["salt"], show=2),
-            _("hash"): mask_hash(decoded["hash"]),
-        }
+        pass
 
     def must_update(self, encoded):
         decoded = self.decode(encoded)

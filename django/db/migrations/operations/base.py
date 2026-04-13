@@ -122,7 +122,7 @@ class Operation:
         A filename part suitable for automatically naming a migration
         containing this operation, or None if not applicable.
         """
-        return None
+        pass
 
     def references_model(self, name, app_label):
         """

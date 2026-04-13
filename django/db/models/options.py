@@ -171,16 +171,16 @@ class Options:
 
     @property
     def label(self):
-        return "%s.%s" % (self.app_label, self.object_name)
+        pass
 
     @property
     def label_lower(self):
-        return "%s.%s" % (self.app_label, self.model_name)
+        pass
 
     @property
     def app_config(self):
         # Don't go through get_app_config to avoid triggering imports.
-        return self.apps.app_configs.get(self.app_label)
+        pass
 
     def contribute_to_class(self, cls, name):
         from django.db import connection
@@ -413,10 +413,7 @@ class Options:
     @cached_property
     def verbose_name_raw(self):
         """Return the untranslated verbose name."""
-        if isinstance(self.verbose_name, str):
-            return self.verbose_name
-        with override(None):
-            return str(self.verbose_name)
+        pass
 
     @cached_property
     def swapped(self):
@@ -427,106 +424,26 @@ class Options:
         For historical reasons, model name lookups using get_model() are
         case insensitive, so we make sure we are case insensitive here.
         """
-        if self.swappable:
-            swapped_for = getattr(settings, self.swappable, None)
-            if swapped_for:
-                try:
-                    swapped_label, swapped_object = swapped_for.split(".")
-                except ValueError:
-                    # setting not in the format app_label.model_name
-                    # raising ImproperlyConfigured here causes problems with
-                    # test cleanup code - instead it is raised in
-                    # get_user_model or as part of validation.
-                    return swapped_for
-
-                if (
-                    "%s.%s" % (swapped_label, swapped_object.lower())
-                    != self.label_lower
-                ):
-                    return swapped_for
-        return None
+        pass
 
     def setting_changed(self, *, setting, **kwargs):
-        if setting == self.swappable and "swapped" in self.__dict__:
-            del self.swapped
+        pass
 
     @cached_property
     def managers(self):
-        managers = []
-        seen_managers = set()
-        bases = (b for b in self.model.mro() if hasattr(b, "_meta"))
-        for depth, base in enumerate(bases):
-            for manager in base._meta.local_managers:
-                if manager.name in seen_managers:
-                    continue
-
-                manager = copy.copy(manager)
-                manager.model = self.model
-                seen_managers.add(manager.name)
-                managers.append((depth, manager.creation_counter, manager))
-
-        return make_immutable_fields_list(
-            "managers",
-            (m[2] for m in sorted(managers)),
-        )
+        pass
 
     @cached_property
     def managers_map(self):
-        return {manager.name: manager for manager in self.managers}
+        pass
 
     @cached_property
     def base_manager(self):
-        base_manager_name = self.base_manager_name
-        if not base_manager_name:
-            # Get the first parent's base_manager_name if there's one.
-            for parent in self.model.mro()[1:]:
-                if hasattr(parent, "_meta"):
-                    if parent._base_manager.name != "_base_manager":
-                        base_manager_name = parent._base_manager.name
-                    break
-
-        if base_manager_name:
-            try:
-                return self.managers_map[base_manager_name]
-            except KeyError:
-                raise ValueError(
-                    "%s has no manager named %r"
-                    % (
-                        self.object_name,
-                        base_manager_name,
-                    )
-                )
-
-        manager = Manager()
-        manager.name = "_base_manager"
-        manager.model = self.model
-        manager.auto_created = True
-        return manager
+        pass
 
     @cached_property
     def default_manager(self):
-        default_manager_name = self.default_manager_name
-        if not default_manager_name and not self.local_managers:
-            # Get the first parent's default_manager_name if there's one.
-            for parent in self.model.mro()[1:]:
-                if hasattr(parent, "_meta"):
-                    default_manager_name = parent._meta.default_manager_name
-                    break
-
-        if default_manager_name:
-            try:
-                return self.managers_map[default_manager_name]
-            except KeyError:
-                raise ValueError(
-                    "%s has no manager named %r"
-                    % (
-                        self.object_name,
-                        default_manager_name,
-                    )
-                )
-
-        if self.managers:
-            return self.managers[0]
+        pass
 
     @cached_property
     def fields(self):
@@ -538,37 +455,7 @@ class Options:
         combined with filtering of field properties is the public API for
         obtaining this field list.
         """
-
-        # For legacy reasons, the fields property should only contain forward
-        # fields that are not private or with a m2m cardinality. Therefore we
-        # pass these three filters as filters to the generator.
-        # The third filter is a longwinded way of checking f.related_model - we
-        # don't use that property directly because related_model is a cached
-        # property, and all the models may not have been loaded yet; we don't
-        # want to cache the string reference to the related_model.
-        def is_not_an_m2m_field(f):
-            return not (f.is_relation and f.many_to_many)
-
-        def is_not_a_generic_relation(f):
-            return not (f.is_relation and f.one_to_many)
-
-        def is_not_a_generic_foreign_key(f):
-            return not (
-                f.is_relation
-                and f.many_to_one
-                and not (hasattr(f.remote_field, "model") and f.remote_field.model)
-            )
-
-        return make_immutable_fields_list(
-            "fields",
-            (
-                f
-                for f in self._get_fields(reverse=False)
-                if is_not_an_m2m_field(f)
-                and is_not_a_generic_relation(f)
-                and is_not_a_generic_foreign_key(f)
-            ),
-        )
+        pass
 
     @cached_property
     def concrete_fields(self):
@@ -579,9 +466,7 @@ class Options:
         combined with filtering of field properties is the public API for
         obtaining this field list.
         """
-        return make_immutable_fields_list(
-            "concrete_fields", (f for f in self.fields if f.concrete)
-        )
+        pass
 
     @cached_property
     def local_concrete_fields(self):
@@ -592,9 +477,7 @@ class Options:
         combined with filtering of field properties is the public API for
         obtaining this field list.
         """
-        return make_immutable_fields_list(
-            "local_concrete_fields", (f for f in self.local_fields if f.concrete)
-        )
+        pass
 
     @cached_property
     def many_to_many(self):
@@ -605,14 +488,7 @@ class Options:
         combined with filtering of field properties is the public API for
         obtaining this list.
         """
-        return make_immutable_fields_list(
-            "many_to_many",
-            (
-                f
-                for f in self._get_fields(reverse=False)
-                if f.is_relation and f.many_to_many
-            ),
-        )
+        pass
 
     @cached_property
     def related_objects(self):
@@ -639,33 +515,11 @@ class Options:
 
     @cached_property
     def _forward_fields_map(self):
-        res = {}
-        fields = self._get_fields(reverse=False)
-        for field in fields:
-            res[field.name] = field
-            # Due to the way Django's internals work, get_field() should also
-            # be able to fetch a field by attname. In the case of a concrete
-            # field with relation, includes the *_id name too
-            try:
-                res[field.attname] = field
-            except AttributeError:
-                pass
-        return res
+        pass
 
     @cached_property
     def fields_map(self):
-        res = {}
-        fields = self._get_fields(forward=False, include_hidden=True)
-        for field in fields:
-            res[field.name] = field
-            # Due to the way Django's internals work, get_field() should also
-            # be able to fetch a field by attname. In the case of a concrete
-            # field with relation, includes the *_id name too
-            try:
-                res[field.attname] = field
-            except AttributeError:
-                pass
-        return res
+        pass
 
     def get_field(self, field_name):
         """
@@ -718,18 +572,14 @@ class Options:
         Useful for determining if something is an ancestor, regardless of
         lineage.
         """
-        result = OrderedSet(self.parents)
-        for parent in self.parents:
-            for ancestor in parent._meta.all_parents:
-                result.add(ancestor)
-        return tuple(result)
+        pass
 
     def get_parent_list(self):
         """
         Return all the ancestors of this model as a list ordered by MRO.
         Backward compatibility method.
         """
-        return list(self.all_parents)
+        pass
 
     def get_ancestor_link(self, ancestor):
         """
@@ -812,42 +662,11 @@ class Options:
         field in a model, in every app), it is computed on first access and
         then is set as a property on every model.
         """
-        related_objects_graph = defaultdict(list)
-
-        all_models = self.apps.get_models(include_auto_created=True)
-        for model in all_models:
-            opts = model._meta
-            # Abstract model's fields are copied to child models, hence we will
-            # see the fields from the child models.
-            if opts.abstract:
-                continue
-            fields_with_relations = (
-                f
-                for f in opts._get_fields(reverse=False, include_parents=False)
-                if f.is_relation and f.related_model is not None
-            )
-            for f in fields_with_relations:
-                if not isinstance(f.remote_field.model, str):
-                    remote_label = f.remote_field.model._meta.concrete_model._meta.label
-                    related_objects_graph[remote_label].append(f)
-
-        for model in all_models:
-            # Set the relation_tree using the internal __dict__. In this way
-            # we avoid calling the cached property. In attribute lookup,
-            # __dict__ takes precedence over a data descriptor (such as
-            # @cached_property). This means that the _meta._relation_tree is
-            # only called if related_objects is not in __dict__.
-            related_objects = related_objects_graph[
-                model._meta.concrete_model._meta.label
-            ]
-            model._meta.__dict__["_relation_tree"] = related_objects
-        # It seems it is possible that self is not in all_models, so guard
-        # against that with default for get().
-        return self.__dict__.get("_relation_tree", EMPTY_RELATION_TREE)
+        pass
 
     @cached_property
     def _relation_tree(self):
-        return self._populate_directed_relation_graph()
+        pass
 
     def _expire_cache(self, forward=True, reverse=True):
         # This method is usually called by apps.cache_clear(), when the
@@ -979,53 +798,27 @@ class Options:
         Return a list of total unique constraints. Useful for determining set
         of fields guaranteed to be unique for all rows.
         """
-        return [
-            constraint
-            for constraint in self.constraints
-            if (
-                isinstance(constraint, UniqueConstraint)
-                and constraint.condition is None
-                and not constraint.contains_expressions
-            )
-        ]
+        pass
 
     @cached_property
     def pk_fields(self):
-        return composite.unnest([self.pk])
+        pass
 
     @property
     def is_composite_pk(self):
-        return isinstance(self.pk, CompositePrimaryKey)
+        pass
 
     @cached_property
     def _property_names(self):
         """Return a set of the names of the properties defined on the model."""
-        names = set()
-        seen = set()
-        for klass in self.model.__mro__:
-            names |= {
-                name
-                for name, value in klass.__dict__.items()
-                if isinstance(value, property) and name not in seen
-            }
-            seen |= set(klass.__dict__)
-        return frozenset(names)
+        pass
 
     @cached_property
     def _non_pk_concrete_field_names(self):
         """
         Return a set of the non-pk concrete field names defined on the model.
         """
-        names = []
-        all_pk_fields = set(self.pk_fields)
-        for parent in self.all_parents:
-            all_pk_fields.update(parent._meta.pk_fields)
-        for field in self.concrete_fields:
-            if field not in all_pk_fields:
-                names.append(field.name)
-                if field.name != field.attname:
-                    names.append(field.attname)
-        return frozenset(names)
+        pass
 
     @cached_property
     def _reverse_one_to_one_field_names(self):
@@ -1033,9 +826,7 @@ class Options:
         Return a set of reverse one to one field names pointing to the current
         model.
         """
-        return frozenset(
-            field.name for field in self.related_objects if field.one_to_one
-        )
+        pass
 
     @cached_property
     def db_returning_fields(self):
@@ -1043,10 +834,4 @@ class Options:
         Private API intended only to be used by Django itself.
         Fields to be returned after a database insert.
         """
-        return [
-            field
-            for field in self._get_fields(
-                forward=True, reverse=False, include_parents=PROXY_PARENTS
-            )
-            if getattr(field, "db_returning", False)
-        ]
+        pass

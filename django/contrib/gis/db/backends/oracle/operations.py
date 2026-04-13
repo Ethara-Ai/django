@@ -120,54 +120,13 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
     @cached_property
     def unsupported_functions(self):
-        unsupported = {
-            "AsKML",
-            "AsSVG",
-            "Azimuth",
-            "ClosestPoint",
-            "ForcePolygonCW",
-            "GeoHash",
-            "GeometryDistance",
-            "IsEmpty",
-            "LineLocatePoint",
-            "MakeValid",
-            "MemSize",
-            "NumDimensions",
-            "Rotate",
-            "Scale",
-            "SnapToGrid",
-            "Translate",
-        }
-        if self.connection.oracle_version < (23,):
-            unsupported.add("GeometryType")
-        return unsupported
+        pass
 
     def geo_quote_name(self, name):
         return super().geo_quote_name(name).upper()
 
     def convert_extent(self, clob):
-        if clob:
-            # Generally, Oracle returns a polygon for the extent -- however,
-            # it can return a single point if there's only one Point in the
-            # table.
-            ext_geom = GEOSGeometry(memoryview(clob.read()))
-            gtype = str(ext_geom.geom_type)
-            if gtype == "Polygon":
-                # Construct the 4-tuple from the coordinates in the polygon.
-                shell = ext_geom.shell
-                ll, ur = shell[0][:2], shell[2][:2]
-            elif gtype == "Point":
-                ll = ext_geom.coords[:2]
-                ur = ll
-            else:
-                raise Exception(
-                    "Unexpected geometry type returned for extent: %s" % gtype
-                )
-            xmin, ymin = ll
-            xmax, ymax = ur
-            return (xmin, ymin, xmax, ymax)
-        else:
-            return None
+        pass
 
     def geo_db_type(self, f):
         """

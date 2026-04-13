@@ -34,7 +34,7 @@ class OracleGeometryColumns(models.Model):
         Return the name of the metadata column used to store the feature table
         name.
         """
-        return "table_name"
+        pass
 
     @classmethod
     def geom_col_name(cls):
@@ -42,7 +42,7 @@ class OracleGeometryColumns(models.Model):
         Return the name of the metadata column used to store the feature
         geometry column.
         """
-        return "column_name"
+        pass
 
 
 class OracleSpatialRefSys(models.Model, SpatialRefSysMixin):
@@ -64,4 +64,4 @@ class OracleSpatialRefSys(models.Model, SpatialRefSysMixin):
 
     @property
     def wkt(self):
-        return self.wktext
+        pass

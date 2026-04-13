@@ -452,11 +452,11 @@ class ModelBase(type):
 
     @property
     def _base_manager(cls):
-        return cls._meta.base_manager
+        pass
 
     @property
     def _default_manager(cls):
-        return cls._meta.default_manager
+        pass
 
 
 class ModelStateFieldsCacheDescriptor:
@@ -700,10 +700,7 @@ class Model(AltersData, metaclass=ModelBase):
         return getattr(self, meta.pk.attname)
 
     def _set_pk_val(self, value):
-        for parent_link in self._meta.parents.values():
-            if parent_link and parent_link != self._meta.pk:
-                setattr(self, parent_link.target_field.attname, value)
-        return setattr(self, self._meta.pk.attname, value)
+        pass
 
     pk = property(_get_pk_val, _set_pk_val)
 
@@ -809,9 +806,7 @@ class Model(AltersData, metaclass=ModelBase):
         self._state.db = db_instance._state.db
 
     async def arefresh_from_db(self, using=None, fields=None, from_queryset=None):
-        return await sync_to_async(self.refresh_from_db)(
-            using=using, fields=fields, from_queryset=from_queryset
-        )
+        pass
 
     def serializable_value(self, field_name):
         """
@@ -1333,56 +1328,13 @@ class Model(AltersData, metaclass=ModelBase):
     adelete.alters_data = True
 
     def _get_FIELD_display(self, field):
-        value = getattr(self, field.attname)
-        choices_dict = dict(make_hashable(field.flatchoices))
-        # force_str() to coerce lazy strings.
-        return force_str(
-            choices_dict.get(make_hashable(value), value), strings_only=True
-        )
+        pass
 
     def _get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
-        if not self._is_pk_set():
-            raise ValueError("get_next/get_previous cannot be used on unsaved objects.")
-        op = "gt" if is_next else "lt"
-        order = "" if is_next else "-"
-        param = getattr(self, field.attname)
-        q = Q.create([(field.name, param), (f"pk__{op}", self.pk)], connector=Q.AND)
-        q = Q.create([q, (f"{field.name}__{op}", param)], connector=Q.OR)
-        qs = (
-            self.__class__._default_manager.using(self._state.db)
-            .filter(**kwargs)
-            .filter(q)
-            .order_by("%s%s" % (order, field.name), "%spk" % order)
-        )
-        try:
-            return qs[0]
-        except IndexError:
-            raise self.DoesNotExist(
-                "%s matching query does not exist." % self.__class__._meta.object_name
-            )
+        pass
 
     def _get_next_or_previous_in_order(self, is_next):
-        cachename = "__%s_order_cache" % is_next
-        if not hasattr(self, cachename):
-            op = "gt" if is_next else "lt"
-            order = "_order" if is_next else "-_order"
-            order_field = self._meta.order_with_respect_to
-            filter_args = order_field.get_filter_kwargs_for_object(self)
-            obj = (
-                self.__class__._default_manager.filter(**filter_args)
-                .filter(
-                    **{
-                        "_order__%s"
-                        % op: self.__class__._default_manager.values("_order").filter(
-                            **{self._meta.pk.name: self.pk}
-                        )
-                    }
-                )
-                .order_by(order)[:1]
-                .get()
-            )
-            setattr(self, cachename, obj)
-        return getattr(self, cachename)
+        pass
 
     def _get_field_expression_map(self, meta, exclude=None):
         if exclude is None:
@@ -2520,19 +2472,11 @@ class Model(AltersData, metaclass=ModelBase):
 
 
 def method_set_order(self, ordered_obj, id_list, using=None):
-    order_wrt = ordered_obj._meta.order_with_respect_to
-    filter_args = order_wrt.get_forward_related_filter(self)
-    ordered_obj.objects.db_manager(using).filter(**filter_args).bulk_update(
-        [ordered_obj(pk=pk, _order=order) for order, pk in enumerate(id_list)],
-        ["_order"],
-    )
+    pass
 
 
 def method_get_order(self, ordered_obj):
-    order_wrt = ordered_obj._meta.order_with_respect_to
-    filter_args = order_wrt.get_forward_related_filter(self)
-    pk_name = ordered_obj._meta.pk.name
-    return ordered_obj.objects.filter(**filter_args).values_list(pk_name, flat=True)
+    pass
 
 
 def make_foreign_order_accessors(model, related_model):
@@ -2555,12 +2499,7 @@ def make_foreign_order_accessors(model, related_model):
 
 def model_unpickle(model_id):
     """Used to unpickle Model subclasses with deferred fields."""
-    if isinstance(model_id, tuple):
-        model = apps.get_model(*model_id)
-    else:
-        # Backwards compat - the model was cached directly in earlier versions.
-        model = model_id
-    return model.__new__(model)
+    pass
 
 
 model_unpickle.__safe_for_unpickle__ = True

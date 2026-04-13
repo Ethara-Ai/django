@@ -64,10 +64,7 @@ def reset_cache(*, setting, **kwargs):
     Reset global state when LANGUAGES setting has been changed, as some
     languages should no longer be accepted.
     """
-    if setting in ("LANGUAGES", "LANGUAGE_CODE"):
-        check_for_language.cache_clear()
-        get_languages.cache_clear()
-        get_supported_language_variant.cache_clear()
+    pass
 
 
 class TranslationCatalog:
@@ -267,7 +264,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
     def language(self):
         """Return the translation language."""
-        return self.__language
+        pass
 
     def to_language(self):
         """Return the translation language name."""
@@ -358,14 +355,7 @@ def catalog():
     This can be used if you need to modify the catalog or want to access the
     whole message catalog instead of just translating one string.
     """
-    global _default
-
-    t = getattr(_active, "value", None)
-    if t is not None:
-        return t
-    if _default is None:
-        _default = translation(settings.LANGUAGE_CODE)
-    return _default
+    pass
 
 
 def gettext(message):

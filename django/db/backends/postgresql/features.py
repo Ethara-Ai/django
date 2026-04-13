@@ -82,107 +82,47 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def supports_uuid7_function(self):
-        return self.is_postgresql_18
+        pass
 
     @cached_property
     def supports_uuid7_function_shift(self):
-        return self.is_postgresql_18
+        pass
 
     @cached_property
     def django_test_skips(self):
-        skips = {
-            "opclasses are PostgreSQL only.": {
-                "indexes.tests.SchemaIndexesNotPostgreSQLTests."
-                "test_create_index_ignores_opclasses",
-            },
-            "PostgreSQL requires casting to text.": {
-                "lookup.tests.LookupTests.test_textfield_exact_null",
-            },
-        }
-        if self.connection.settings_dict["OPTIONS"].get("pool"):
-            skips.update(
-                {
-                    "Pool does implicit health checks": {
-                        "backends.base.test_base.ConnectionHealthChecksTests."
-                        "test_health_checks_enabled",
-                        "backends.base.test_base.ConnectionHealthChecksTests."
-                        "test_set_autocommit_health_checks_enabled",
-                    },
-                }
-            )
-        if self.uses_server_side_binding:
-            skips.update(
-                {
-                    "The actual query cannot be determined for server side bindings": {
-                        "backends.base.test_base.ExecuteWrapperTests."
-                        "test_wrapper_debug",
-                    }
-                },
-            )
-        return skips
+        pass
 
     @cached_property
     def django_test_expected_failures(self):
-        expected_failures = set()
-        if self.uses_server_side_binding:
-            expected_failures.update(
-                {
-                    # Parameters passed to expressions in SELECT and GROUP BY
-                    # clauses are not recognized as the same values when using
-                    # server-side binding cursors (#34255).
-                    "aggregation.tests.AggregateTestCase."
-                    "test_group_by_nested_expression_with_params",
-                }
-            )
-        if not is_psycopg3:
-            expected_failures.update(
-                {
-                    # operator does not exist: bigint[] = integer[]
-                    "postgres_tests.test_array.TestQuerying.test_gt",
-                    "postgres_tests.test_array.TestQuerying.test_in",
-                    "postgres_tests.test_array.TestQuerying.test_lt",
-                }
-            )
-        return expected_failures
+        pass
 
     @cached_property
     def uses_server_side_binding(self):
-        options = self.connection.settings_dict["OPTIONS"]
-        return is_psycopg3 and options.get("server_side_binding") is True
+        pass
 
     @cached_property
     def max_query_params(self):
-        if self.uses_server_side_binding:
-            return 2**16 - 1
-        return None
+        pass
 
     @cached_property
     def prohibits_null_characters_in_text_exception(self):
-        if is_psycopg3:
-            return DataError, "PostgreSQL text fields cannot contain NUL (0x00) bytes"
-        else:
-            return ValueError, "A string literal cannot contain NUL (0x00) characters."
+        pass
 
     @cached_property
     def introspected_field_types(self):
-        return {
-            **super().introspected_field_types,
-            "PositiveBigIntegerField": "BigIntegerField",
-            "PositiveIntegerField": "IntegerField",
-            "PositiveSmallIntegerField": "SmallIntegerField",
-        }
+        pass
 
     @cached_property
     def is_postgresql_16(self):
-        return self.connection.pg_version >= 160000
+        pass
 
     @cached_property
     def is_postgresql_17(self):
-        return self.connection.pg_version >= 170000
+        pass
 
     @cached_property
     def is_postgresql_18(self):
-        return self.connection.pg_version >= 180000
+        pass
 
     supports_unlimited_charfield = True
     supports_any_value = property(operator.attrgetter("is_postgresql_16"))

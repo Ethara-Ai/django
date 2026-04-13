@@ -174,10 +174,7 @@ class RawQuery:
         return RawQuery(self.sql, using, params=self.params)
 
     def get_columns(self):
-        if self.cursor is None:
-            self._execute_query()
-        converter = connections[self.using].introspection.identifier_converter
-        return [converter(column_meta[0]) for column_meta in self.cursor.description]
+        pass
 
     def __iter__(self):
         # Always execute a new query for a new iterator.
@@ -196,9 +193,7 @@ class RawQuery:
 
     @property
     def params_type(self):
-        if self.params is None:
-            return None
-        return dict if isinstance(self.params, Mapping) else tuple
+        pass
 
     def __str__(self):
         if self.params_type is None:
@@ -206,23 +201,7 @@ class RawQuery:
         return self.sql % self.params_type(self.params)
 
     def _execute_query(self):
-        connection = connections[self.using]
-
-        # Adapt parameters to the database, as much as possible considering
-        # that the target type isn't known. See #17755.
-        params_type = self.params_type
-        adapter = connection.ops.adapt_unknown_value
-        if params_type is tuple:
-            params = tuple(adapter(val) for val in self.params)
-        elif params_type is dict:
-            params = {key: adapter(val) for key, val in self.params.items()}
-        elif params_type is None:
-            params = None
-        else:
-            raise RuntimeError("Unexpected params type: %s" % params_type)
-
-        self.cursor = connection.cursor()
-        self.cursor.execute(self.sql, params)
+        pass
 
 
 ExplainInfo = namedtuple("ExplainInfo", ("format", "options"))
@@ -331,16 +310,11 @@ class Query(BaseExpression):
 
     @property
     def output_field(self):
-        if len(self.select) == 1:
-            select = self.select[0]
-            return getattr(select, "target", None) or select.field
-        elif len(self.annotation_select) == 1:
-            return next(iter(self.annotation_select.values())).output_field
+        pass
 
     @cached_property
     def base_table(self):
-        for alias in self.alias_map:
-            return alias
+        pass
 
     def __str__(self):
         """
@@ -358,7 +332,7 @@ class Query(BaseExpression):
         Return the query as an SQL string and the parameters that will be
         substituted into the query.
         """
-        return self.get_compiler(DEFAULT_DB_ALIAS).as_sql()
+        pass
 
     def __deepcopy__(self, memo):
         """Limit the amount of work when a Query is deepcopied."""
@@ -686,16 +660,7 @@ class Query(BaseExpression):
         return compiler.has_results()
 
     def explain(self, using, format=None, **options):
-        q = self.clone()
-        for option_name in options:
-            if (
-                not EXPLAIN_OPTIONS_PATTERN.fullmatch(option_name)
-                or "--" in option_name
-            ):
-                raise ValueError(f"Invalid option name: {option_name!r}.")
-        q.explain_info = ExplainInfo(format, options)
-        compiler = q.get_compiler(using=using)
-        return "\n".join(compiler.explain_query())
+        pass
 
     def combine(self, rhs, connector):
         """
@@ -1250,11 +1215,7 @@ class Query(BaseExpression):
 
     @property
     def _subquery_fields_len(self):
-        if not self.has_select_fields or not self.select:
-            return len(self.model._meta.pk_fields)
-        return len(self.select) + sum(
-            len(expr.targets) - 1 for expr in self.select if isinstance(expr, ColPairs)
-        )
+        pass
 
     def resolve_expression(self, query, *args, **kwargs):
         clone = self.clone()
@@ -1929,9 +1890,7 @@ class Query(BaseExpression):
         # fields to the appropriate wrapped version.
 
         def final_transformer(field, alias):
-            if not self.alias_cols:
-                alias = None
-            return field.get_col(alias)
+            pass
 
         # Try resolving all the names as fields first. If there's an error,
         # treat trailing names as lookups until a field can be resolved.
@@ -2215,7 +2174,7 @@ class Query(BaseExpression):
 
     @property
     def is_sliced(self):
-        return self.low_mark != 0 or self.high_mark is not None
+        pass
 
     def has_limit_one(self):
         return self.high_mark is not None and (self.high_mark - self.low_mark) == 1
@@ -2361,30 +2320,7 @@ class Query(BaseExpression):
 
     @property
     def orderby_issubset_groupby(self):
-        if self.extra_order_by:
-            # Raw SQL from extra(order_by=...) can't be reliably compared
-            # against resolved OrderBy/Col expressions. Treat as not a subset.
-            return False
-        if self.group_by in (None, True):
-            # There is either no aggregation at all (None), or the group by
-            # is generated automatically from model fields (True), in which
-            # case the order by is necessarily a subset of them.
-            return True
-        if not self.order_by:
-            # Although an empty set is always a subset, there's no point in
-            # clearing ordering when there isn't any. Avoid the clone() below.
-            return True
-        # Don't pollute the original query (might disrupt joins).
-        q = self.clone()
-        order_by_set = {
-            (
-                order_by.resolve_expression(q)
-                if hasattr(order_by, "resolve_expression")
-                else F(order_by).resolve_expression(q)
-            )
-            for order_by in q.order_by
-        }
-        return order_by_set.issubset(self.group_by)
+        pass
 
     def clear_ordering(self, force=False, clear_default=True):
         """
@@ -2576,7 +2512,7 @@ class Query(BaseExpression):
 
     @property
     def has_select_fields(self):
-        return self.selected is not None
+        pass
 
     def set_values(self, fields):
         self.select_related = False
@@ -2659,33 +2595,11 @@ class Query(BaseExpression):
         Return the dictionary of aggregate columns that are not masked and
         should be used in the SELECT clause. Cache this result for performance.
         """
-        if self._annotation_select_cache is not None:
-            return self._annotation_select_cache
-        elif not self.annotations:
-            return {}
-        elif self.annotation_select_mask is not None:
-            self._annotation_select_cache = {
-                k: v
-                for k, v in self.annotations.items()
-                if k in self.annotation_select_mask
-            }
-            return self._annotation_select_cache
-        else:
-            return self.annotations
+        pass
 
     @property
     def extra_select(self):
-        if self._extra_select_cache is not None:
-            return self._extra_select_cache
-        if not self.extra:
-            return {}
-        elif self.extra_select_mask is not None:
-            self._extra_select_cache = {
-                k: v for k, v in self.extra.items() if k in self.extra_select_mask
-            }
-            return self._extra_select_cache
-        else:
-            return self.extra
+        pass
 
     def trim_start(self, names_with_path):
         """

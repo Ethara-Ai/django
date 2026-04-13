@@ -50,28 +50,16 @@ class FileProxyMixin:
 
     @property
     def closed(self):
-        return not self.file or self.file.closed
+        pass
 
     def readable(self):
-        if self.closed:
-            return False
-        if hasattr(self.file, "readable"):
-            return self.file.readable()
-        return True
+        pass
 
     def writable(self):
-        if self.closed:
-            return False
-        if hasattr(self.file, "writable"):
-            return self.file.writable()
-        return "w" in getattr(self.file, "mode", "")
+        pass
 
     def seekable(self):
-        if self.closed:
-            return False
-        if hasattr(self.file, "seekable"):
-            return self.file.seekable()
-        return True
+        pass
 
     def __iter__(self):
         return iter(self.file)

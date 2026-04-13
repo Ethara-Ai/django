@@ -26,47 +26,7 @@ def ordinal(value):
     Convert an integer to its ordinal as a string. 1 is '1st', 2 is '2nd',
     3 is '3rd', etc. Works for any non-negative integer.
     """
-    try:
-        value = int(value)
-    except (TypeError, ValueError):
-        return value
-    if value < 0:
-        return str(value)
-    if value == 1:
-        # Translators: Ordinal format when value is 1 (1st).
-        value = pgettext("ordinal is 1", "{}st").format(value)
-    elif value % 100 in (11, 12, 13):
-        # Translators: Ordinal format for 11 (11th), 12 (12th), and 13 (13th).
-        value = pgettext("ordinal 11, 12, 13", "{}th").format(value)
-    else:
-        templates = (
-            # Translators: Ordinal format when value ends with 0, e.g. 80th.
-            pgettext("ordinal 0", "{}th"),
-            # Translators: Ordinal format when value ends with 1, e.g. 81st,
-            # except 11.
-            pgettext("ordinal 1", "{}st"),
-            # Translators: Ordinal format when value ends with 2, e.g. 82nd,
-            # except 12.
-            pgettext("ordinal 2", "{}nd"),
-            # Translators: Ordinal format when value ends with 3, e.g. 83rd,
-            # except 13.
-            pgettext("ordinal 3", "{}rd"),
-            # Translators: Ordinal format when value ends with 4, e.g. 84th.
-            pgettext("ordinal 4", "{}th"),
-            # Translators: Ordinal format when value ends with 5, e.g. 85th.
-            pgettext("ordinal 5", "{}th"),
-            # Translators: Ordinal format when value ends with 6, e.g. 86th.
-            pgettext("ordinal 6", "{}th"),
-            # Translators: Ordinal format when value ends with 7, e.g. 87th.
-            pgettext("ordinal 7", "{}th"),
-            # Translators: Ordinal format when value ends with 8, e.g. 88th.
-            pgettext("ordinal 8", "{}th"),
-            # Translators: Ordinal format when value ends with 9, e.g. 89th.
-            pgettext("ordinal 9", "{}th"),
-        )
-        value = templates[value % 10].format(value)
-    # Mark value safe so i18n does not break with <sup> or <sub> see #19988
-    return mark_safe(value)
+    pass
 
 
 @register.filter(is_safe=True)
@@ -76,23 +36,7 @@ def intcomma(value, use_l10n=True):
     string containing commas every three digits. Format localization is
     respected. For example, 3000 becomes '3,000' and 45000 becomes '45,000'.
     """
-    if use_l10n:
-        try:
-            if not isinstance(value, (float, Decimal)):
-                value = Decimal(value)
-        except (TypeError, ValueError, InvalidOperation):
-            return intcomma(value, False)
-        else:
-            return number_format(value, use_l10n=True, force_grouping=True)
-    result = str(value)
-    match = re.match(r"-?\d+", result)
-    if match:
-        prefix = match[0]
-        prefix_with_commas = re.sub(r"\d{3}", r"\g<0>,", prefix[::-1])[::-1]
-        # Remove a leading comma, if needed.
-        prefix_with_commas = re.sub(r"^(-?),", r"\1", prefix_with_commas)
-        result = prefix_with_commas + result[len(prefix) :]
-    return result
+    pass
 
 
 # A tuple of standard large number to their converters
@@ -134,24 +78,7 @@ def intword(value):
     for numbers over 1 million. For example, 1000000 becomes '1.0 million',
     1200000 becomes '1.2 million' and '1200000000' becomes '1.2 billion'.
     """
-    try:
-        value = int(value)
-    except (TypeError, ValueError):
-        return value
-
-    abs_value = abs(value)
-    if abs_value < 1000000:
-        return value
-
-    for exponent, converter in intword_converters:
-        large_number = 10**exponent
-        if abs_value < large_number * 1000:
-            new_value = value / large_number
-            rounded_value = round_away_from_one(new_value)
-            return converter(abs(rounded_value)) % {
-                "value": defaultfilters.floatformat(new_value, 1),
-            }
-    return value
+    pass
 
 
 @register.filter(is_safe=True)
@@ -160,23 +87,7 @@ def apnumber(value):
     For numbers 1-9, return the number spelled out. Otherwise, return the
     number. This follows Associated Press style.
     """
-    try:
-        value = int(value)
-    except (TypeError, ValueError):
-        return value
-    if not 0 < value < 10:
-        return value
-    return (
-        _("one"),
-        _("two"),
-        _("three"),
-        _("four"),
-        _("five"),
-        _("six"),
-        _("seven"),
-        _("eight"),
-        _("nine"),
-    )[value - 1]
+    pass
 
 
 # Perform the comparison in the default time zone when USE_TZ = True
@@ -188,21 +99,7 @@ def naturalday(value, arg=None):
     present day return representing string. Otherwise, return a string
     formatted according to settings.DATE_FORMAT.
     """
-    tzinfo = getattr(value, "tzinfo", None)
-    try:
-        value = date(value.year, value.month, value.day)
-    except AttributeError:
-        # Passed value wasn't a date object
-        return value
-    today = datetime.now(tzinfo).date()
-    delta = value - today
-    if delta.days == 0:
-        return _("today")
-    elif delta.days == 1:
-        return _("tomorrow")
-    elif delta.days == -1:
-        return _("yesterday")
-    return defaultfilters.date(value, arg)
+    pass
 
 
 # This filter doesn't require expects_localtime=True because it deals properly
@@ -213,7 +110,7 @@ def naturaltime(value):
     For date and time values show how many seconds, minutes, or hours ago
     compared to current timestamp return representing string.
     """
-    return NaturalTimeFormatter.string_for(value)
+    pass
 
 
 class NaturalTimeFormatter:
@@ -304,43 +201,4 @@ class NaturalTimeFormatter:
 
     @classmethod
     def string_for(cls, value):
-        if not isinstance(value, date):  # datetime is a subclass of date
-            return value
-
-        now = datetime.now(UTC if is_aware(value) else None)
-        if value < now:
-            delta = now - value
-            if delta.days != 0:
-                return cls.time_strings["past-day"] % {
-                    "delta": defaultfilters.timesince(
-                        value, now, time_strings=cls.past_substrings
-                    ),
-                }
-            elif delta.seconds == 0:
-                return cls.time_strings["now"]
-            elif delta.seconds < 60:
-                return cls.time_strings["past-second"] % {"count": delta.seconds}
-            elif delta.seconds // 60 < 60:
-                count = delta.seconds // 60
-                return cls.time_strings["past-minute"] % {"count": count}
-            else:
-                count = delta.seconds // 60 // 60
-                return cls.time_strings["past-hour"] % {"count": count}
-        else:
-            delta = value - now
-            if delta.days != 0:
-                return cls.time_strings["future-day"] % {
-                    "delta": defaultfilters.timeuntil(
-                        value, now, time_strings=cls.future_substrings
-                    ),
-                }
-            elif delta.seconds == 0:
-                return cls.time_strings["now"]
-            elif delta.seconds < 60:
-                return cls.time_strings["future-second"] % {"count": delta.seconds}
-            elif delta.seconds // 60 < 60:
-                count = delta.seconds // 60
-                return cls.time_strings["future-minute"] % {"count": count}
-            else:
-                count = delta.seconds // 60 // 60
-                return cls.time_strings["future-hour"] % {"count": count}
+        pass

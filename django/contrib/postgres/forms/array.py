@@ -122,7 +122,7 @@ class SplitArrayWidget(forms.Widget):
 
     @property
     def is_hidden(self):
-        return self.widget.is_hidden
+        pass
 
     def value_from_datadict(self, data, files, name):
         return [
@@ -167,7 +167,7 @@ class SplitArrayWidget(forms.Widget):
 
     @property
     def media(self):
-        return self.widget.media
+        pass
 
     def __deepcopy__(self, memo):
         obj = super().__deepcopy__(memo)
@@ -176,7 +176,7 @@ class SplitArrayWidget(forms.Widget):
 
     @property
     def needs_multipart_form(self):
-        return self.widget.needs_multipart_form
+        pass
 
 
 class SplitArrayField(forms.Field):

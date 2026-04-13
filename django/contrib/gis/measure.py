@@ -64,10 +64,10 @@ class MeasureBase:
             self._default_unit = default_unit
 
     def _get_standard(self):
-        return getattr(self, self.STANDARD_UNIT)
+        pass
 
     def _set_standard(self, value):
-        setattr(self, self.STANDARD_UNIT, value)
+        pass
 
     standard = property(_get_standard, _set_standard)
 

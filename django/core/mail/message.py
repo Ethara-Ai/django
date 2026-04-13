@@ -198,16 +198,7 @@ class SafeMIMEText(MIMEMixin, MIMEText):
         MIMEText.__setitem__(self, name, val)
 
     def set_payload(self, payload, charset=None):
-        if charset == "utf-8" and not isinstance(charset, Charset.Charset):
-            has_long_lines = any(
-                len(line.encode(errors="surrogateescape"))
-                > RFC5322_EMAIL_LINE_LENGTH_LIMIT
-                for line in payload.splitlines()
-            )
-            # Quoted-Printable encoding has the side effect of shortening long
-            # lines, if any (#22561).
-            charset = utf8_charset_qp if has_long_lines else utf8_charset
-        MIMEText.set_payload(self, payload, charset=charset)
+        pass
 
 
 # RemovedInDjango70Warning.
@@ -427,10 +418,7 @@ class EmailMessage:
         as UTF-8. If that fails, set the mimetype to
         DEFAULT_ATTACHMENT_MIME_TYPE and don't decode the content.
         """
-        path = Path(path)
-        with path.open("rb") as file:
-            content = file.read()
-            self.attach(path.name, content, mimetype)
+        pass
 
     def _add_bodies(self, msg):
         if self.body or not self.attachments:
@@ -634,10 +622,4 @@ class EmailMultiAlternatives(EmailMessage):
         Checks that ``text`` occurs in the email body and in all attached MIME
         type text/* alternatives.
         """
-        if text not in self.body:
-            return False
-
-        for content, mimetype in self.alternatives:
-            if mimetype.startswith("text/") and text not in content:
-                return False
-        return True
+        pass

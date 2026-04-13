@@ -218,27 +218,16 @@ class Now(Func):
         # PostgreSQL's CURRENT_TIMESTAMP means "the time at the start of the
         # transaction". Use STATEMENT_TIMESTAMP to be cross-compatible with
         # other databases.
-        return self.as_sql(
-            compiler, connection, template="STATEMENT_TIMESTAMP()", **extra_context
-        )
+        pass
 
     def as_mysql(self, compiler, connection, **extra_context):
-        return self.as_sql(
-            compiler, connection, template="CURRENT_TIMESTAMP(6)", **extra_context
-        )
+        pass
 
     def as_sqlite(self, compiler, connection, **extra_context):
-        return self.as_sql(
-            compiler,
-            connection,
-            template="STRFTIME('%%%%Y-%%%%m-%%%%d %%%%H:%%%%M:%%%%f', 'NOW')",
-            **extra_context,
-        )
+        pass
 
     def as_oracle(self, compiler, connection, **extra_context):
-        return self.as_sql(
-            compiler, connection, template="LOCALTIMESTAMP", **extra_context
-        )
+        pass
 
 
 class TruncBase(TimezoneMixin, Transform):
@@ -342,7 +331,7 @@ class TruncBase(TimezoneMixin, Transform):
         return copy
 
     def convert_value(self, value, expression, connection):
-        return connection.ops.convert_trunc_expression(value, expression)
+        pass
 
 
 class Trunc(TruncBase):

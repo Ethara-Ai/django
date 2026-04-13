@@ -32,11 +32,7 @@ class Command(BaseCommand):
 
     @cached_property
     def local(self):
-        try:
-            self.storage.path("")
-        except NotImplementedError:
-            return False
-        return True
+        pass
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -299,105 +295,16 @@ class Command(BaseCommand):
         """
         Check if the target file should be deleted if it already exists.
         """
-        if self.storage.exists(prefixed_path):
-            try:
-                # When was the target file modified last time?
-                target_last_modified = self.storage.get_modified_time(prefixed_path)
-            except (OSError, NotImplementedError):
-                # The storage doesn't support get_modified_time() or failed
-                pass
-            else:
-                try:
-                    # When was the source file modified last time?
-                    source_last_modified = source_storage.get_modified_time(path)
-                except (OSError, NotImplementedError):
-                    pass
-                else:
-                    # The full path of the target file
-                    if self.local:
-                        full_path = self.storage.path(prefixed_path)
-                        # If it's --link mode and the path isn't a link (i.e.
-                        # the previous collectstatic wasn't with --link) or if
-                        # it's non-link mode and the path is a link (i.e. the
-                        # previous collectstatic was with --link), the old
-                        # links/files must be deleted so it's not safe to skip
-                        # unmodified files.
-                        can_skip_unmodified_files = not (
-                            self.symlink ^ os.path.islink(full_path)
-                        )
-                    else:
-                        # In remote storages, skipping is only based on the
-                        # modified times since symlinks aren't relevant.
-                        can_skip_unmodified_files = True
-                    # Avoid sub-second precision (see #14665, #19540)
-                    file_is_unmodified = target_last_modified.replace(
-                        microsecond=0
-                    ) >= source_last_modified.replace(microsecond=0)
-                    if file_is_unmodified and can_skip_unmodified_files:
-                        if prefixed_path not in self.unmodified_files:
-                            self.unmodified_files.append(prefixed_path)
-                        self.log("Skipping '%s' (not modified)" % path)
-                        return False
-            # Then delete the existing file if really needed
-            if self.dry_run:
-                self.log("Pretending to delete '%s'" % path)
-            else:
-                self.log("Deleting '%s'" % path)
-                self.storage.delete(prefixed_path)
-        return True
+        pass
 
     def link_file(self, path, prefixed_path, source_storage):
         """
         Attempt to link ``path``
         """
-        # Skip this file if it was already copied earlier
-        if prefixed_path in self.symlinked_files:
-            return self.log("Skipping '%s' (already linked earlier)" % path)
-        # Delete the target file if needed or break
-        if not self.delete_file(path, prefixed_path, source_storage):
-            return
-        # The full path of the source file
-        source_path = source_storage.path(path)
-        # Finally link the file
-        if self.dry_run:
-            self.log("Pretending to link '%s'" % source_path, level=1)
-        else:
-            self.log("Linking '%s'" % source_path, level=2)
-            full_path = self.storage.path(prefixed_path)
-            os.makedirs(os.path.dirname(full_path), exist_ok=True)
-            try:
-                if os.path.lexists(full_path):
-                    os.unlink(full_path)
-                os.symlink(source_path, full_path)
-            except NotImplementedError:
-                import platform
-
-                raise CommandError(
-                    "Symlinking is not supported in this "
-                    "platform (%s)." % platform.platform()
-                )
-            except OSError as e:
-                raise CommandError(e)
-        if prefixed_path not in self.symlinked_files:
-            self.symlinked_files.append(prefixed_path)
+        pass
 
     def copy_file(self, path, prefixed_path, source_storage):
         """
         Attempt to copy ``path`` with storage
         """
-        # Skip this file if it was already copied earlier
-        if prefixed_path in self.copied_files:
-            return self.log("Skipping '%s' (already copied earlier)" % path)
-        # Delete the target file if needed or break
-        if not self.delete_file(path, prefixed_path, source_storage):
-            return
-        # The full path of the source file
-        source_path = source_storage.path(path)
-        # Finally start copying
-        if self.dry_run:
-            self.log("Pretending to copy '%s'" % source_path, level=1)
-        else:
-            self.log("Copying '%s'" % source_path, level=2)
-            with source_storage.open(path) as source_file:
-                self.storage.save(prefixed_path, source_file)
-        self.copied_files.append(prefixed_path)
+        pass

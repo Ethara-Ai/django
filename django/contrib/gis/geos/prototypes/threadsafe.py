@@ -51,27 +51,27 @@ class GEOSFunc:
 
     # argtypes property
     def _get_argtypes(self):
-        return self.cfunc.argtypes
+        pass
 
     def _set_argtypes(self, argtypes):
-        self.cfunc.argtypes = [CONTEXT_PTR, *argtypes]
+        pass
 
     argtypes = property(_get_argtypes, _set_argtypes)
 
     # restype property
     def _get_restype(self):
-        return self.cfunc.restype
+        pass
 
     def _set_restype(self, restype):
-        self.cfunc.restype = restype
+        pass
 
     restype = property(_get_restype, _set_restype)
 
     # errcheck property
     def _get_errcheck(self):
-        return self.cfunc.errcheck
+        pass
 
     def _set_errcheck(self, errcheck):
-        self.cfunc.errcheck = errcheck
+        pass
 
     errcheck = property(_get_errcheck, _set_errcheck)

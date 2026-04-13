@@ -132,62 +132,7 @@ def get_deleted_objects(objs, request, admin_site):
     Return a nested list of strings suitable for display in the
     template with the ``unordered_list`` filter.
     """
-    from django.contrib.admin.options import EMPTY_VALUE_STRING
-
-    try:
-        obj = objs[0]
-    except IndexError:
-        return [], {}, set(), []
-    else:
-        using = router.db_for_write(obj._meta.model)
-    collector = NestedObjects(using=using, origin=objs)
-    collector.collect(objs)
-    perms_needed = set()
-
-    def format_callback(obj):
-        model = obj.__class__
-        opts = obj._meta
-
-        no_edit_link = "%s: %s" % (capfirst(opts.verbose_name), obj)
-
-        if admin_site.is_registered(model):
-            if not admin_site.get_model_admin(model).has_delete_permission(
-                request, obj
-            ):
-                perms_needed.add(opts.verbose_name)
-            try:
-                admin_url = reverse(
-                    "%s:%s_%s_change"
-                    % (admin_site.name, opts.app_label, opts.model_name),
-                    None,
-                    (quote(obj.pk),),
-                )
-            except NoReverseMatch:
-                # Change url doesn't exist -- don't display link to edit
-                return no_edit_link
-
-            # Display a link to the admin page.
-            obj_display = display_for_value(str(obj), EMPTY_VALUE_STRING)
-            return format_html(
-                '{}: <a href="{}">{}</a>',
-                capfirst(opts.verbose_name),
-                admin_url,
-                obj_display,
-            )
-        else:
-            # Don't display link to edit, because it either has no
-            # admin or is edited inline.
-            return no_edit_link
-
-    to_delete = collector.nested(format_callback)
-
-    protected = [format_callback(obj) for obj in collector.protected]
-    model_count = {
-        model._meta.verbose_name_plural: len(objs)
-        for model, objs in collector.model_objs.items()
-    }
-
-    return to_delete, model_count, perms_needed, protected
+    pass
 
 
 class NestedObjects(Collector):
@@ -225,29 +170,13 @@ class NestedObjects(Collector):
         )
 
     def _nested(self, obj, seen, format_callback):
-        if obj in seen:
-            return []
-        seen.add(obj)
-        children = []
-        for child in self.edges.get(obj, ()):
-            children.extend(self._nested(child, seen, format_callback))
-        if format_callback:
-            ret = [format_callback(obj)]
-        else:
-            ret = [obj]
-        if children:
-            ret.append(children)
-        return ret
+        pass
 
     def nested(self, format_callback=None):
         """
         Return the graph as a nested list.
         """
-        seen = set()
-        roots = []
-        for root in self.edges.get(None, ()):
-            roots.extend(self._nested(root, seen, format_callback))
-        return roots
+        pass
 
 
 def model_format_dict(obj):
@@ -257,16 +186,7 @@ def model_format_dict(obj):
 
     `obj` may be a `Model` instance, `Model` subclass, or `QuerySet` instance.
     """
-    if isinstance(obj, (models.Model, models.base.ModelBase)):
-        opts = obj._meta
-    elif isinstance(obj, models.query.QuerySet):
-        opts = obj.model._meta
-    else:
-        opts = obj
-    return {
-        "verbose_name": opts.verbose_name,
-        "verbose_name_plural": opts.verbose_name_plural,
-    }
+    pass
 
 
 def model_ngettext(obj, n=None):
@@ -278,51 +198,11 @@ def model_ngettext(obj, n=None):
     If `obj` is a `QuerySet` instance, `n` is optional and the length of the
     `QuerySet` is used.
     """
-    if isinstance(obj, models.query.QuerySet):
-        if n is None:
-            n = obj.count()
-        obj = obj.model
-    d = model_format_dict(obj)
-    singular, plural = d["verbose_name"], d["verbose_name_plural"]
-    return ngettext(singular, plural, n or 0)
+    pass
 
 
 def lookup_field(name, obj, model_admin=None):
-    opts = obj._meta
-    try:
-        f = _get_non_gfk_field(opts, name)
-    except (FieldDoesNotExist, FieldIsAForeignKeyColumnName):
-        # For non-regular field values, the value is either a method,
-        # property, related field, or returned via a callable.
-        f = None
-        if callable(name):
-            attr = name
-            value = attr(obj)
-        elif hasattr(model_admin, name) and name != "__str__":
-            attr = getattr(model_admin, name)
-            value = attr(obj)
-        else:
-            sentinel = object()
-            attr = getattr(obj, name, sentinel)
-            if callable(attr):
-                value = attr()
-            else:
-                if attr is sentinel:
-                    attr = obj
-                    for part in name.split(LOOKUP_SEP):
-                        attr = getattr(attr, part, sentinel)
-                        if attr is sentinel:
-                            return None, None, None
-                    # The final field is needed for displaying boolean icons.
-                    if LOOKUP_SEP in name:
-                        f = get_fields_from_path(opts.model, name)[-1]
-                value = attr
-            if hasattr(model_admin, "model") and hasattr(model_admin.model, name):
-                attr = getattr(model_admin.model, name)
-    else:
-        attr = None
-        value = getattr(obj, name)
-    return f, attr, value
+    pass
 
 
 def _get_non_gfk_field(opts, name):
@@ -433,67 +313,11 @@ def help_text_for_field(name, model):
 
 
 def display_for_field(value, field, empty_value_display, avoid_link=False):
-    from django.contrib.admin.templatetags.admin_list import _boolean_icon
-
-    if field.name == "password" and field.model == get_user_model():
-        return render_password_as_hash(value)
-    elif getattr(field, "flatchoices", None):
-        try:
-            return dict(field.flatchoices).get(value, empty_value_display)
-        except TypeError:
-            # Allow list-like choices.
-            flatchoices = make_hashable(field.flatchoices)
-            value = make_hashable(value)
-            return dict(flatchoices).get(value, empty_value_display)
-
-    # BooleanField needs special-case null-handling, so it comes before the
-    # general null test.
-    elif isinstance(field, models.BooleanField):
-        return _boolean_icon(value)
-    elif value in field.empty_values:
-        return empty_value_display
-    elif isinstance(field, models.DateTimeField):
-        return formats.localize(timezone.template_localtime(value))
-    elif isinstance(field, (models.DateField, models.TimeField)):
-        return formats.localize(value)
-    elif isinstance(field, models.DecimalField):
-        return formats.number_format(value, field.decimal_places)
-    elif isinstance(field, (models.IntegerField, models.FloatField)):
-        return formats.number_format(value)
-    elif isinstance(field, models.FileField) and value and not avoid_link:
-        return format_html('<a href="{}">{}</a>', value.url, value)
-    elif isinstance(field, models.URLField) and value and not avoid_link:
-        return format_html('<a href="{}">{}</a>', value, value)
-    elif isinstance(field, models.JSONField) and value:
-        try:
-            return json.dumps(value, ensure_ascii=False, cls=field.encoder)
-        except TypeError:
-            return display_for_value(value, empty_value_display)
-    else:
-        return display_for_value(value, empty_value_display)
+    pass
 
 
 def display_for_value(value, empty_value_display, boolean=False):
-    from django.contrib.admin.templatetags.admin_list import _boolean_icon
-
-    if boolean:
-        return _boolean_icon(value)
-    if isinstance(value, str) and not isinstance(value, SafeString):
-        value = value.strip()
-    if value in EMPTY_VALUES:
-        return empty_value_display
-    elif isinstance(value, bool):
-        return str(value)
-    elif isinstance(value, datetime.datetime):
-        return formats.localize(timezone.template_localtime(value))
-    elif isinstance(value, (datetime.date, datetime.time)):
-        return formats.localize(value)
-    elif isinstance(value, (int, decimal.Decimal, float)):
-        return formats.number_format(value)
-    elif isinstance(value, (list, tuple)):
-        return ", ".join(str(v) for v in value)
-    else:
-        return str(value)
+    pass
 
 
 class NotRelationField(Exception):
@@ -564,64 +388,8 @@ def construct_change_message(form, formsets, add):
     Translations are deactivated so that strings are stored untranslated.
     Translation happens later on LogEntry access.
     """
-    change_message = []
-    if add:
-        change_message.append({"added": {}})
-    # Evaluating `form.changed_data` prior to disabling translations is
-    # required to avoid fields affected by localization from being included
-    # incorrectly, e.g. where date formats differ such as MM/DD/YYYY vs
-    # DD/MM/YYYY.
-    elif changed_data := form.changed_data:
-        with translation_override(None):
-            # Deactivate translations while fetching verbose_name for form
-            # field labels and using `field_name`, if verbose_name is not
-            # provided. Translations will happen later on LogEntry access.
-            changed_field_labels = _get_changed_field_labels_from_form(
-                form, changed_data
-            )
-        change_message.append({"changed": {"fields": changed_field_labels}})
-    if formsets:
-        with translation_override(None):
-            for formset in formsets:
-                for added_object in formset.new_objects:
-                    change_message.append(
-                        {
-                            "added": {
-                                "name": str(added_object._meta.verbose_name),
-                                "object": str(added_object),
-                            }
-                        }
-                    )
-                for changed_object, changed_fields in formset.changed_objects:
-                    change_message.append(
-                        {
-                            "changed": {
-                                "name": str(changed_object._meta.verbose_name),
-                                "object": str(changed_object),
-                                "fields": _get_changed_field_labels_from_form(
-                                    formset.forms[0], changed_fields
-                                ),
-                            }
-                        }
-                    )
-                for deleted_object in formset.deleted_objects:
-                    change_message.append(
-                        {
-                            "deleted": {
-                                "name": str(deleted_object._meta.verbose_name),
-                                "object": str(deleted_object),
-                            }
-                        }
-                    )
-    return change_message
+    pass
 
 
 def _get_changed_field_labels_from_form(form, changed_data):
-    changed_field_labels = []
-    for field_name in changed_data:
-        try:
-            verbose_field_name = form.fields[field_name].label or field_name
-        except KeyError:
-            verbose_field_name = field_name
-        changed_field_labels.append(str(verbose_field_name))
-    return changed_field_labels
+    pass

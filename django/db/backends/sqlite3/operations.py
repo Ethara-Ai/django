@@ -179,23 +179,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return -1
 
     def __references_graph(self, table_name):
-        query = """
-        WITH tables AS (
-            SELECT %s name
-            UNION
-            SELECT sqlite_master.name
-            FROM sqlite_master
-            JOIN tables ON (sql REGEXP %s || tables.name || %s)
-        ) SELECT name FROM tables;
-        """
-        params = (
-            table_name,
-            r'(?i)\s+references\s+("|\')?',
-            r'("|\')?\s*\(',
-        )
-        with self.connection.cursor() as cursor:
-            results = cursor.execute(query, params)
-            return [row[0] for row in results.fetchall()]
+        pass
 
     @cached_property
     def _references_graph(self):
@@ -287,24 +271,13 @@ class DatabaseOperations(BaseDatabaseOperations):
         return converters
 
     def convert_datetimefield_value(self, value, expression, connection):
-        if value is not None:
-            if not isinstance(value, datetime.datetime):
-                value = parse_datetime(value)
-            if settings.USE_TZ and not timezone.is_aware(value):
-                value = timezone.make_aware(value, self.connection.timezone)
-        return value
+        pass
 
     def convert_datefield_value(self, value, expression, connection):
-        if value is not None:
-            if not isinstance(value, datetime.date):
-                value = parse_date(value)
-        return value
+        pass
 
     def convert_timefield_value(self, value, expression, connection):
-        if value is not None:
-            if not isinstance(value, datetime.time):
-                value = parse_time(value)
-        return value
+        pass
 
     @staticmethod
     def _create_decimal(value):
@@ -335,12 +308,10 @@ class DatabaseOperations(BaseDatabaseOperations):
         return converter
 
     def convert_uuidfield_value(self, value, expression, connection):
-        if value is not None:
-            value = uuid.UUID(value)
-        return value
+        pass
 
     def convert_booleanfield_value(self, value, expression, connection):
-        return bool(value) if value in (1, 0) else value
+        pass
 
     def combine_expression(self, connector, sub_expressions):
         # SQLite doesn't have a ^ operator, so use the user-defined POWER

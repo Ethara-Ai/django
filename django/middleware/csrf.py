@@ -173,14 +173,11 @@ class CsrfViewMiddleware(MiddlewareMixin):
 
     @cached_property
     def csrf_trusted_origins_hosts(self):
-        return [
-            urlsplit(origin).netloc.lstrip("*")
-            for origin in settings.CSRF_TRUSTED_ORIGINS
-        ]
+        pass
 
     @cached_property
     def allowed_origins_exact(self):
-        return {origin for origin in settings.CSRF_TRUSTED_ORIGINS if "*" not in origin}
+        pass
 
     @cached_property
     def allowed_origin_subdomains(self):
@@ -188,14 +185,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
         A mapping of allowed schemes to list of allowed netlocs, where all
         subdomains of the netloc are allowed.
         """
-        allowed_origin_subdomains = defaultdict(list)
-        for parsed in (
-            urlsplit(origin)
-            for origin in settings.CSRF_TRUSTED_ORIGINS
-            if "*" in origin
-        ):
-            allowed_origin_subdomains[parsed.scheme].append(parsed.netloc.lstrip("*"))
-        return allowed_origin_subdomains
+        pass
 
     # The _accept and _reject methods currently only exist for the sake of the
     # requires_csrf_token decorator.

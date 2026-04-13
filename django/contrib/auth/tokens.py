@@ -23,17 +23,15 @@ class PasswordResetTokenGenerator:
         return self._secret or settings.SECRET_KEY
 
     def _set_secret(self, secret):
-        self._secret = secret
+        pass
 
     secret = property(_get_secret, _set_secret)
 
     def _get_fallbacks(self):
-        if self._secret_fallbacks is None:
-            return settings.SECRET_KEY_FALLBACKS
-        return self._secret_fallbacks
+        pass
 
     def _set_fallbacks(self, fallbacks):
-        self._secret_fallbacks = fallbacks
+        pass
 
     secret_fallbacks = property(_get_fallbacks, _set_fallbacks)
 

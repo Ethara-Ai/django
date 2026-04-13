@@ -58,7 +58,7 @@ class GenericForeignKey(FieldCacheMixin, Field):
 
     @cached_property
     def ct_field_attname(self):
-        return self.model._meta.get_field(self.ct_field).attname
+        pass
 
     def get_filter_kwargs_for_object(self, obj):
         """See corresponding method on Field"""
@@ -155,7 +155,7 @@ class GenericForeignKey(FieldCacheMixin, Field):
 
     @cached_property
     def cache_name(self):
-        return self.name
+        pass
 
     def get_content_type(self, obj=None, id=None, using=None, model=None):
         if obj is not None:
@@ -224,14 +224,7 @@ class GenericForeignKeyDescriptor:
         # the content type, so we use a callable that returns a (fk, class)
         # pair.
         def gfk_key(obj):
-            ct_id = getattr(obj, ct_attname)
-            if ct_id is None:
-                return None
-            else:
-                model = self.field.get_content_type(
-                    id=ct_id, using=obj._state.db
-                ).model_class()
-                return str(getattr(obj, self.field.fk_field)), model
+            pass
 
         return (
             ret_val,
@@ -420,13 +413,7 @@ class GenericRelation(ForeignObject):
             return []
 
     def resolve_related_fields(self):
-        self.to_fields = [self.model._meta.pk.name]
-        return [
-            (
-                self.remote_field.model._meta.get_field(self.object_id_field_name),
-                self.model._meta.pk,
-            )
-        ]
+        pass
 
     def get_local_related_value(self, instance):
         return self.get_instance_value_for_fields(instance, self.foreign_related_fields)
@@ -540,10 +527,7 @@ class GenericRelation(ForeignObject):
         if not cls._meta.abstract:
 
             def make_generic_foreign_order_accessors(related_model, model):
-                if self._is_matching_generic_foreign_key(
-                    model._meta.order_with_respect_to
-                ):
-                    make_foreign_order_accessors(model, related_model)
+                pass
 
             lazy_related_operation(
                 make_generic_foreign_order_accessors,
@@ -758,7 +742,7 @@ def create_generic_related_manager(superclass, rel):
         add.alters_data = True
 
         async def aadd(self, *objs, bulk=True):
-            return await sync_to_async(self.add)(*objs, bulk=bulk)
+            pass
 
         aadd.alters_data = True
 
@@ -770,7 +754,7 @@ def create_generic_related_manager(superclass, rel):
         remove.alters_data = True
 
         async def aremove(self, *objs, bulk=True):
-            return await sync_to_async(self.remove)(*objs, bulk=bulk)
+            pass
 
         aremove.alters_data = True
 
@@ -780,7 +764,7 @@ def create_generic_related_manager(superclass, rel):
         clear.alters_data = True
 
         async def aclear(self, *, bulk=True):
-            return await sync_to_async(self.clear)(bulk=bulk)
+            pass
 
         aclear.alters_data = True
 
@@ -802,24 +786,7 @@ def create_generic_related_manager(superclass, rel):
         def set(self, objs, *, bulk=True, clear=False):
             # Force evaluation of `objs` in case it's a queryset whose value
             # could be affected by `manager.clear()`. Refs #19816.
-            objs = tuple(objs)
-
-            db = router.db_for_write(self.model, instance=self.instance)
-            with transaction.atomic(using=db, savepoint=False):
-                if clear:
-                    self.clear()
-                    self.add(*objs, bulk=bulk)
-                else:
-                    old_objs = set(self.using(db).all())
-                    new_objs = []
-                    for obj in objs:
-                        if obj in old_objs:
-                            old_objs.remove(obj)
-                        else:
-                            new_objs.append(obj)
-
-                    self.remove(*old_objs)
-                    self.add(*new_objs, bulk=bulk)
+            pass
 
         set.alters_data = True
 
@@ -864,7 +831,7 @@ def create_generic_related_manager(superclass, rel):
         update_or_create.alters_data = True
 
         async def aupdate_or_create(self, **kwargs):
-            return await sync_to_async(self.update_or_create)(**kwargs)
+            pass
 
         aupdate_or_create.alters_data = True
 

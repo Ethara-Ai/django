@@ -148,48 +148,14 @@ class ConnectionHandler(BaseConnectionHandler):
     thread_critical = True
 
     def configure_settings(self, databases):
-        databases = super().configure_settings(databases)
-        if databases == {}:
-            databases[DEFAULT_DB_ALIAS] = {"ENGINE": "django.db.backends.dummy"}
-        elif DEFAULT_DB_ALIAS not in databases:
-            raise ImproperlyConfigured(
-                f"You must define a '{DEFAULT_DB_ALIAS}' database."
-            )
-        elif databases[DEFAULT_DB_ALIAS] == {}:
-            databases[DEFAULT_DB_ALIAS]["ENGINE"] = "django.db.backends.dummy"
-
-        # Configure default settings.
-        for conn in databases.values():
-            conn.setdefault("ATOMIC_REQUESTS", False)
-            conn.setdefault("AUTOCOMMIT", True)
-            conn.setdefault("ENGINE", "django.db.backends.dummy")
-            if conn["ENGINE"] == "django.db.backends." or not conn["ENGINE"]:
-                conn["ENGINE"] = "django.db.backends.dummy"
-            conn.setdefault("CONN_MAX_AGE", 0)
-            conn.setdefault("CONN_HEALTH_CHECKS", False)
-            conn.setdefault("OPTIONS", {})
-            conn.setdefault("TIME_ZONE", None)
-            for setting in ["NAME", "USER", "PASSWORD", "HOST", "PORT"]:
-                conn.setdefault(setting, "")
-
-            test_settings = conn.setdefault("TEST", {})
-            default_test_settings = [
-                ("CHARSET", None),
-                ("COLLATION", None),
-                ("MIGRATE", True),
-                ("MIRROR", None),
-                ("NAME", None),
-            ]
-            for key, value in default_test_settings:
-                test_settings.setdefault(key, value)
-        return databases
+        pass
 
     @property
     def databases(self):
         # Maintained for backward compatibility as some 3rd party packages have
         # made use of this private API in the past. It is no longer used within
         # Django itself.
-        return self.settings
+        pass
 
     def create_connection(self, alias):
         db = self.settings[alias]
@@ -206,35 +172,11 @@ class ConnectionRouter:
 
     @cached_property
     def routers(self):
-        if self._routers is None:
-            self._routers = settings.DATABASE_ROUTERS
-        routers = []
-        for r in self._routers:
-            if isinstance(r, str):
-                router = import_string(r)()
-            else:
-                router = r
-            routers.append(router)
-        return routers
+        pass
 
     def _router_func(action):
         def _route_db(self, model, **hints):
-            chosen_db = None
-            for router in self.routers:
-                try:
-                    method = getattr(router, action)
-                except AttributeError:
-                    # If the router doesn't have a method, skip to the next
-                    # one.
-                    pass
-                else:
-                    chosen_db = method(model, **hints)
-                    if chosen_db:
-                        return chosen_db
-            instance = hints.get("instance")
-            if instance is not None and instance._state.db:
-                return instance._state.db
-            return DEFAULT_DB_ALIAS
+            pass
 
         return _route_db
 

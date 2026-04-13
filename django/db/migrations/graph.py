@@ -301,9 +301,7 @@ class MigrationGraph:
         return "<%s: nodes=%s, edges=%s>" % (self.__class__.__name__, nodes, edges)
 
     def _nodes_and_edges(self):
-        return len(self.nodes), sum(
-            len(node.parents) for node in self.node_map.values()
-        )
+        pass
 
     def _generate_plan(self, nodes, at_end):
         plan = OrderedSet()

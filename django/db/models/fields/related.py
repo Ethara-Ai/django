@@ -119,8 +119,7 @@ class RelatedField(FieldCacheMixin, Field):
     @cached_property
     def related_model(self):
         # Can't cache this property until all the models are loaded.
-        apps.check_models_ready()
-        return self.remote_field.model
+        pass
 
     def check(self, **kwargs):
         return [
@@ -399,8 +398,7 @@ class RelatedField(FieldCacheMixin, Field):
                 self.remote_field.related_query_name = related_query_name
 
             def resolve_related_class(model, related, field):
-                field.remote_field.model = related
-                field.do_related_class(related, model)
+                pass
 
             lazy_related_operation(
                 resolve_related_class, cls, self.remote_field.model, field=self
@@ -455,14 +453,7 @@ class RelatedField(FieldCacheMixin, Field):
         Get the setting that this is powered from for swapping, or None
         if it's not swapped in / marked with swappable=False.
         """
-        if self.swappable:
-            # Work out string form of "to"
-            if isinstance(self.remote_field.model, str):
-                to_string = self.remote_field.model
-            else:
-                to_string = self.remote_field.model._meta.label
-            return apps.get_swappable_settings_name(to_string)
-        return None
+        pass
 
     def set_attributes_from_rel(self):
         self.name = self.name or (
@@ -528,17 +519,11 @@ class RelatedField(FieldCacheMixin, Field):
         When filtering against this relation, return the field on the remote
         model against which the filtering should happen.
         """
-        target_fields = self.path_infos[-1].target_fields
-        if len(target_fields) > 1:
-            raise exceptions.FieldError(
-                "The relation has multiple target fields, but only single target field "
-                "was asked for"
-            )
-        return target_fields[0]
+        pass
 
     @cached_property
     def cache_name(self):
-        return self.name
+        pass
 
 
 class ForeignObject(RelatedField):
@@ -772,46 +757,23 @@ class ForeignObject(RelatedField):
         return name, path, args, kwargs
 
     def resolve_related_fields(self):
-        if not self.from_fields or len(self.from_fields) != len(self.to_fields):
-            raise ValueError(
-                "Foreign Object from and to fields must be the same non-zero length"
-            )
-        if isinstance(self.remote_field.model, str):
-            raise ValueError(
-                "Related model %r cannot be resolved" % self.remote_field.model
-            )
-        related_fields = []
-        for from_field_name, to_field_name in zip(self.from_fields, self.to_fields):
-            from_field = (
-                self
-                if from_field_name == RECURSIVE_RELATIONSHIP_CONSTANT
-                else self.opts.get_field(from_field_name)
-            )
-            to_field = (
-                self.remote_field.model._meta.pk
-                if to_field_name is None
-                else self.remote_field.model._meta.get_field(to_field_name)
-            )
-            related_fields.append((from_field, to_field))
-        return related_fields
+        pass
 
     @cached_property
     def related_fields(self):
-        return self.resolve_related_fields()
+        pass
 
     @cached_property
     def reverse_related_fields(self):
-        return [(rhs_field, lhs_field) for lhs_field, rhs_field in self.related_fields]
+        pass
 
     @cached_property
     def local_related_fields(self):
-        return tuple(lhs_field for lhs_field, rhs_field in self.related_fields)
+        pass
 
     @cached_property
     def foreign_related_fields(self):
-        return tuple(
-            rhs_field for lhs_field, rhs_field in self.related_fields if rhs_field
-        )
+        pass
 
     def get_local_related_value(self, instance):
         return self.get_instance_value_for_fields(instance, self.local_related_fields)
@@ -898,7 +860,7 @@ class ForeignObject(RelatedField):
 
     @cached_property
     def path_infos(self):
-        return self.get_path_info()
+        pass
 
     def get_reverse_path_info(self, filtered_relation=None):
         """Get path from the related model to this field's model."""
@@ -918,7 +880,7 @@ class ForeignObject(RelatedField):
 
     @cached_property
     def reverse_path_infos(self):
-        return self.get_reverse_path_info()
+        pass
 
     @classmethod
     @functools.cache
@@ -1202,7 +1164,7 @@ class ForeignKey(ForeignObject):
 
     @property
     def target_field(self):
-        return self.foreign_related_fields[0]
+        pass
 
     def validate(self, value, model_instance):
         if self.remote_field.parent_link:
@@ -1229,23 +1191,7 @@ class ForeignKey(ForeignObject):
             )
 
     def resolve_related_fields(self):
-        related_fields = super().resolve_related_fields()
-        for from_field, to_field in related_fields:
-            if (
-                to_field
-                and to_field.model != self.remote_field.model._meta.concrete_model
-            ):
-                raise exceptions.FieldError(
-                    "'%s.%s' refers to field '%s' which is not local to model "
-                    "'%s'."
-                    % (
-                        self.model._meta.label,
-                        self.name,
-                        to_field.name,
-                        self.remote_field.model._meta.concrete_model._meta.label,
-                    )
-                )
-        return related_fields
+        pass
 
     def get_attname(self):
         return "%s_id" % self.name
@@ -1320,9 +1266,7 @@ class ForeignKey(ForeignObject):
         }
 
     def convert_empty_strings(self, value, expression, connection):
-        if (not value) and isinstance(value, str):
-            return None
-        return value
+        pass
 
     def get_db_converters(self, connection):
         converters = super().get_db_converters(connection)
@@ -1394,7 +1338,7 @@ def create_many_to_many_intermediary_model(field, klass):
     from django.db import models
 
     def set_managed(model, related, through):
-        through._meta.managed = model._meta.managed or related._meta.managed
+        pass
 
     to_model = resolve_relation(klass, field.remote_field.model)
     name = "%s_%s" % (klass._meta.object_name, field.name)
@@ -1975,14 +1919,14 @@ class ManyToManyField(RelatedField):
 
     @cached_property
     def path_infos(self):
-        return self.get_path_info()
+        pass
 
     def get_reverse_path_info(self, filtered_relation=None):
         return self._get_path_info(direct=False, filtered_relation=filtered_relation)
 
     @cached_property
     def reverse_path_infos(self):
-        return self.get_reverse_path_info()
+        pass
 
     def _get_m2m_db_table(self, opts):
         """
@@ -2002,51 +1946,14 @@ class ManyToManyField(RelatedField):
         Function that can be curried to provide the source accessor or DB
         column name for the m2m table.
         """
-        cache_attr = "_m2m_%s_cache" % attr
-        if hasattr(self, cache_attr):
-            return getattr(self, cache_attr)
-        if self.remote_field.through_fields is not None:
-            link_field_name = self.remote_field.through_fields[0]
-        else:
-            link_field_name = None
-        for f in self.remote_field.through._meta.fields:
-            if (
-                f.is_relation
-                and f.remote_field.model == related.related_model
-                and (link_field_name is None or link_field_name == f.name)
-            ):
-                setattr(self, cache_attr, getattr(f, attr))
-                return getattr(self, cache_attr)
+        pass
 
     def _get_m2m_reverse_attr(self, related, attr):
         """
         Function that can be curried to provide the related accessor or DB
         column name for the m2m table.
         """
-        cache_attr = "_m2m_reverse_%s_cache" % attr
-        if hasattr(self, cache_attr):
-            return getattr(self, cache_attr)
-        found = False
-        if self.remote_field.through_fields is not None:
-            link_field_name = self.remote_field.through_fields[1]
-        else:
-            link_field_name = None
-        for f in self.remote_field.through._meta.fields:
-            if f.is_relation and f.remote_field.model == related.model:
-                if link_field_name is None and related.related_model == related.model:
-                    # If this is an m2m-intermediate to self,
-                    # the first foreign key you find will be
-                    # the source column. Keep searching for
-                    # the second foreign key.
-                    if found:
-                        setattr(self, cache_attr, getattr(f, attr))
-                        break
-                    else:
-                        found = True
-                elif link_field_name is None or link_field_name == f.name:
-                    setattr(self, cache_attr, getattr(f, attr))
-                    break
-        return getattr(self, cache_attr)
+        pass
 
     def contribute_to_class(self, cls, name, **kwargs):
         # To support multiple relations to self, it's useful to have a non-None
@@ -2081,7 +1988,7 @@ class ManyToManyField(RelatedField):
             if self.remote_field.through:
 
                 def resolve_through_model(_, model, field):
-                    field.remote_field.through = model
+                    pass
 
                 lazy_related_operation(
                     resolve_through_model, cls, self.remote_field.through, field=self

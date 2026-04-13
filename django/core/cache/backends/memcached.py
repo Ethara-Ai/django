@@ -30,14 +30,14 @@ class BaseMemcachedCache(BaseCache):
 
     @property
     def client_servers(self):
-        return self._servers
+        pass
 
     @cached_property
     def _cache(self):
         """
         Implement transparent thread-safe access to a memcached client.
         """
-        return self._class(self.client_servers, **self._options)
+        pass
 
     def get_backend_timeout(self, timeout=DEFAULT_TIMEOUT):
         """
@@ -76,15 +76,10 @@ class BaseMemcachedCache(BaseCache):
         return self._cache.get(key, default)
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_and_validate_key(key, version=version)
-        if not self._cache.set(key, value, self.get_backend_timeout(timeout)):
-            # Make sure the key doesn't keep its old value in case of failure
-            # to set (memcached's 1MB limit).
-            self._cache.delete(key)
+        pass
 
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_and_validate_key(key, version=version)
-        return bool(self._cache.touch(key, self.get_backend_timeout(timeout)))
+        pass
 
     def delete(self, key, version=None):
         key = self.make_and_validate_key(key, version=version)
@@ -102,37 +97,13 @@ class BaseMemcachedCache(BaseCache):
         self._cache.disconnect_all()
 
     def incr(self, key, delta=1, version=None):
-        key = self.make_and_validate_key(key, version=version)
-        try:
-            # Memcached doesn't support negative delta.
-            if delta < 0:
-                val = self._cache.decr(key, -delta)
-            else:
-                val = self._cache.incr(key, delta)
-        # Normalize an exception raised by the underlying client library to
-        # ValueError in the event of a nonexistent key when calling
-        # incr()/decr().
-        except self.LibraryValueNotFoundException:
-            val = None
-        if val is None:
-            raise ValueError("Key '%s' not found" % key)
-        return val
+        pass
 
     def set_many(self, data, timeout=DEFAULT_TIMEOUT, version=None):
-        safe_data = {}
-        original_keys = {}
-        for key, value in data.items():
-            safe_key = self.make_and_validate_key(key, version=version)
-            safe_data[safe_key] = value
-            original_keys[safe_key] = key
-        failed_keys = self._cache.set_multi(
-            safe_data, self.get_backend_timeout(timeout)
-        )
-        return [original_keys[k] for k in failed_keys]
+        pass
 
     def delete_many(self, keys, version=None):
-        keys = [self.make_and_validate_key(key, version=version) for key in keys]
-        self._cache.delete_multi(keys)
+        pass
 
     def clear(self):
         self._cache.flush_all()
@@ -154,16 +125,10 @@ class PyLibMCCache(BaseMemcachedCache):
 
     @property
     def client_servers(self):
-        output = []
-        for server in self._servers:
-            output.append(server.removeprefix("unix:"))
-        return output
+        pass
 
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_and_validate_key(key, version=version)
-        if timeout == 0:
-            return self._cache.delete(key)
-        return self._cache.touch(key, self.get_backend_timeout(timeout))
+        pass
 
     def close(self, **kwargs):
         # libmemcached manages its own connections. Don't call disconnect_all()

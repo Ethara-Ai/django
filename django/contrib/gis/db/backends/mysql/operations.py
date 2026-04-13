@@ -17,11 +17,11 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
 
     @cached_property
     def mariadb(self):
-        return self.connection.mysql_is_mariadb
+        pass
 
     @cached_property
     def mysql(self):
-        return not self.connection.mysql_is_mariadb
+        pass
 
     @cached_property
     def select(self):
@@ -29,7 +29,7 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
 
     @cached_property
     def from_text(self):
-        return self.geom_func_prefix + "GeomFromText"
+        pass
 
     @cached_property
     def collect(self):
@@ -38,45 +38,11 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
 
     @cached_property
     def gis_operators(self):
-        operators = {
-            "bbcontains": SpatialOperator(
-                func="MBRContains"
-            ),  # For consistency w/PostGIS API
-            "bboverlaps": SpatialOperator(func="MBROverlaps"),  # ...
-            "contained": SpatialOperator(func="MBRWithin"),  # ...
-            "contains": SpatialOperator(func="ST_Contains"),
-            "coveredby": SpatialOperator(func="MBRCoveredBy"),
-            "crosses": SpatialOperator(func="ST_Crosses"),
-            "disjoint": SpatialOperator(func="ST_Disjoint"),
-            "equals": SpatialOperator(func="ST_Equals"),
-            "exact": SpatialOperator(func="ST_Equals"),
-            "intersects": SpatialOperator(func="ST_Intersects"),
-            "overlaps": SpatialOperator(func="ST_Overlaps"),
-            "same_as": SpatialOperator(func="ST_Equals"),
-            "touches": SpatialOperator(func="ST_Touches"),
-            "within": SpatialOperator(func="ST_Within"),
-        }
-        if self.connection.mysql_is_mariadb:
-            operators["relate"] = SpatialOperator(func="ST_Relate")
-            if self.connection.mysql_version < (12, 0, 1):
-                del operators["coveredby"]
-        else:
-            operators["covers"] = SpatialOperator(func="MBRCovers")
-        return operators
+        pass
 
     @cached_property
     def disallowed_aggregates(self):
-        disallowed_aggregates = [
-            models.Extent,
-            models.Extent3D,
-            models.MakeLine,
-            models.Union,
-        ]
-        is_mariadb = self.connection.mysql_is_mariadb
-        if is_mariadb:
-            if self.connection.mysql_version < (12, 0, 1):
-                disallowed_aggregates.insert(0, models.Collect)
-        return tuple(disallowed_aggregates)
+        pass
 
     function_names = {
         "FromWKB": "ST_GeomFromWKB",
@@ -85,34 +51,7 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
 
     @cached_property
     def unsupported_functions(self):
-        unsupported = {
-            "AsGML",
-            "AsKML",
-            "AsSVG",
-            "Azimuth",
-            "BoundingCircle",
-            "ClosestPoint",
-            "ForcePolygonCW",
-            "GeometryDistance",
-            "IsEmpty",
-            "LineLocatePoint",
-            "MakeValid",
-            "MemSize",
-            "NumDimensions",
-            "Perimeter",
-            "PointOnSurface",
-            "Reverse",
-            "Rotate",
-            "Scale",
-            "SnapToGrid",
-            "Transform",
-            "Translate",
-        }
-        if self.connection.mysql_is_mariadb:
-            unsupported.remove("PointOnSurface")
-            if self.connection.mysql_version < (12, 0, 1):
-                unsupported.update({"GeoHash", "IsValid"})
-        return unsupported
+        pass
 
     def geo_db_type(self, f):
         return f.geom_type

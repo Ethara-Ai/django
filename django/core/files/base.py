@@ -70,7 +70,7 @@ class File(FileProxyMixin):
         always return ``False`` -- there's no good reason to read from memory
         in chunks.
         """
-        return self.size > (chunk_size or self.DEFAULT_CHUNK_SIZE)
+        pass
 
     def __iter__(self):
         # Iterate over this file-like object by newlines
@@ -109,13 +109,7 @@ class File(FileProxyMixin):
         self.close()
 
     def open(self, mode=None, *args, **kwargs):
-        if not self.closed:
-            self.seek(0)
-        elif self.name and os.path.exists(self.name):
-            self.file = open(self.name, mode or self.mode, *args, **kwargs)
-        else:
-            raise ValueError("The file cannot be reopened.")
-        return self
+        pass
 
     def close(self):
         self.file.close()
@@ -138,8 +132,7 @@ class ContentFile(File):
         return True
 
     def open(self, mode=None):
-        self.seek(0)
-        return self
+        pass
 
     def close(self):
         pass
@@ -151,14 +144,14 @@ class ContentFile(File):
 
 def endswith_cr(line):
     """Return True if line (a text or bytestring) ends with '\r'."""
-    return line.endswith("\r" if isinstance(line, str) else b"\r")
+    pass
 
 
 def endswith_lf(line):
     """Return True if line (a text or bytestring) ends with '\n'."""
-    return line.endswith("\n" if isinstance(line, str) else b"\n")
+    pass
 
 
 def equals_lf(line):
     """Return True if line (a text or bytestring) equals '\n'."""
-    return line == ("\n" if isinstance(line, str) else b"\n")
+    pass

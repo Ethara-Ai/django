@@ -81,12 +81,7 @@ class FacetsMixin:
         )
 
     def get_facet_queryset(self, changelist):
-        filtered_qs = changelist.get_queryset(
-            self.request, exclude_parameters=self.expected_parameters()
-        )
-        return filtered_qs.aggregate(
-            **self.get_facet_counts(changelist.pk_attname, filtered_qs)
-        )
+        pass
 
 
 class SimpleListFilter(FacetsMixin, ListFilter):
@@ -132,40 +127,10 @@ class SimpleListFilter(FacetsMixin, ListFilter):
         return [self.parameter_name]
 
     def get_facet_counts(self, pk_attname, filtered_qs):
-        original_value = self.used_parameters.get(self.parameter_name)
-        counts = {}
-        for i, choice in enumerate(self.lookup_choices):
-            self.used_parameters[self.parameter_name] = choice[0]
-            lookup_qs = self.queryset(self.request, filtered_qs)
-            if lookup_qs is not None:
-                counts[f"{i}__c"] = models.Count(
-                    pk_attname,
-                    filter=models.Q(pk__in=lookup_qs),
-                )
-        self.used_parameters[self.parameter_name] = original_value
-        return counts
+        pass
 
     def choices(self, changelist):
-        add_facets = changelist.add_facets
-        facet_counts = self.get_facet_queryset(changelist) if add_facets else None
-        yield {
-            "selected": self.value() is None,
-            "query_string": changelist.get_query_string(remove=[self.parameter_name]),
-            "display": _("All"),
-        }
-        for i, (lookup, title) in enumerate(self.lookup_choices):
-            if add_facets:
-                if (count := facet_counts.get(f"{i}__c", -1)) != -1:
-                    title = f"{title} ({count})"
-                else:
-                    title = f"{title} (-)"
-            yield {
-                "selected": self.value() == str(lookup),
-                "query_string": changelist.get_query_string(
-                    {self.parameter_name: lookup}
-                ),
-                "display": title,
-            }
+        pass
 
 
 class FieldListFilter(FacetsMixin, ListFilter):
@@ -243,7 +208,7 @@ class RelatedFieldListFilter(FieldListFilter):
         Return True if a "(None)" choice should be included, which filters
         out everything except empty relationships.
         """
-        return self.field.null or (self.field.is_relation and self.field.many_to_many)
+        pass
 
     def has_output(self):
         if self.include_empty_choice:
@@ -273,53 +238,10 @@ class RelatedFieldListFilter(FieldListFilter):
         return field.get_choices(include_blank=False, ordering=ordering)
 
     def get_facet_counts(self, pk_attname, filtered_qs):
-        counts = {
-            f"{pk_val}__c": models.Count(
-                pk_attname, filter=models.Q(**{self.lookup_kwarg: pk_val})
-            )
-            for pk_val, _ in self.lookup_choices
-        }
-        if self.include_empty_choice:
-            counts["__c"] = models.Count(
-                pk_attname, filter=models.Q(**{self.lookup_kwarg_isnull: True})
-            )
-        return counts
+        pass
 
     def choices(self, changelist):
-        add_facets = changelist.add_facets
-        facet_counts = self.get_facet_queryset(changelist) if add_facets else None
-        yield {
-            "selected": self.lookup_val is None and not self.lookup_val_isnull,
-            "query_string": changelist.get_query_string(
-                remove=[self.lookup_kwarg, self.lookup_kwarg_isnull]
-            ),
-            "display": _("All"),
-        }
-        count = None
-        for pk_val, val in self.lookup_choices:
-            if add_facets:
-                count = facet_counts[f"{pk_val}__c"]
-                val = f"{val} ({count})"
-            yield {
-                "selected": self.lookup_val is not None
-                and str(pk_val) in self.lookup_val,
-                "query_string": changelist.get_query_string(
-                    {self.lookup_kwarg: pk_val}, [self.lookup_kwarg_isnull]
-                ),
-                "display": val,
-            }
-        empty_title = self.empty_value_display
-        if self.include_empty_choice:
-            if add_facets:
-                count = facet_counts["__c"]
-                empty_title = f"{empty_title} ({count})"
-            yield {
-                "selected": bool(self.lookup_val_isnull),
-                "query_string": changelist.get_query_string(
-                    {self.lookup_kwarg_isnull: "True"}, [self.lookup_kwarg]
-                ),
-                "display": empty_title,
-            }
+        pass
 
 
 FieldListFilter.register(lambda f: f.remote_field, RelatedFieldListFilter)
@@ -345,50 +267,10 @@ class BooleanFieldListFilter(FieldListFilter):
         return [self.lookup_kwarg, self.lookup_kwarg2]
 
     def get_facet_counts(self, pk_attname, filtered_qs):
-        return {
-            "true__c": models.Count(
-                pk_attname, filter=models.Q(**{self.field_path: True})
-            ),
-            "false__c": models.Count(
-                pk_attname, filter=models.Q(**{self.field_path: False})
-            ),
-            "null__c": models.Count(
-                pk_attname, filter=models.Q(**{self.lookup_kwarg2: True})
-            ),
-        }
+        pass
 
     def choices(self, changelist):
-        field_choices = dict(self.field.flatchoices)
-        add_facets = changelist.add_facets
-        facet_counts = self.get_facet_queryset(changelist) if add_facets else None
-        for lookup, title, count_field in (
-            (None, _("All"), None),
-            ("1", field_choices.get(True, _("Yes")), "true__c"),
-            ("0", field_choices.get(False, _("No")), "false__c"),
-        ):
-            if add_facets:
-                if count_field is not None:
-                    count = facet_counts[count_field]
-                    title = f"{title} ({count})"
-            yield {
-                "selected": self.lookup_val == lookup and not self.lookup_val2,
-                "query_string": changelist.get_query_string(
-                    {self.lookup_kwarg: lookup}, [self.lookup_kwarg2]
-                ),
-                "display": title,
-            }
-        if self.field.null:
-            display = field_choices.get(None, _("Unknown"))
-            if add_facets:
-                count = facet_counts["null__c"]
-                display = f"{display} ({count})"
-            yield {
-                "selected": self.lookup_val2 == "True",
-                "query_string": changelist.get_query_string(
-                    {self.lookup_kwarg2: "True"}, [self.lookup_kwarg]
-                ),
-                "display": display,
-            }
+        pass
 
 
 FieldListFilter.register(
@@ -410,52 +292,10 @@ class ChoicesFieldListFilter(FieldListFilter):
         return [self.lookup_kwarg, self.lookup_kwarg_isnull]
 
     def get_facet_counts(self, pk_attname, filtered_qs):
-        return {
-            f"{i}__c": models.Count(
-                pk_attname,
-                filter=models.Q(
-                    (self.lookup_kwarg, value)
-                    if value is not None
-                    else (self.lookup_kwarg_isnull, True)
-                ),
-            )
-            for i, (value, _) in enumerate(self.field.flatchoices)
-        }
+        pass
 
     def choices(self, changelist):
-        add_facets = changelist.add_facets
-        facet_counts = self.get_facet_queryset(changelist) if add_facets else None
-        yield {
-            "selected": self.lookup_val is None,
-            "query_string": changelist.get_query_string(
-                remove=[self.lookup_kwarg, self.lookup_kwarg_isnull]
-            ),
-            "display": _("All"),
-        }
-        none_title = ""
-        for i, (lookup, title) in enumerate(self.field.flatchoices):
-            if add_facets:
-                count = facet_counts[f"{i}__c"]
-                title = f"{title} ({count})"
-            if lookup is None:
-                none_title = title
-                continue
-            yield {
-                "selected": self.lookup_val is not None
-                and str(lookup) in self.lookup_val,
-                "query_string": changelist.get_query_string(
-                    {self.lookup_kwarg: lookup}, [self.lookup_kwarg_isnull]
-                ),
-                "display": title,
-            }
-        if none_title:
-            yield {
-                "selected": bool(self.lookup_val_isnull),
-                "query_string": changelist.get_query_string(
-                    {self.lookup_kwarg_isnull: "True"}, [self.lookup_kwarg]
-                ),
-                "display": none_title,
-            }
+        pass
 
 
 FieldListFilter.register(lambda f: bool(f.choices), ChoicesFieldListFilter)
@@ -533,26 +373,10 @@ class DateFieldListFilter(FieldListFilter):
         return params
 
     def get_facet_counts(self, pk_attname, filtered_qs):
-        return {
-            f"{i}__c": models.Count(pk_attname, filter=models.Q(**param_dict))
-            for i, (_, param_dict) in enumerate(self.links)
-        }
+        pass
 
     def choices(self, changelist):
-        add_facets = changelist.add_facets
-        facet_counts = self.get_facet_queryset(changelist) if add_facets else None
-        for i, (title, param_dict) in enumerate(self.links):
-            param_dict_str = {key: str(value) for key, value in param_dict.items()}
-            if add_facets:
-                count = facet_counts[f"{i}__c"]
-                title = f"{title} ({count})"
-            yield {
-                "selected": self.date_params == param_dict_str,
-                "query_string": changelist.get_query_string(
-                    param_dict_str, [self.field_generic]
-                ),
-                "display": title,
-            }
+        pass
 
 
 FieldListFilter.register(lambda f: isinstance(f, models.DateField), DateFieldListFilter)
@@ -585,54 +409,10 @@ class AllValuesFieldListFilter(FieldListFilter):
         return [self.lookup_kwarg, self.lookup_kwarg_isnull]
 
     def get_facet_counts(self, pk_attname, filtered_qs):
-        return {
-            f"{i}__c": models.Count(
-                pk_attname,
-                filter=models.Q(
-                    (self.lookup_kwarg, value)
-                    if value is not None
-                    else (self.lookup_kwarg_isnull, True)
-                ),
-            )
-            for i, value in enumerate(self.lookup_choices)
-        }
+        pass
 
     def choices(self, changelist):
-        add_facets = changelist.add_facets
-        facet_counts = self.get_facet_queryset(changelist) if add_facets else None
-        yield {
-            "selected": self.lookup_val is None and self.lookup_val_isnull is None,
-            "query_string": changelist.get_query_string(
-                remove=[self.lookup_kwarg, self.lookup_kwarg_isnull]
-            ),
-            "display": _("All"),
-        }
-        include_none = False
-        count = None
-        empty_title = self.empty_value_display
-        for i, val in enumerate(self.lookup_choices):
-            if add_facets:
-                count = facet_counts[f"{i}__c"]
-            if val is None:
-                include_none = True
-                empty_title = f"{empty_title} ({count})" if add_facets else empty_title
-                continue
-            val = str(val)
-            yield {
-                "selected": self.lookup_val is not None and val in self.lookup_val,
-                "query_string": changelist.get_query_string(
-                    {self.lookup_kwarg: val}, [self.lookup_kwarg_isnull]
-                ),
-                "display": f"{val} ({count})" if add_facets else val,
-            }
-        if include_none:
-            yield {
-                "selected": bool(self.lookup_val_isnull),
-                "query_string": changelist.get_query_string(
-                    {self.lookup_kwarg_isnull: "True"}, [self.lookup_kwarg]
-                ),
-                "display": empty_title,
-            }
+        pass
 
 
 FieldListFilter.register(lambda f: True, AllValuesFieldListFilter)
@@ -689,28 +469,7 @@ class EmptyFieldListFilter(FieldListFilter):
         return [self.lookup_kwarg]
 
     def get_facet_counts(self, pk_attname, filtered_qs):
-        lookup_condition = self.get_lookup_condition()
-        return {
-            "empty__c": models.Count(pk_attname, filter=lookup_condition),
-            "not_empty__c": models.Count(pk_attname, filter=~lookup_condition),
-        }
+        pass
 
     def choices(self, changelist):
-        add_facets = changelist.add_facets
-        facet_counts = self.get_facet_queryset(changelist) if add_facets else None
-        for lookup, title, count_field in (
-            (None, _("All"), None),
-            ("1", _("Empty"), "empty__c"),
-            ("0", _("Not empty"), "not_empty__c"),
-        ):
-            if add_facets:
-                if count_field is not None:
-                    count = facet_counts[count_field]
-                    title = f"{title} ({count})"
-            yield {
-                "selected": self.lookup_val == lookup,
-                "query_string": changelist.get_query_string(
-                    {self.lookup_kwarg: lookup}
-                ),
-                "display": title,
-            }
+        pass

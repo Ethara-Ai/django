@@ -26,7 +26,7 @@ class CompositeAttribute:
 
     @property
     def attnames(self):
-        return [field.attname for field in self.field.fields]
+        pass
 
     def __get__(self, instance, cls=None):
         return tuple(getattr(instance, attname) for attname in self.attnames)
@@ -82,12 +82,11 @@ class CompositePrimaryKey(Field):
 
     @cached_property
     def fields(self):
-        meta = self.model._meta
-        return tuple(meta.get_field(field_name) for field_name in self.field_names)
+        pass
 
     @cached_property
     def columns(self):
-        return tuple(field.column for field in self.fields)
+        pass
 
     def contribute_to_class(self, cls, name, private_only=False):
         super().contribute_to_class(cls, name, private_only=private_only)
@@ -105,7 +104,7 @@ class CompositePrimaryKey(Field):
 
     @cached_property
     def cached_col(self):
-        return ColPairs(self.model._meta.db_table, self.fields, self.fields, self)
+        pass
 
     def get_col(self, alias, output_field=None):
         if alias == self.model._meta.db_table and (

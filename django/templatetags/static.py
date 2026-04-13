@@ -25,18 +25,7 @@ class PrefixNode(template.Node):
         """
         Class method to parse prefix node and return a Node.
         """
-        # token.split_contents() isn't useful here because tags using this
-        # method don't accept variable as arguments.
-        tokens = token.contents.split()
-        if len(tokens) > 1 and tokens[1] != "as":
-            raise template.TemplateSyntaxError(
-                "First argument in '%s' must be 'as'" % tokens[0]
-            )
-        if len(tokens) > 1:
-            varname = tokens[2]
-        else:
-            varname = None
-        return cls(varname, name)
+        pass
 
     @classmethod
     def handle_simple(cls, name):
@@ -71,7 +60,7 @@ def get_static_prefix(parser, token):
         {% get_static_prefix %}
         {% get_static_prefix as static_prefix %}
     """
-    return PrefixNode.handle_token(parser, token, "STATIC_URL")
+    pass
 
 
 @register.tag
@@ -89,7 +78,7 @@ def get_media_prefix(parser, token):
         {% get_media_prefix %}
         {% get_media_prefix as media_prefix %}
     """
-    return PrefixNode.handle_token(parser, token, "MEDIA_URL")
+    pass
 
 
 class StaticNode(template.Node):
@@ -135,21 +124,7 @@ class StaticNode(template.Node):
         """
         Class method to parse prefix node and return a Node.
         """
-        bits = token.split_contents()
-
-        if len(bits) < 2:
-            raise template.TemplateSyntaxError(
-                "'%s' takes at least one argument (path to file)" % bits[0]
-            )
-
-        path = parser.compile_filter(bits[1])
-
-        if len(bits) >= 2 and bits[-2] == "as":
-            varname = bits[3]
-        else:
-            varname = None
-
-        return cls(varname, path)
+        pass
 
 
 @register.tag("static")
@@ -168,7 +143,7 @@ def do_static(parser, token):
         {% static "myapp/css/base.css" as admin_base_css %}
         {% static variable_with_path as varname %}
     """
-    return StaticNode.handle_token(parser, token)
+    pass
 
 
 def static(path):

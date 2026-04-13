@@ -124,7 +124,7 @@ def ogrinspect(*args, **kwargs):
 
     Note: Call the _ogrinspect() helper to do the heavy lifting.
     """
-    return "\n".join(_ogrinspect(*args, **kwargs))
+    pass
 
 
 def _ogrinspect(

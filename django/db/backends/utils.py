@@ -94,24 +94,12 @@ class CursorWrapper:
     def _execute(self, sql, params, *ignored_wrapper_args):
         # Raise a warning during app initialization (stored_app_configs is only
         # ever set during testing).
-        if not apps.ready and not apps.stored_app_configs:
-            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
-        self.db.validate_no_broken_transaction()
-        with self.db.wrap_database_errors:
-            if params is None:
-                # params default might be backend specific.
-                return self.cursor.execute(sql)
-            else:
-                return self.cursor.execute(sql, params)
+        pass
 
     def _executemany(self, sql, param_list, *ignored_wrapper_args):
         # Raise a warning during app initialization (stored_app_configs is only
         # ever set during testing).
-        if not apps.ready and not apps.stored_app_configs:
-            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
-        self.db.validate_no_broken_transaction()
-        with self.db.wrap_database_errors:
-            return self.cursor.executemany(sql, param_list)
+        pass
 
 
 class CursorDebugWrapper(CursorWrapper):
@@ -212,53 +200,17 @@ def split_tzname_delta(tzname):
 
 
 def typecast_date(s):
-    return (
-        datetime.date(*map(int, s.split("-"))) if s else None
-    )  # return None if s is null
+    pass
 
 
 def typecast_time(s):  # does NOT store time zone information
-    if not s:
-        return None
-    hour, minutes, seconds = s.split(":")
-    if "." in seconds:  # check whether seconds have a fractional part
-        seconds, microseconds = seconds.split(".")
-    else:
-        microseconds = "0"
-    return datetime.time(
-        int(hour), int(minutes), int(seconds), int((microseconds + "000000")[:6])
-    )
+    pass
 
 
 def typecast_timestamp(s):  # does NOT store time zone information
     # "2005-07-29 15:48:00.590358-05"
     # "2005-07-29 09:56:00-05"
-    if not s:
-        return None
-    if " " not in s:
-        return typecast_date(s)
-    d, t = s.split()
-    # Remove timezone information.
-    if "-" in t:
-        t, _ = t.split("-", 1)
-    elif "+" in t:
-        t, _ = t.split("+", 1)
-    dates = d.split("-")
-    times = t.split(":")
-    seconds = times[2]
-    if "." in seconds:  # check whether seconds have a fractional part
-        seconds, microseconds = seconds.split(".")
-    else:
-        microseconds = "0"
-    return datetime.datetime(
-        int(dates[0]),
-        int(dates[1]),
-        int(dates[2]),
-        int(times[0]),
-        int(times[1]),
-        int(seconds),
-        int((microseconds + "000000")[:6]),
-    )
+    pass
 
 
 ###############################################
@@ -317,19 +269,7 @@ def format_number(value, max_digits, decimal_places):
     Format a number into a string with the requisite number of digits and
     decimal places.
     """
-    if value is None:
-        return None
-    context = decimal.getcontext().copy()
-    if max_digits is not None:
-        context.prec = max_digits
-    if decimal_places is not None:
-        value = value.quantize(
-            decimal.Decimal(1).scaleb(-decimal_places), context=context
-        )
-    else:
-        context.traps[decimal.Rounded] = 1
-        value = context.create_decimal(value)
-    return "{:f}".format(value)
+    pass
 
 
 def strip_quotes(table_name):

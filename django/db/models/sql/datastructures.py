@@ -151,13 +151,7 @@ class Join:
 
     @property
     def identity(self):
-        return (
-            self.__class__,
-            self.table_name,
-            self.parent_alias,
-            self.join_field,
-            self.filtered_relation,
-        )
+        pass
 
     def __eq__(self, other):
         if not isinstance(other, Join):
@@ -211,7 +205,7 @@ class BaseTable:
 
     @property
     def identity(self):
-        return self.__class__, self.table_name, self.table_alias
+        pass
 
     def __eq__(self, other):
         if not isinstance(other, BaseTable):

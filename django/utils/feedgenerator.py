@@ -64,15 +64,7 @@ def _guess_stylesheet_mimetype(url):
     Return the given stylesheet's mimetype tuple, using a slightly custom
     version of Python's mimetypes.guess_type().
     """
-    mimetypedb = mimetypes.MimeTypes()
-
-    # The official mimetype for XSLT files is technically
-    # `application/xslt+xml` but as of 2024 almost no browser supports that
-    # (they all expect text/xsl). On top of that, windows seems to assume that
-    # the type for xsl is text/xml.
-    mimetypedb.readfp(StringIO("text/xsl\txsl\ntext/xsl\txslt"))
-
-    return mimetypedb.guess_type(url)
+    pass
 
 
 class Stylesheet:
@@ -91,9 +83,7 @@ class Stylesheet:
 
     @property
     def mimetype(self):
-        if self._mimetype == "":
-            return _guess_stylesheet_mimetype(self.url)[0]
-        return self._mimetype
+        pass
 
     def __str__(self):
         attrs = {
@@ -213,7 +203,7 @@ class SyndicationFeed:
         )
 
     def num_items(self):
-        return len(self.items)
+        pass
 
     def root_attributes(self):
         """
@@ -261,9 +251,7 @@ class SyndicationFeed:
         """
         Return the feed in the given encoding as a string.
         """
-        s = StringIO()
-        self.write(s, encoding)
-        return s.getvalue()
+        pass
 
     def latest_post_date(self):
         """

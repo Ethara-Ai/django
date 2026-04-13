@@ -107,9 +107,7 @@ class _UninitializedOperatorsDescriptor:
 
 
 def _get_decimal_column(data):
-    if data["max_digits"] is None and data["decimal_places"] is None:
-        return "NUMBER"
-    return "NUMBER(%(max_digits)s, %(decimal_places)s)" % data
+    pass
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):
@@ -253,34 +251,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @property
     def is_pool(self):
-        return self.settings_dict["OPTIONS"].get("pool", False)
+        pass
 
     @property
     def pool(self):
-        if not self.is_pool:
-            return None
-
-        if self.settings_dict.get("CONN_MAX_AGE", 0) != 0:
-            raise ImproperlyConfigured(
-                "Pooling doesn't support persistent connections."
-            )
-
-        pool_key = (self.alias, self.settings_dict["USER"])
-        if pool_key not in self._connection_pools:
-            connect_kwargs = self.get_connection_params()
-            pool_options = connect_kwargs.pop("pool")
-            if pool_options is not True:
-                connect_kwargs.update(pool_options)
-
-            pool = Database.create_pool(
-                user=self.settings_dict["USER"],
-                password=self.settings_dict["PASSWORD"],
-                dsn=dsn(self.settings_dict),
-                **connect_kwargs,
-            )
-            self._connection_pools.setdefault(pool_key, pool)
-
-        return self._connection_pools[pool_key]
+        pass
 
     def close_pool(self):
         if self.pool:
@@ -400,12 +375,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @cached_property
     def oracle_version(self):
-        with self.temporary_connection():
-            return tuple(int(x) for x in self.connection.version.split("."))
+        pass
 
     @cached_property
     def oracledb_version(self):
-        return get_version_tuple(Database.__version__)
+        pass
 
 
 class OracleParam:
@@ -502,15 +476,11 @@ class FormatStylePlaceholderCursor:
 
     @staticmethod
     def _output_number_converter(value):
-        return decimal.Decimal(value) if "." in value else int(value)
+        pass
 
     @staticmethod
     def _get_decimal_converter(precision, scale):
-        if scale == 0:
-            return int
-        context = decimal.Context(prec=precision)
-        quantize_value = decimal.Decimal(1).scaleb(-scale)
-        return lambda v: decimal.Decimal(v).quantize(quantize_value, context=context)
+        pass
 
     @staticmethod
     def _output_type_handler(cursor, name, defaultType, length, precision, scale):
@@ -518,38 +488,7 @@ class FormatStylePlaceholderCursor:
         Called for each db column fetched from cursors. Return numbers as the
         appropriate Python type, and NCLOB with JSON as strings.
         """
-        if defaultType == Database.NUMBER:
-            if scale == -127:
-                if precision == 0:
-                    # NUMBER column: decimal-precision floating point.
-                    # This will normally be an integer from a sequence,
-                    # but it could be a decimal value.
-                    outconverter = FormatStylePlaceholderCursor._output_number_converter
-                else:
-                    # FLOAT column: binary-precision floating point.
-                    # This comes from FloatField columns.
-                    outconverter = float
-            elif precision > 0:
-                # NUMBER(p,s) column: decimal-precision fixed point.
-                # This comes from IntegerField and DecimalField columns.
-                outconverter = FormatStylePlaceholderCursor._get_decimal_converter(
-                    precision, scale
-                )
-            else:
-                # No type information. This normally comes from a
-                # mathematical expression in the SELECT list. Guess int
-                # or Decimal based on whether it has a decimal point.
-                outconverter = FormatStylePlaceholderCursor._output_number_converter
-            return cursor.var(
-                Database.STRING,
-                size=255,
-                arraysize=cursor.arraysize,
-                outconverter=outconverter,
-            )
-        # oracledb 2.0.0+ returns NLOB columns with IS JSON constraints as
-        # dicts. Use a no-op converter to avoid this.
-        elif defaultType == Database.DB_TYPE_NCLOB:
-            return cursor.var(Database.DB_TYPE_NCLOB, arraysize=cursor.arraysize)
+        pass
 
     def _format_params(self, params):
         try:
@@ -660,7 +599,7 @@ class FormatStylePlaceholderCursor:
         return VariableWrapper(self.cursor.var(*args))
 
     def arrayvar(self, *args):
-        return VariableWrapper(self.cursor.arrayvar(*args))
+        pass
 
     def __getattr__(self, attr):
         return getattr(self.cursor, attr)

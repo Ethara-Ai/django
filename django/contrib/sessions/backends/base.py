@@ -71,7 +71,7 @@ class SessionBase:
 
     @property
     def key_salt(self):
-        return "django.contrib.sessions." + self.__class__.__qualname__
+        pass
 
     def get(self, key, default=None):
         return self._session.get(key, default)
@@ -85,9 +85,7 @@ class SessionBase:
         return self._session.pop(key, *args)
 
     async def apop(self, key, default=__not_given):
-        self.modified = self.modified or key in (await self._aget_session())
-        args = () if default is self.__not_given else (default,)
-        return (await self._aget_session()).pop(key, *args)
+        pass
 
     def setdefault(self, key, value):
         if key in self._session:
@@ -97,30 +95,25 @@ class SessionBase:
             return value
 
     async def asetdefault(self, key, value):
-        session = await self._aget_session()
-        if key in session:
-            return session[key]
-        else:
-            await self.aset(key, value)
-            return value
+        pass
 
     def set_test_cookie(self):
-        self[self.TEST_COOKIE_NAME] = self.TEST_COOKIE_VALUE
+        pass
 
     async def aset_test_cookie(self):
-        await self.aset(self.TEST_COOKIE_NAME, self.TEST_COOKIE_VALUE)
+        pass
 
     def test_cookie_worked(self):
-        return self.get(self.TEST_COOKIE_NAME) == self.TEST_COOKIE_VALUE
+        pass
 
     async def atest_cookie_worked(self):
-        return (await self.aget(self.TEST_COOKIE_NAME)) == self.TEST_COOKIE_VALUE
+        pass
 
     def delete_test_cookie(self):
-        del self[self.TEST_COOKIE_NAME]
+        pass
 
     async def adelete_test_cookie(self):
-        del (await self._aget_session())[self.TEST_COOKIE_NAME]
+        pass
 
     def encode(self, session_dict):
         """
@@ -152,8 +145,7 @@ class SessionBase:
         self.modified = True
 
     async def aupdate(self, dict_):
-        (await self._aget_session()).update(dict_)
-        self.modified = True
+        pass
 
     def has_key(self, key):
         return key in self._session
@@ -165,19 +157,19 @@ class SessionBase:
         return self._session.keys()
 
     async def akeys(self):
-        return (await self._aget_session()).keys()
+        pass
 
     def values(self):
         return self._session.values()
 
     async def avalues(self):
-        return (await self._aget_session()).values()
+        pass
 
     def items(self):
         return self._session.items()
 
     async def aitems(self):
-        return (await self._aget_session()).items()
+        pass
 
     def clear(self):
         # To avoid unnecessary persistent storage accesses, we set up the
@@ -222,7 +214,7 @@ class SessionBase:
         Key must be truthy and at least 8 characters long. 8 characters is an
         arbitrary lower bound for some minimal key security.
         """
-        return key and len(key) >= 8
+        pass
 
     def _get_session_key(self):
         return self.__session_key
@@ -231,10 +223,7 @@ class SessionBase:
         """
         Validate session key on assignment. Invalid values will set to None.
         """
-        if self._validate_session_key(value):
-            self.__session_key = value
-        else:
-            self.__session_key = None
+        pass
 
     session_key = property(_get_session_key)
     _session_key = property(_get_session_key, _set_session_key)
@@ -371,32 +360,10 @@ class SessionBase:
         If ``value`` is ``None``, the session uses the global session expiry
         policy.
         """
-        if value is None:
-            # Remove any custom expiration for this session.
-            try:
-                del self["_session_expiry"]
-            except KeyError:
-                pass
-            return
-        if isinstance(value, timedelta):
-            value = timezone.now() + value
-        if isinstance(value, datetime):
-            value = value.isoformat()
-        self["_session_expiry"] = value
+        pass
 
     async def aset_expiry(self, value):
-        if value is None:
-            # Remove any custom expiration for this session.
-            try:
-                await self.apop("_session_expiry")
-            except KeyError:
-                pass
-            return
-        if isinstance(value, timedelta):
-            value = timezone.now() + value
-        if isinstance(value, datetime):
-            value = value.isoformat()
-        await self.aset("_session_expiry", value)
+        pass
 
     def get_expire_at_browser_close(self):
         """
@@ -410,9 +377,7 @@ class SessionBase:
         return expiry == 0
 
     async def aget_expire_at_browser_close(self):
-        if (expiry := await self.aget("_session_expiry")) is None:
-            return settings.SESSION_EXPIRE_AT_BROWSER_CLOSE
-        return expiry == 0
+        pass
 
     def flush(self):
         """
@@ -525,4 +490,4 @@ class SessionBase:
 
     @classmethod
     async def aclear_expired(cls):
-        return await sync_to_async(cls.clear_expired)()
+        pass

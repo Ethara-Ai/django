@@ -51,7 +51,7 @@ class MigrationRecorder:
 
     @property
     def migration_qs(self):
-        return self.Migration.objects.using(self.connection.alias)
+        pass
 
     def has_table(self):
         """Return True if the django_migrations table exists."""

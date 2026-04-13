@@ -247,51 +247,37 @@ END;
         return converters
 
     def convert_textfield_value(self, value, expression, connection):
-        if isinstance(value, Database.LOB):
-            value = value.read()
-        return value
+        pass
 
     def convert_binaryfield_value(self, value, expression, connection):
-        if isinstance(value, Database.LOB):
-            value = force_bytes(value.read())
-        return value
+        pass
 
     def convert_booleanfield_value(self, value, expression, connection):
-        if value in (0, 1):
-            value = bool(value)
-        return value
+        pass
 
     # oracledb always returns datetime.datetime objects for
     # DATE and TIMESTAMP columns, but Django wants to see a
     # python datetime.date, .time, or .datetime.
 
     def convert_datetimefield_value(self, value, expression, connection):
-        if value is not None:
-            value = timezone.make_aware(value, self.connection.timezone)
-        return value
+        pass
 
     def convert_datefield_value(self, value, expression, connection):
-        if isinstance(value, datetime.datetime):
-            value = value.date()
-        return value
+        pass
 
     def convert_timefield_value(self, value, expression, connection):
-        if isinstance(value, datetime.datetime):
-            value = value.time()
-        return value
+        pass
 
     def convert_uuidfield_value(self, value, expression, connection):
-        if value is not None:
-            value = uuid.UUID(value)
-        return value
+        pass
 
     @staticmethod
     def convert_empty_string(value, expression, connection):
-        return "" if value is None else value
+        pass
 
     @staticmethod
     def convert_empty_bytes(value, expression, connection):
-        return b"" if value is None else value
+        pass
 
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
@@ -409,46 +395,7 @@ END;
         return "REGEXP_LIKE(%%s, %%s, %s)" % match_option
 
     def __foreign_key_constraints(self, table_name, recursive):
-        with self.connection.cursor() as cursor:
-            if recursive:
-                cursor.execute(
-                    """
-                    SELECT
-                        user_tables.table_name, rcons.constraint_name
-                    FROM
-                        user_tables
-                    JOIN
-                        user_constraints cons
-                        ON (user_tables.table_name = cons.table_name
-                        AND cons.constraint_type = ANY('P', 'U'))
-                    LEFT JOIN
-                        user_constraints rcons
-                        ON (user_tables.table_name = rcons.table_name
-                        AND rcons.constraint_type = 'R')
-                    START WITH user_tables.table_name = UPPER(%s)
-                    CONNECT BY
-                        NOCYCLE PRIOR cons.constraint_name = rcons.r_constraint_name
-                    GROUP BY
-                        user_tables.table_name, rcons.constraint_name
-                    HAVING user_tables.table_name != UPPER(%s)
-                    ORDER BY MAX(level) DESC
-                    """,
-                    (table_name, table_name),
-                )
-            else:
-                cursor.execute(
-                    """
-                    SELECT
-                        cons.table_name, cons.constraint_name
-                    FROM
-                        user_constraints cons
-                    WHERE
-                        cons.constraint_type = 'R'
-                        AND cons.table_name = UPPER(%s)
-                    """,
-                    (table_name,),
-                )
-            return cursor.fetchall()
+        pass
 
     @cached_property
     def _foreign_key_constraints(self):

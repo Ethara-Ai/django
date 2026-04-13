@@ -20,15 +20,7 @@ class RestrictedError(IntegrityError):
 
 
 def CASCADE(collector, field, sub_objs, using):
-    collector.collect(
-        sub_objs,
-        source=field.remote_field.model,
-        source_attr=field.name,
-        nullable=field.null,
-        fail_on_restricted=False,
-    )
-    if field.null and not connections[using].features.can_defer_constraint_checks:
-        collector.add_field_update(field, None, sub_objs)
+    pass
 
 
 def PROTECT(collector, field, sub_objs, using):
@@ -45,20 +37,19 @@ def PROTECT(collector, field, sub_objs, using):
 
 
 def RESTRICT(collector, field, sub_objs, using):
-    collector.add_restricted_objects(field, sub_objs)
-    collector.add_dependency(field.remote_field.model, field.model)
+    pass
 
 
 def SET(value):
     if callable(value):
 
         def set_on_delete(collector, field, sub_objs, using):
-            collector.add_field_update(field, value(), sub_objs)
+            pass
 
     else:
 
         def set_on_delete(collector, field, sub_objs, using):
-            collector.add_field_update(field, value, sub_objs)
+            pass
 
         set_on_delete.lazy_sub_objs = True
 
@@ -67,14 +58,14 @@ def SET(value):
 
 
 def SET_NULL(collector, field, sub_objs, using):
-    collector.add_field_update(field, None, sub_objs)
+    pass
 
 
 SET_NULL.lazy_sub_objs = True
 
 
 def SET_DEFAULT(collector, field, sub_objs, using):
-    collector.add_field_update(field, field.get_default(), sub_objs)
+    pass
 
 
 def DO_NOTHING(collector, field, sub_objs, using):
@@ -178,9 +169,7 @@ class Collector:
         self.field_updates[field, value].append(objs)
 
     def add_restricted_objects(self, field, objs):
-        if objs:
-            model = objs[0].__class__
-            self.restricted_objects[model][field].update(objs)
+        pass
 
     def clear_restricted_objects_from_set(self, model, objs):
         if model in self.restricted_objects:

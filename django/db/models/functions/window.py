@@ -53,8 +53,7 @@ class LagLeadFunction(Func):
         super().__init__(*args, **extra)
 
     def _resolve_output_field(self):
-        sources = self.get_source_expressions()
-        return sources[0].output_field
+        pass
 
 
 class Lag(LagLeadFunction):
@@ -87,8 +86,7 @@ class NthValue(Func):
         super().__init__(expression, nth, **extra)
 
     def _resolve_output_field(self):
-        sources = self.get_source_expressions()
-        return sources[0].output_field
+        pass
 
 
 class Ntile(Func):

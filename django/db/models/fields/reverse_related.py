@@ -64,15 +64,15 @@ class ForeignObjectRel(FieldCacheMixin):
     @cached_property
     def hidden(self):
         """Should the related object be hidden?"""
-        return bool(self.related_name) and self.related_name[-1] == "+"
+        pass
 
     @cached_property
     def name(self):
-        return self.field.related_query_name()
+        pass
 
     @property
     def remote_field(self):
-        return self.field
+        pass
 
     @property
     def target_field(self):
@@ -80,37 +80,27 @@ class ForeignObjectRel(FieldCacheMixin):
         When filtering against this relation, return the field on the remote
         model against which the filtering should happen.
         """
-        target_fields = self.path_infos[-1].target_fields
-        if len(target_fields) > 1:
-            raise exceptions.FieldError(
-                "Can't use target_field for multicolumn relations."
-            )
-        return target_fields[0]
+        pass
 
     @cached_property
     def related_model(self):
-        if not self.field.model:
-            raise AttributeError(
-                "This property can't be accessed before self.field.contribute_to_class "
-                "has been called."
-            )
-        return self.field.model
+        pass
 
     @cached_property
     def many_to_many(self):
-        return self.field.many_to_many
+        pass
 
     @cached_property
     def many_to_one(self):
-        return self.field.one_to_many
+        pass
 
     @cached_property
     def one_to_many(self):
-        return self.field.many_to_one
+        pass
 
     @cached_property
     def one_to_one(self):
-        return self.field.one_to_one
+        pass
 
     def get_lookup(self, lookup_name):
         return self.field.get_lookup(lookup_name)
@@ -137,17 +127,7 @@ class ForeignObjectRel(FieldCacheMixin):
 
     @property
     def identity(self):
-        return (
-            self.field,
-            self.model,
-            self.related_name,
-            self.related_query_name,
-            make_hashable(self.limit_choices_to),
-            self.parent_link,
-            self.on_delete,
-            self.symmetrical,
-            self.multiple,
-        )
+        pass
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -207,7 +187,7 @@ class ForeignObjectRel(FieldCacheMixin):
 
     @cached_property
     def accessor_name(self):
-        return self.get_accessor_name()
+        pass
 
     def get_accessor_name(self, model=None):
         # This method encapsulates the logic that decides what name to give an
@@ -235,7 +215,7 @@ class ForeignObjectRel(FieldCacheMixin):
 
     @cached_property
     def path_infos(self):
-        return self.get_path_info()
+        pass
 
     @cached_property
     def cache_name(self):
@@ -243,7 +223,7 @@ class ForeignObjectRel(FieldCacheMixin):
         Return the name of the cache key to use for storing an instance of the
         forward model on the reverse model.
         """
-        return self.accessor_name
+        pass
 
 
 class ManyToOneRel(ForeignObjectRel):
@@ -291,7 +271,7 @@ class ManyToOneRel(ForeignObjectRel):
 
     @property
     def identity(self):
-        return (*super().identity, self.field_name)
+        pass
 
     def get_related_field(self):
         """
@@ -382,12 +362,7 @@ class ManyToManyRel(ForeignObjectRel):
 
     @property
     def identity(self):
-        return (
-            *super().identity,
-            self.through,
-            make_hashable(self.through_fields),
-            self.db_constraint,
-        )
+        pass
 
     def get_related_field(self):
         """

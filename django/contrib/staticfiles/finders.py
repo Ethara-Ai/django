@@ -135,12 +135,7 @@ class FileSystemFinder(BaseFinder):
         """
         List all files in all locations.
         """
-        for prefix, root in self.locations:
-            # Skip nonexistent directories.
-            if os.path.isdir(root):
-                storage = self.storages[root]
-                for path in utils.get_files(storage, ignore_patterns):
-                    yield path, storage
+        pass
 
 
 class AppDirectoriesFinder(BaseFinder):
@@ -175,10 +170,7 @@ class AppDirectoriesFinder(BaseFinder):
         """
         List all files in all app storages.
         """
-        for storage in self.storages.values():
-            if storage.exists(""):  # check if storage location exists
-                for path in utils.get_files(storage, ignore_patterns):
-                    yield path, storage
+        pass
 
     def find(self, path, find_all=False):
         """
@@ -252,8 +244,7 @@ class BaseStorageFinder(BaseFinder):
         """
         List all files of the storage.
         """
-        for path in utils.get_files(self.storage, ignore_patterns):
-            yield path, self.storage
+        pass
 
 
 class DefaultStorageFinder(BaseStorageFinder):

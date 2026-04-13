@@ -27,7 +27,7 @@ class ModelOperation(Operation):
 
     @cached_property
     def name_lower(self):
-        return self.name.lower()
+        pass
 
     def references_model(self, name, app_label):
         return name.lower() == self.name_lower
@@ -123,7 +123,7 @@ class CreateModel(ModelOperation):
 
     @property
     def migration_name_fragment(self):
-        return self.name_lower
+        pass
 
     def references_model(self, name, app_label):
         name_lower = name.lower()
@@ -413,7 +413,7 @@ class DeleteModel(ModelOperation):
 
     @property
     def migration_name_fragment(self):
-        return "delete_%s" % self.name_lower
+        pass
 
 
 class RenameModel(ModelOperation):
@@ -428,11 +428,11 @@ class RenameModel(ModelOperation):
 
     @cached_property
     def old_name_lower(self):
-        return self.old_name.lower()
+        pass
 
     @cached_property
     def new_name_lower(self):
-        return self.new_name.lower()
+        pass
 
     def deconstruct(self):
         kwargs = {
@@ -517,7 +517,7 @@ class RenameModel(ModelOperation):
 
     @property
     def migration_name_fragment(self):
-        return "rename_%s_%s" % (self.old_name_lower, self.new_name_lower)
+        pass
 
     def reduce(self, operation, app_label):
         if (
@@ -592,7 +592,7 @@ class AlterModelTable(ModelOptionOperation):
 
     @property
     def migration_name_fragment(self):
-        return "alter_%s_table" % self.name_lower
+        pass
 
 
 class AlterModelTableComment(ModelOptionOperation):
@@ -630,7 +630,7 @@ class AlterModelTableComment(ModelOptionOperation):
 
     @property
     def migration_name_fragment(self):
-        return f"alter_{self.name_lower}_table_comment"
+        pass
 
 
 class AlterTogetherOptionOperation(ModelOptionOperation):
@@ -644,7 +644,7 @@ class AlterTogetherOptionOperation(ModelOptionOperation):
 
     @cached_property
     def option_value(self):
-        return getattr(self, self.option_name)
+        pass
 
     def deconstruct(self):
         kwargs = {
@@ -690,7 +690,7 @@ class AlterTogetherOptionOperation(ModelOptionOperation):
 
     @property
     def migration_name_fragment(self):
-        return "alter_%s_%s" % (self.name_lower, self.option_name)
+        pass
 
     def can_reduce_through(self, operation, app_label):
         return super().can_reduce_through(operation, app_label) or (
@@ -788,7 +788,7 @@ class AlterOrderWithRespectTo(ModelOptionOperation):
 
     @property
     def migration_name_fragment(self):
-        return "alter_%s_order_with_respect_to" % self.name_lower
+        pass
 
 
 class AlterModelOptions(ModelOptionOperation):
@@ -843,7 +843,7 @@ class AlterModelOptions(ModelOptionOperation):
 
     @property
     def migration_name_fragment(self):
-        return "alter_%s_options" % self.name_lower
+        pass
 
 
 class AlterModelManagers(ModelOptionOperation):
@@ -872,7 +872,7 @@ class AlterModelManagers(ModelOptionOperation):
 
     @property
     def migration_name_fragment(self):
-        return "alter_%s_managers" % self.name_lower
+        pass
 
 
 class IndexOperation(Operation):
@@ -880,7 +880,7 @@ class IndexOperation(Operation):
 
     @cached_property
     def model_name_lower(self):
-        return self.model_name.lower()
+        pass
 
 
 class AddIndex(IndexOperation):
@@ -936,7 +936,7 @@ class AddIndex(IndexOperation):
 
     @property
     def migration_name_fragment(self):
-        return "%s_%s" % (self.model_name_lower, self.index.name.lower())
+        pass
 
     def reduce(self, operation, app_label):
         if isinstance(operation, RemoveIndex) and self.index.name == operation.name:
@@ -990,7 +990,7 @@ class RemoveIndex(IndexOperation):
 
     @property
     def migration_name_fragment(self):
-        return "remove_%s_%s" % (self.model_name_lower, self.name.lower())
+        pass
 
 
 class RenameIndex(IndexOperation):
@@ -1015,11 +1015,11 @@ class RenameIndex(IndexOperation):
 
     @cached_property
     def old_name_lower(self):
-        return self.old_name.lower()
+        pass
 
     @cached_property
     def new_name_lower(self):
-        return self.new_name.lower()
+        pass
 
     def deconstruct(self):
         kwargs = {
@@ -1121,13 +1121,7 @@ class RenameIndex(IndexOperation):
 
     @property
     def migration_name_fragment(self):
-        if self.old_name:
-            return "rename_%s_%s" % (self.old_name_lower, self.new_name_lower)
-        return "rename_%s_%s_%s" % (
-            self.model_name_lower,
-            "_".join(self.old_fields),
-            self.new_name_lower,
-        )
+        pass
 
     def reduce(self, operation, app_label):
         if (
@@ -1179,7 +1173,7 @@ class AddConstraint(IndexOperation):
 
     @property
     def migration_name_fragment(self):
-        return "%s_%s" % (self.model_name_lower, self.constraint.name.lower())
+        pass
 
     def reduce(self, operation, app_label):
         if (
@@ -1237,7 +1231,7 @@ class RemoveConstraint(IndexOperation):
 
     @property
     def migration_name_fragment(self):
-        return "remove_%s_%s" % (self.model_name_lower, self.name.lower())
+        pass
 
 
 class AlterConstraint(IndexOperation):
@@ -1276,7 +1270,7 @@ class AlterConstraint(IndexOperation):
 
     @property
     def migration_name_fragment(self):
-        return "alter_%s_%s" % (self.model_name_lower, self.constraint.name.lower())
+        pass
 
     def reduce(self, operation, app_label):
         if (

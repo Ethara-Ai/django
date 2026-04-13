@@ -389,44 +389,7 @@ class Command(BaseCommand):
         )
 
     def migration_progress_callback(self, action, migration=None, fake=False):
-        if self.verbosity >= 1:
-            compute_time = self.verbosity > 1
-            if action == "apply_start":
-                if compute_time:
-                    self.start = time.monotonic()
-                self.stdout.write("  Applying %s..." % migration, ending="")
-                self.stdout.flush()
-            elif action == "apply_success":
-                elapsed = (
-                    " (%.3fs)" % (time.monotonic() - self.start) if compute_time else ""
-                )
-                if fake:
-                    self.stdout.write(self.style.SUCCESS(" FAKED" + elapsed))
-                else:
-                    self.stdout.write(self.style.SUCCESS(" OK" + elapsed))
-            elif action == "unapply_start":
-                if compute_time:
-                    self.start = time.monotonic()
-                self.stdout.write("  Unapplying %s..." % migration, ending="")
-                self.stdout.flush()
-            elif action == "unapply_success":
-                elapsed = (
-                    " (%.3fs)" % (time.monotonic() - self.start) if compute_time else ""
-                )
-                if fake:
-                    self.stdout.write(self.style.SUCCESS(" FAKED" + elapsed))
-                else:
-                    self.stdout.write(self.style.SUCCESS(" OK" + elapsed))
-            elif action == "render_start":
-                if compute_time:
-                    self.start = time.monotonic()
-                self.stdout.write("  Rendering model states...", ending="")
-                self.stdout.flush()
-            elif action == "render_success":
-                elapsed = (
-                    " (%.3fs)" % (time.monotonic() - self.start) if compute_time else ""
-                )
-                self.stdout.write(self.style.SUCCESS(" DONE" + elapsed))
+        pass
 
     def sync_apps(self, connection, app_labels):
         """Run the old syncdb-style operation on a list of app_labels."""
@@ -446,16 +409,7 @@ class Command(BaseCommand):
         ]
 
         def model_installed(model):
-            opts = model._meta
-            converter = connection.introspection.identifier_converter
-            max_name_length = connection.ops.max_name_length()
-            return not (
-                (converter(truncate_name(opts.db_table, max_name_length)) in tables)
-                or (
-                    opts.auto_created
-                    and converter(opts.auto_created._meta.db_table) in tables
-                )
-            )
+            pass
 
         manifest = {
             app_name: list(filter(model_installed, model_list))

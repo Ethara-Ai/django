@@ -51,9 +51,7 @@ class InMemoryFileNode(ContentFile, TimingMixin):
         self._initialize_times()
 
     def open(self, mode):
-        self._convert_stream_content(mode)
-        self._update_accessed_time()
-        return super().open(mode)
+        pass
 
     def write(self, data):
         super().write(data)
@@ -61,21 +59,11 @@ class InMemoryFileNode(ContentFile, TimingMixin):
 
     def _initialize_stream(self):
         """Initialize underlying stream according to the content type."""
-        self.file = io.BytesIO() if self._content_type == bytes else io.StringIO()
+        pass
 
     def _convert_stream_content(self, mode):
         """Convert actual file content according to the opening mode."""
-        new_content_type = bytes if "b" in mode else str
-        # No conversion needed.
-        if self._content_type == new_content_type:
-            return
-
-        content = self.file.getvalue()
-        content = content.encode() if isinstance(content, str) else content.decode()
-        self._content_type = new_content_type
-        self._initialize_stream()
-
-        self.file.write(content)
+        pass
 
 
 class InMemoryDirNode(TimingMixin):
@@ -187,29 +175,23 @@ class InMemoryStorage(Storage, StorageSettingsMixin):
 
     @cached_property
     def base_location(self):
-        return self._value_or_setting(self._location, settings.MEDIA_ROOT)
+        pass
 
     @cached_property
     def location(self):
-        return os.path.abspath(self.base_location)
+        pass
 
     @cached_property
     def base_url(self):
-        if self._base_url is not None and not self._base_url.endswith("/"):
-            self._base_url += "/"
-        return self._value_or_setting(self._base_url, settings.MEDIA_URL)
+        pass
 
     @cached_property
     def file_permissions_mode(self):
-        return self._value_or_setting(
-            self._file_permissions_mode, settings.FILE_UPLOAD_PERMISSIONS
-        )
+        pass
 
     @cached_property
     def directory_permissions_mode(self):
-        return self._value_or_setting(
-            self._directory_permissions_mode, settings.FILE_UPLOAD_DIRECTORY_PERMISSIONS
-        )
+        pass
 
     def _relative_path(self, name):
         full_path = self.path(name)
@@ -281,13 +263,10 @@ class InMemoryStorage(Storage, StorageSettingsMixin):
         return urljoin(self.base_url, url)
 
     def get_accessed_time(self, name):
-        file_node = self._resolve(name)
-        return file_node.accessed_time
+        pass
 
     def get_created_time(self, name):
-        file_node = self._resolve(name)
-        return file_node.created_time
+        pass
 
     def get_modified_time(self, name):
-        file_node = self._resolve(name)
-        return file_node.modified_time
+        pass

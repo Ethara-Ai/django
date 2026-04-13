@@ -55,15 +55,7 @@ def get_internal_wsgi_application():
 
 
 def is_broken_pipe_error():
-    exc_type, _, _ = sys.exc_info()
-    return issubclass(
-        exc_type,
-        (
-            BrokenPipeError,
-            ConnectionAbortedError,
-            ConnectionResetError,
-        ),
-    )
+    pass
 
 
 class WSGIServer(simple_server.WSGIServer):
@@ -78,10 +70,7 @@ class WSGIServer(simple_server.WSGIServer):
         super().__init__(*args, **kwargs)
 
     def handle_error(self, request, client_address):
-        if is_broken_pipe_error():
-            logger.info("- Broken pipe from %s", client_address)
-        else:
-            super().handle_error(request, client_address)
+        pass
 
 
 class ThreadedWSGIServer(socketserver.ThreadingMixIn, WSGIServer):
@@ -96,20 +85,14 @@ class ThreadedWSGIServer(socketserver.ThreadingMixIn, WSGIServer):
     # socketserver.ThreadingMixIn.process_request() passes this method as
     # the target to a new Thread object.
     def process_request_thread(self, request, client_address):
-        if self.connections_override:
-            # Override this thread's database connections with the ones
-            # provided by the parent thread.
-            for alias, conn in self.connections_override.items():
-                connections[alias] = conn
-        super().process_request_thread(request, client_address)
+        pass
 
     def _close_connections(self):
         # Used for mocking in tests.
-        connections.close_all()
+        pass
 
     def close_request(self, request):
-        self._close_connections()
-        super().close_request(request)
+        pass
 
 
 class ServerHandler(simple_server.ServerHandler):
@@ -131,48 +114,14 @@ class ServerHandler(simple_server.ServerHandler):
         )
 
     def cleanup_headers(self):
-        super().cleanup_headers()
-        if (
-            self.environ["REQUEST_METHOD"] == "HEAD"
-            and "Content-Length" in self.headers
-            and str(self.headers["Content-Length"]) == "0"
-        ):
-            del self.headers["Content-Length"]
-        # HTTP/1.1 requires support for persistent connections. Send 'close' if
-        # the content length is unknown to prevent clients from reusing the
-        # connection.
-        if (
-            self.environ["REQUEST_METHOD"] != "HEAD"
-            and "Content-Length" not in self.headers
-        ):
-            self.headers["Connection"] = "close"
-        # Persistent connections require threading server.
-        elif not isinstance(self.request_handler.server, socketserver.ThreadingMixIn):
-            self.headers["Connection"] = "close"
-        # Mark the connection for closing if it's set as such above or if the
-        # application sent the header.
-        if self.headers.get("Connection") == "close":
-            self.request_handler.close_connection = True
+        pass
 
     def close(self):
         self.get_stdin().read()
         super().close()
 
     def finish_response(self):
-        if self.environ["REQUEST_METHOD"] == "HEAD":
-            try:
-                deque(self.result, maxlen=0)  # Consume iterator.
-                # Don't call self.finish_content() as, if the headers have not
-                # been sent and Content-Length isn't set, it'll default to "0"
-                # which will prevent omission of the Content-Length header with
-                # HEAD requests as permitted by RFC 9110 Section 9.3.2.
-                # Instead, send the headers, if not sent yet.
-                if not self.headers_sent:
-                    self.send_headers()
-            finally:
-                self.close()
-        else:
-            super().finish_response()
+        pass
 
 
 class WSGIRequestHandler(simple_server.WSGIRequestHandler):
@@ -180,7 +129,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
 
     def address_string(self):
         # Short-circuit parent method to not call socket.getfqdn
-        return self.client_address[0]
+        pass
 
     def log_message(self, format, *args):
         if args[1][0] == "4" and args[0].startswith("\x16\x03"):

@@ -113,146 +113,39 @@ def register(connection):
 
 
 def _sqlite_datetime_parse(dt, tzname=None, conn_tzname=None):
-    if dt is None:
-        return None
-    try:
-        dt = typecast_timestamp(dt)
-    except (TypeError, ValueError):
-        return None
-    if conn_tzname:
-        dt = dt.replace(tzinfo=zoneinfo.ZoneInfo(conn_tzname))
-    if tzname is not None and tzname != conn_tzname:
-        tzname, sign, offset = split_tzname_delta(tzname)
-        if offset:
-            hours, minutes = offset.split(":")
-            offset_delta = timedelta(hours=int(hours), minutes=int(minutes))
-            dt += offset_delta if sign == "+" else -offset_delta
-        # The tzname may originally be just the offset e.g. "+3:00",
-        # which becomes an empty string after splitting the sign and offset.
-        # In this case, use the conn_tzname as fallback.
-        dt = timezone.localtime(dt, zoneinfo.ZoneInfo(tzname or conn_tzname))
-    return dt
+    pass
 
 
 def _sqlite_date_trunc(lookup_type, dt, tzname, conn_tzname):
-    dt = _sqlite_datetime_parse(dt, tzname, conn_tzname)
-    if dt is None:
-        return None
-    if lookup_type == "year":
-        return f"{dt.year:04d}-01-01"
-    elif lookup_type == "quarter":
-        month_in_quarter = dt.month - (dt.month - 1) % 3
-        return f"{dt.year:04d}-{month_in_quarter:02d}-01"
-    elif lookup_type == "month":
-        return f"{dt.year:04d}-{dt.month:02d}-01"
-    elif lookup_type == "week":
-        dt -= timedelta(days=dt.weekday())
-        return f"{dt.year:04d}-{dt.month:02d}-{dt.day:02d}"
-    elif lookup_type == "day":
-        return f"{dt.year:04d}-{dt.month:02d}-{dt.day:02d}"
-    raise ValueError(f"Unsupported lookup type: {lookup_type!r}")
+    pass
 
 
 def _sqlite_time_trunc(lookup_type, dt, tzname, conn_tzname):
-    if dt is None:
-        return None
-    dt_parsed = _sqlite_datetime_parse(dt, tzname, conn_tzname)
-    if dt_parsed is None:
-        try:
-            dt = typecast_time(dt)
-        except (ValueError, TypeError):
-            return None
-    else:
-        dt = dt_parsed
-    if lookup_type == "hour":
-        return f"{dt.hour:02d}:00:00"
-    elif lookup_type == "minute":
-        return f"{dt.hour:02d}:{dt.minute:02d}:00"
-    elif lookup_type == "second":
-        return f"{dt.hour:02d}:{dt.minute:02d}:{dt.second:02d}"
-    raise ValueError(f"Unsupported lookup type: {lookup_type!r}")
+    pass
 
 
 def _sqlite_datetime_cast_date(dt, tzname, conn_tzname):
-    dt = _sqlite_datetime_parse(dt, tzname, conn_tzname)
-    if dt is None:
-        return None
-    return dt.date().isoformat()
+    pass
 
 
 def _sqlite_datetime_cast_time(dt, tzname, conn_tzname):
-    dt = _sqlite_datetime_parse(dt, tzname, conn_tzname)
-    if dt is None:
-        return None
-    return dt.time().isoformat()
+    pass
 
 
 def _sqlite_datetime_extract(lookup_type, dt, tzname=None, conn_tzname=None):
-    dt = _sqlite_datetime_parse(dt, tzname, conn_tzname)
-    if dt is None:
-        return None
-    if lookup_type == "week_day":
-        return (dt.isoweekday() % 7) + 1
-    elif lookup_type == "iso_week_day":
-        return dt.isoweekday()
-    elif lookup_type == "week":
-        return dt.isocalendar().week
-    elif lookup_type == "quarter":
-        return ceil(dt.month / 3)
-    elif lookup_type == "iso_year":
-        return dt.isocalendar().year
-    else:
-        return getattr(dt, lookup_type)
+    pass
 
 
 def _sqlite_datetime_trunc(lookup_type, dt, tzname, conn_tzname):
-    dt = _sqlite_datetime_parse(dt, tzname, conn_tzname)
-    if dt is None:
-        return None
-    if lookup_type == "year":
-        return f"{dt.year:04d}-01-01 00:00:00"
-    elif lookup_type == "quarter":
-        month_in_quarter = dt.month - (dt.month - 1) % 3
-        return f"{dt.year:04d}-{month_in_quarter:02d}-01 00:00:00"
-    elif lookup_type == "month":
-        return f"{dt.year:04d}-{dt.month:02d}-01 00:00:00"
-    elif lookup_type == "week":
-        dt -= timedelta(days=dt.weekday())
-        return f"{dt.year:04d}-{dt.month:02d}-{dt.day:02d} 00:00:00"
-    elif lookup_type == "day":
-        return f"{dt.year:04d}-{dt.month:02d}-{dt.day:02d} 00:00:00"
-    elif lookup_type == "hour":
-        return f"{dt.year:04d}-{dt.month:02d}-{dt.day:02d} {dt.hour:02d}:00:00"
-    elif lookup_type == "minute":
-        return (
-            f"{dt.year:04d}-{dt.month:02d}-{dt.day:02d} "
-            f"{dt.hour:02d}:{dt.minute:02d}:00"
-        )
-    elif lookup_type == "second":
-        return (
-            f"{dt.year:04d}-{dt.month:02d}-{dt.day:02d} "
-            f"{dt.hour:02d}:{dt.minute:02d}:{dt.second:02d}"
-        )
-    raise ValueError(f"Unsupported lookup type: {lookup_type!r}")
+    pass
 
 
 def _sqlite_time_extract(lookup_type, dt):
-    if dt is None:
-        return None
-    try:
-        dt = typecast_time(dt)
-    except (ValueError, TypeError):
-        return None
-    return getattr(dt, lookup_type)
+    pass
 
 
 def _sqlite_prepare_dtdelta_param(conn, param):
-    if conn in ["+", "-"]:
-        if isinstance(param, int):
-            return timedelta(0, 0, param)
-        else:
-            return typecast_timestamp(param)
-    return param
+    pass
 
 
 def _sqlite_format_dtdelta(connector, lhs, rhs):
@@ -262,254 +155,151 @@ def _sqlite_format_dtdelta(connector, lhs, rhs):
     - A string representing a datetime
     - A scalar value, e.g. float
     """
-    if connector is None or lhs is None or rhs is None:
-        return None
-    connector = connector.strip()
-    try:
-        real_lhs = _sqlite_prepare_dtdelta_param(connector, lhs)
-        real_rhs = _sqlite_prepare_dtdelta_param(connector, rhs)
-    except (ValueError, TypeError):
-        return None
-    if connector == "+":
-        # typecast_timestamp() returns a date or a datetime without timezone.
-        # It will be formatted as "%Y-%m-%d" or "%Y-%m-%d %H:%M:%S[.%f]"
-        out = str(real_lhs + real_rhs)
-    elif connector == "-":
-        out = str(real_lhs - real_rhs)
-    elif connector == "*":
-        out = real_lhs * real_rhs
-    else:
-        out = real_lhs / real_rhs
-    return out
+    pass
 
 
 def _sqlite_time_diff(lhs, rhs):
-    if lhs is None or rhs is None:
-        return None
-    left = typecast_time(lhs)
-    right = typecast_time(rhs)
-    return (
-        (left.hour * 60 * 60 * 1000000)
-        + (left.minute * 60 * 1000000)
-        + (left.second * 1000000)
-        + (left.microsecond)
-        - (right.hour * 60 * 60 * 1000000)
-        - (right.minute * 60 * 1000000)
-        - (right.second * 1000000)
-        - (right.microsecond)
-    )
+    pass
 
 
 def _sqlite_timestamp_diff(lhs, rhs):
-    if lhs is None or rhs is None:
-        return None
-    left = typecast_timestamp(lhs)
-    right = typecast_timestamp(rhs)
-    return duration_microseconds(left - right)
+    pass
 
 
 def _sqlite_regexp(pattern, string):
-    if pattern is None or string is None:
-        return None
-    if not isinstance(string, str):
-        string = str(string)
-    return bool(re_search(pattern, string))
+    pass
 
 
 def _sqlite_acos(x):
-    if x is None:
-        return None
-    return acos(x)
+    pass
 
 
 def _sqlite_asin(x):
-    if x is None:
-        return None
-    return asin(x)
+    pass
 
 
 def _sqlite_atan(x):
-    if x is None:
-        return None
-    return atan(x)
+    pass
 
 
 def _sqlite_atan2(y, x):
-    if y is None or x is None:
-        return None
-    return atan2(y, x)
+    pass
 
 
 def _sqlite_bitxor(x, y):
-    if x is None or y is None:
-        return None
-    return x ^ y
+    pass
 
 
 def _sqlite_ceiling(x):
-    if x is None:
-        return None
-    return ceil(x)
+    pass
 
 
 def _sqlite_cos(x):
-    if x is None:
-        return None
-    return cos(x)
+    pass
 
 
 def _sqlite_cot(x):
-    if x is None:
-        return None
-    return 1 / tan(x)
+    pass
 
 
 def _sqlite_degrees(x):
-    if x is None:
-        return None
-    return degrees(x)
+    pass
 
 
 def _sqlite_exp(x):
-    if x is None:
-        return None
-    return exp(x)
+    pass
 
 
 def _sqlite_floor(x):
-    if x is None:
-        return None
-    return floor(x)
+    pass
 
 
 def _sqlite_ln(x):
-    if x is None:
-        return None
-    return log(x)
+    pass
 
 
 def _sqlite_log(base, x):
-    if base is None or x is None:
-        return None
-    # Arguments reversed to match SQL standard.
-    return log(x, base)
+    pass
 
 
 def _sqlite_lpad(text, length, fill_text):
-    if text is None or length is None or fill_text is None:
-        return None
-    delta = length - len(text)
-    if delta <= 0:
-        return text[:length]
-    return (fill_text * length)[:delta] + text
+    pass
 
 
 def _sqlite_md5(text):
-    if text is None:
-        return None
-    return md5(text.encode()).hexdigest()
+    pass
 
 
 def _sqlite_mod(x, y):
-    if x is None or y is None:
-        return None
-    return fmod(x, y)
+    pass
 
 
 def _sqlite_pi():
-    return pi
+    pass
 
 
 def _sqlite_power(x, y):
-    if x is None or y is None:
-        return None
-    return x**y
+    pass
 
 
 def _sqlite_radians(x):
-    if x is None:
-        return None
-    return radians(x)
+    pass
 
 
 def _sqlite_repeat(text, count):
-    if text is None or count is None:
-        return None
-    return text * count
+    pass
 
 
 def _sqlite_reverse(text):
-    if text is None:
-        return None
-    return text[::-1]
+    pass
 
 
 def _sqlite_rpad(text, length, fill_text):
-    if text is None or length is None or fill_text is None:
-        return None
-    return (text + fill_text * length)[:length]
+    pass
 
 
 def _sqlite_sha1(text):
-    if text is None:
-        return None
-    return sha1(text.encode()).hexdigest()
+    pass
 
 
 def _sqlite_sha224(text):
-    if text is None:
-        return None
-    return sha224(text.encode()).hexdigest()
+    pass
 
 
 def _sqlite_sha256(text):
-    if text is None:
-        return None
-    return sha256(text.encode()).hexdigest()
+    pass
 
 
 def _sqlite_sha384(text):
-    if text is None:
-        return None
-    return sha384(text.encode()).hexdigest()
+    pass
 
 
 def _sqlite_sha512(text):
-    if text is None:
-        return None
-    return sha512(text.encode()).hexdigest()
+    pass
 
 
 def _sqlite_sign(x):
-    if x is None:
-        return None
-    return (x > 0) - (x < 0)
+    pass
 
 
 def _sqlite_sin(x):
-    if x is None:
-        return None
-    return sin(x)
+    pass
 
 
 def _sqlite_sqrt(x):
-    if x is None:
-        return None
-    return sqrt(x)
+    pass
 
 
 def _sqlite_tan(x):
-    if x is None:
-        return None
-    return tan(x)
+    pass
 
 
 def _sqlite_uuid4():
-    return uuid4().hex
+    pass
 
 
 def _sqlite_uuid7():
-    return uuid7().hex
+    pass
 
 
 class ListAggregate(list):
@@ -534,4 +324,4 @@ class VarSamp(ListAggregate):
 
 class AnyValue(ListAggregate):
     def finalize(self):
-        return self[0]
+        pass

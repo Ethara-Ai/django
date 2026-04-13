@@ -73,12 +73,7 @@ def password_validators_help_texts(password_validators=None):
     """
     Return a list of all help texts of all configured validators.
     """
-    help_texts = []
-    if password_validators is None:
-        password_validators = get_default_password_validators()
-    for validator in password_validators:
-        help_texts.append(validator.get_help_text())
-    return help_texts
+    pass
 
 
 def _password_validators_help_text_html(password_validators=None):
@@ -86,11 +81,7 @@ def _password_validators_help_text_html(password_validators=None):
     Return an HTML string with all help texts of all configured validators
     in an <ul>.
     """
-    help_texts = password_validators_help_texts(password_validators)
-    help_items = format_html_join(
-        "", "<li>{}</li>", ((help_text,) for help_text in help_texts)
-    )
-    return format_html("<ul>{}</ul>", help_items) if help_items else ""
+    pass
 
 
 password_validators_help_text_html = lazy(_password_validators_help_text_html, str)
@@ -123,11 +114,7 @@ class MinimumLengthValidator:
         )
 
     def get_help_text(self):
-        return ngettext(
-            "Your password must contain at least %(min_length)d character.",
-            "Your password must contain at least %(min_length)d characters.",
-            self.min_length,
-        ) % {"min_length": self.min_length}
+        pass
 
 
 def exceeds_maximum_length_ratio(password, max_similarity, value):
@@ -216,9 +203,7 @@ class UserAttributeSimilarityValidator:
         return _("The password is too similar to the %(verbose_name)s.")
 
     def get_help_text(self):
-        return _(
-            "Your password can’t be too similar to your other personal information."
-        )
+        pass
 
 
 class CommonPasswordValidator:
@@ -235,7 +220,7 @@ class CommonPasswordValidator:
 
     @cached_property
     def DEFAULT_PASSWORD_LIST_PATH(self):
-        return Path(__file__).resolve().parent / "common-passwords.txt.gz"
+        pass
 
     def __init__(self, password_list_path=DEFAULT_PASSWORD_LIST_PATH):
         if password_list_path is CommonPasswordValidator.DEFAULT_PASSWORD_LIST_PATH:
@@ -258,7 +243,7 @@ class CommonPasswordValidator:
         return _("This password is too common.")
 
     def get_help_text(self):
-        return _("Your password can’t be a commonly used password.")
+        pass
 
 
 class NumericPasswordValidator:
@@ -277,4 +262,4 @@ class NumericPasswordValidator:
         return _("This password is entirely numeric.")
 
     def get_help_text(self):
-        return _("Your password can’t be entirely numeric.")
+        pass

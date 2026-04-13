@@ -78,7 +78,7 @@ class LazyNonce(SimpleLazyObject):
 
 
 def generate_nonce():
-    return secrets.token_urlsafe(16)
+    pass
 
 
 def build_policy(config, nonce=None):

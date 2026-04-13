@@ -111,14 +111,7 @@ class SearchVectorCombinable:
     ADD = "||"
 
     def _combine(self, other, connector, reversed):
-        if not isinstance(other, SearchVectorCombinable):
-            raise TypeError(
-                "SearchVector can only be combined with other SearchVector "
-                "instances, got %s." % type(other).__name__
-            )
-        if reversed:
-            return CombinedSearchVector(other, connector, self, self.config)
-        return CombinedSearchVector(self, connector, other, self.config)
+        pass
 
 
 register_combinable_fields(
@@ -199,14 +192,7 @@ class SearchQueryCombinable:
     BITOR = "||"
 
     def _combine(self, other, connector, reversed):
-        if not isinstance(other, SearchQueryCombinable):
-            raise TypeError(
-                "SearchQuery can only be combined with other SearchQuery "
-                "instances, got %s." % type(other).__name__
-            )
-        if reversed:
-            return CombinedSearchQuery(other, connector, self, self.config)
-        return CombinedSearchQuery(self, connector, other, self.config)
+        pass
 
     # On Combinable, these are not implemented to reduce confusion with Q. In
     # this case we are actually (ab)using them to do logical combination so
@@ -430,14 +416,7 @@ class LexemeCombinable:
     BITOR = "|"
 
     def _combine(self, other, connector, reversed):
-        if not isinstance(other, LexemeCombinable):
-            raise TypeError(
-                "A Lexeme can only be combined with another Lexeme, "
-                f"got {other.__class__.__name__}."
-            )
-        if reversed:
-            return CombinedLexeme(other, connector, self)
-        return CombinedLexeme(self, connector, other)
+        pass
 
     # On Combinable, these are not implemented to reduce confusion with Q. In
     # this case we are actually (ab)using them to do logical combination so

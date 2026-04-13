@@ -139,10 +139,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @cached_property
     def data_types(self):
-        _data_types = self._data_types.copy()
-        if self.features.has_native_uuid_field:
-            _data_types["UUIDField"] = "uuid"
-        return _data_types
+        pass
 
     # For these data types MySQL and MariaDB don't support full width database
     # indexes.
@@ -380,62 +377,28 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @cached_property
     def display_name(self):
-        return "MariaDB" if self.mysql_is_mariadb else "MySQL"
+        pass
 
     @cached_property
     def data_type_check_constraints(self):
-        if self.features.supports_column_check_constraints:
-            check_constraints = {
-                "PositiveBigIntegerField": "`%(column)s` >= 0",
-                "PositiveIntegerField": "`%(column)s` >= 0",
-                "PositiveSmallIntegerField": "`%(column)s` >= 0",
-            }
-            return check_constraints
-        return {}
+        pass
 
     @cached_property
     def mysql_server_data(self):
-        with self.temporary_connection() as cursor:
-            # Select some server variables and test if the time zone
-            # definitions are installed. CONVERT_TZ returns NULL if 'UTC'
-            # timezone isn't loaded into the mysql.time_zone table.
-            cursor.execute("""
-                SELECT VERSION(),
-                       @@sql_mode,
-                       @@default_storage_engine,
-                       @@sql_auto_is_null,
-                       @@lower_case_table_names,
-                       CONVERT_TZ('2001-01-01 01:00:00', 'UTC', 'UTC') IS NOT NULL
-            """)
-            row = cursor.fetchone()
-        return {
-            "version": row[0],
-            "sql_mode": row[1],
-            "default_storage_engine": row[2],
-            "sql_auto_is_null": bool(row[3]),
-            "lower_case_table_names": bool(row[4]),
-            "has_zoneinfo_database": bool(row[5]),
-        }
+        pass
 
     @cached_property
     def mysql_server_info(self):
-        return self.mysql_server_data["version"]
+        pass
 
     @cached_property
     def mysql_version(self):
-        match = server_version_re.match(self.mysql_server_info)
-        if not match:
-            raise Exception(
-                "Unable to determine MySQL version from version string %r"
-                % self.mysql_server_info
-            )
-        return tuple(int(x) for x in match.groups())
+        pass
 
     @cached_property
     def mysql_is_mariadb(self):
-        return "mariadb" in self.mysql_server_info.lower()
+        pass
 
     @cached_property
     def sql_mode(self):
-        sql_mode = self.mysql_server_data["sql_mode"]
-        return set(sql_mode.split(",") if sql_mode else ())
+        pass

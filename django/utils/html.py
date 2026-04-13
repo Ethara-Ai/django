@@ -87,7 +87,7 @@ _js_escapes.update(
 @keep_lazy(SafeString)
 def escapejs(value):
     """Hex encode characters for use in JavaScript strings."""
-    return mark_safe(str(value).translate(_js_escapes))
+    pass
 
 
 _json_script_escapes = {
@@ -103,18 +103,7 @@ def json_script(value, element_id=None, encoder=None):
     value is safe to be output anywhere except for inside a tag attribute. Wrap
     the escaped JSON in a script tag.
     """
-    from django.core.serializers.json import DjangoJSONEncoder
-
-    json_str = json.dumps(value, cls=encoder or DjangoJSONEncoder).translate(
-        _json_script_escapes
-    )
-    if element_id:
-        template = '<script id="{}" type="application/json">{}</script>'
-        args = (element_id, mark_safe(json_str))
-    else:
-        template = '<script type="application/json">{}</script>'
-        args = (mark_safe(json_str),)
-    return format_html(template, *args)
+    pass
 
 
 def conditional_escape(text):
@@ -159,28 +148,13 @@ def format_html_join(sep, format_string, args_generator):
       format_html_join('\n', "<li>{} {}</li>", ((u.first_name, u.last_name)
                                                   for u in users))
     """
-    return mark_safe(
-        conditional_escape(sep).join(
-            (
-                format_html(format_string, **args)
-                if isinstance(args, Mapping)
-                else format_html(format_string, *args)
-            )
-            for args in args_generator
-        )
-    )
+    pass
 
 
 @keep_lazy_text
 def linebreaks(value, autoescape=False):
     """Convert newlines into <p> and <br>s."""
-    value = normalize_newlines(value)
-    paras = re.split("\n{2,}", str(value))
-    if autoescape:
-        paras = ["<p>%s</p>" % escape(p).replace("\n", "<br>") for p in paras]
-    else:
-        paras = ["<p>%s</p>" % p.replace("\n", "<br>") for p in paras]
-    return "\n\n".join(paras)
+    pass
 
 
 class MLStripper(HTMLParser):
@@ -190,48 +164,29 @@ class MLStripper(HTMLParser):
         self.fed = []
 
     def handle_data(self, d):
-        self.fed.append(d)
+        pass
 
     def handle_entityref(self, name):
-        self.fed.append("&%s;" % name)
+        pass
 
     def handle_charref(self, name):
-        self.fed.append("&#%s;" % name)
+        pass
 
     def get_data(self):
-        return "".join(self.fed)
+        pass
 
 
 def _strip_once(value):
     """
     Internal tag stripping utility used by strip_tags.
     """
-    s = MLStripper()
-    s.feed(value)
-    s.close()
-    return s.get_data()
+    pass
 
 
 @keep_lazy_text
 def strip_tags(value):
     """Return the given HTML with all tags stripped."""
-    value = str(value)
-    for long_open_tag in long_open_tag_without_closing_re.finditer(value):
-        if long_open_tag.group().count("<") >= MAX_STRIP_TAGS_DEPTH:
-            raise SuspiciousOperation
-    # Note: in typical case this loop executes _strip_once twice (the second
-    # execution does not remove any more tags).
-    strip_tags_depth = 0
-    while "<" in value and ">" in value:
-        if strip_tags_depth >= MAX_STRIP_TAGS_DEPTH:
-            raise SuspiciousOperation
-        new_value = _strip_once(value)
-        if value.count("<") == new_value.count("<"):
-            # _strip_once wasn't able to detect more tags.
-            break
-        value = new_value
-        strip_tags_depth += 1
-    return value
+    pass
 
 
 @keep_lazy_text
@@ -416,15 +371,15 @@ class Urlizer:
 
     @cached_property
     def wrapping_punctuation_openings(self):
-        return "".join(dict(self.wrapping_punctuation).keys())
+        pass
 
     @cached_property
     def trailing_punctuation_chars_no_semicolon(self):
-        return self.trailing_punctuation_chars.replace(";", "")
+        pass
 
     @cached_property
     def trailing_punctuation_chars_has_semicolon(self):
-        return ";" in self.trailing_punctuation_chars
+        pass
 
     def trim_punctuation(self, word):
         """
@@ -500,9 +455,7 @@ urlizer = Urlizer()
 
 @keep_lazy_text
 def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
-    return urlizer(
-        text, trim_url_limit=trim_url_limit, nofollow=nofollow, autoescape=autoescape
-    )
+    pass
 
 
 def avoid_wrapping(value):
@@ -510,7 +463,7 @@ def avoid_wrapping(value):
     Avoid text wrapping in the middle of a phrase by adding non-breaking
     spaces where there previously were normal spaces.
     """
-    return value.replace(" ", "\xa0")
+    pass
 
 
 def html_safe(klass):
@@ -518,17 +471,4 @@ def html_safe(klass):
     A decorator that defines the __html__ method. This helps non-Django
     templates to detect classes whose __str__ methods return SafeString.
     """
-    if "__html__" in klass.__dict__:
-        raise ValueError(
-            "can't apply @html_safe to %s because it defines "
-            "__html__()." % klass.__name__
-        )
-    if "__str__" not in klass.__dict__:
-        raise ValueError(
-            "can't apply @html_safe to %s because it doesn't "
-            "define __str__()." % klass.__name__
-        )
-    klass_str = klass.__str__
-    klass.__str__ = lambda self: mark_safe(klass_str(self))
-    klass.__html__ = lambda self: str(self)
-    return klass
+    pass

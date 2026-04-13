@@ -93,46 +93,7 @@ class AdminEmailHandler(logging.Handler):
 
     def emit(self, record):
         # Early return when no email will be sent.
-        if (
-            not settings.ADMINS
-            # Method not overridden.
-            and self.send_mail.__func__ is AdminEmailHandler.send_mail
-        ):
-            return
-        try:
-            request = record.request
-            subject = "%s (%s IP): %s" % (
-                record.levelname,
-                (
-                    "internal"
-                    if request.META.get("REMOTE_ADDR") in settings.INTERNAL_IPS
-                    else "EXTERNAL"
-                ),
-                record.getMessage(),
-            )
-        except Exception:
-            subject = "%s: %s" % (record.levelname, record.getMessage())
-            request = None
-        subject = self.format_subject(subject)
-
-        # Since we add a nicely formatted traceback on our own, create a copy
-        # of the log record without the exception data.
-        no_exc_record = copy(record)
-        no_exc_record.exc_info = None
-        no_exc_record.exc_text = None
-
-        if record.exc_info:
-            exc_info = record.exc_info
-        else:
-            exc_info = (None, record.getMessage(), None)
-
-        reporter = self.reporter_class(request, is_email=True, *exc_info)
-        message = "%s\n\n%s" % (
-            self.format(no_exc_record),
-            reporter.get_traceback_text(),
-        )
-        html_message = reporter.get_traceback_html() if self.include_html else None
-        self.send_mail(subject, message, html_message=html_message)
+        pass
 
     def send_mail(self, subject, message, *args, **kwargs):
         mail.mail_admins(
@@ -146,7 +107,7 @@ class AdminEmailHandler(logging.Handler):
         """
         Escape CR and LF characters.
         """
-        return subject.replace("\n", "\\n").replace("\r", "\\r")
+        pass
 
 
 class CallbackFilter(logging.Filter):
@@ -160,19 +121,17 @@ class CallbackFilter(logging.Filter):
         self.callback = callback
 
     def filter(self, record):
-        if self.callback(record):
-            return 1
-        return 0
+        pass
 
 
 class RequireDebugFalse(logging.Filter):
     def filter(self, record):
-        return not settings.DEBUG
+        pass
 
 
 class RequireDebugTrue(logging.Filter):
     def filter(self, record):
-        return settings.DEBUG
+        pass
 
 
 class ServerFormatter(logging.Formatter):
@@ -183,35 +142,10 @@ class ServerFormatter(logging.Formatter):
         super().__init__(*args, **kwargs)
 
     def format(self, record):
-        msg = record.msg
-        status_code = getattr(record, "status_code", None)
-
-        if status_code:
-            if 200 <= status_code < 300:
-                # Put 2XX first, since it should be the common case
-                msg = self.style.HTTP_SUCCESS(msg)
-            elif 100 <= status_code < 200:
-                msg = self.style.HTTP_INFO(msg)
-            elif status_code == 304:
-                msg = self.style.HTTP_NOT_MODIFIED(msg)
-            elif 300 <= status_code < 400:
-                msg = self.style.HTTP_REDIRECT(msg)
-            elif status_code == 404:
-                msg = self.style.HTTP_NOT_FOUND(msg)
-            elif 400 <= status_code < 500:
-                msg = self.style.HTTP_BAD_REQUEST(msg)
-            else:
-                # Any 5XX, or any other status code
-                msg = self.style.HTTP_SERVER_ERROR(msg)
-
-        if self.uses_server_time() and not hasattr(record, "server_time"):
-            record.server_time = self.formatTime(record, self.datefmt)
-
-        record.msg = msg
-        return super().format(record)
+        pass
 
     def uses_server_time(self):
-        return self._fmt.find("{server_time}") >= 0
+        pass
 
 
 def log_message(

@@ -17,9 +17,7 @@ class StorageHandler:
 
     @cached_property
     def backends(self):
-        if self._backends is None:
-            self._backends = settings.STORAGES.copy()
-        return self._backends
+        pass
 
     def __getitem__(self, alias):
         try:

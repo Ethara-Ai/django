@@ -115,7 +115,7 @@ class ST_Polygon(Func):
 
     @cached_property
     def output_field(self):
-        return GeometryField(srid=self.source_expressions[0].field.srid)
+        pass
 
 
 class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
@@ -176,47 +176,12 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     @cached_property
     def function_names(self):
-        function_names = {
-            "AsWKB": "ST_AsBinary",
-            "AsWKT": "ST_AsText",
-            "BoundingCircle": "ST_MinimumBoundingCircle",
-            "FromWKB": "ST_GeomFromWKB",
-            "FromWKT": "ST_GeomFromText",
-            "NumDimensions": "ST_NDims",
-            "NumPoints": "ST_NPoints",
-            "GeometryType": "GeometryType",
-        }
-        return function_names
+        pass
 
     @cached_property
     def spatial_version(self):
         """Determine the version of the PostGIS library."""
-        # Trying to get the PostGIS version because the function
-        # signatures will depend on the version used. The cost
-        # here is a database query to determine the version, which
-        # can be mitigated by setting `POSTGIS_VERSION` with a 3-tuple
-        # comprising user-supplied values for the major, minor, and
-        # subminor revision of PostGIS.
-        if hasattr(settings, "POSTGIS_VERSION"):
-            version = settings.POSTGIS_VERSION
-        else:
-            # Run a basic query to check the status of the connection so we're
-            # sure we only raise the error below if the problem comes from
-            # PostGIS and not from PostgreSQL itself (see #24862).
-            self._get_postgis_func("version")
-
-            try:
-                vtup = self.postgis_version_tuple()
-            except ProgrammingError:
-                raise ImproperlyConfigured(
-                    'Cannot determine PostGIS version for database "%s" '
-                    'using command "SELECT postgis_lib_version()". '
-                    "GeoDjango requires at least PostGIS version 3.2. "
-                    "Was the database created from a spatial database "
-                    "template?" % self.connection.settings_dict["NAME"]
-                )
-            version = vtup[1:]
-        return version
+        pass
 
     def convert_extent(self, box):
         """
@@ -224,12 +189,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         the bounding box text returned by PostGIS (`box` argument), for
         example: "BOX(-90.0 30.0, -85.0 40.0)".
         """
-        if box is None:
-            return None
-        ll, ur = box[4:-1].split(",")
-        xmin, ymin = map(float, ll.split())
-        xmax, ymax = map(float, ur.split())
-        return (xmin, ymin, xmax, ymax)
+        pass
 
     def convert_extent3d(self, box3d):
         """
@@ -237,12 +197,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         the 3d bounding-box text returned by PostGIS (`box3d` argument), for
         example: "BOX3D(-90.0 30.0 1, -85.0 40.0 2)".
         """
-        if box3d is None:
-            return None
-        ll, ur = box3d[6:-1].split(",")
-        xmin, ymin, zmin = map(float, ll.split())
-        xmax, ymax, zmax = map(float, ur.split())
-        return (xmin, ymin, zmin, xmax, ymax, zmax)
+        pass
 
     def geo_db_type(self, f):
         """
@@ -336,53 +291,43 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         Helper routine for calling PostGIS functions and returning their
         result.
         """
-        # Close out the connection. See #9437.
-        with self.connection.temporary_connection() as cursor:
-            cursor.execute("SELECT %s()" % func)
-            return cursor.fetchone()[0]
+        pass
 
     def postgis_geos_version(self):
         "Return the version of the GEOS library used with PostGIS."
-        return self._get_postgis_func("postgis_geos_version")
+        pass
 
     def postgis_lib_version(self):
         """
         Return the version number of the PostGIS library used with PostgreSQL.
         """
-        return self._get_postgis_func("postgis_lib_version")
+        pass
 
     def postgis_proj_version(self):
         """Return the version of the PROJ library used with PostGIS."""
-        return self._get_postgis_func("postgis_proj_version")
+        pass
 
     def postgis_version(self):
         "Return PostGIS version number and compile-time options."
-        return self._get_postgis_func("postgis_version")
+        pass
 
     def postgis_full_version(self):
         "Return PostGIS version number and compile-time options."
-        return self._get_postgis_func("postgis_full_version")
+        pass
 
     def postgis_version_tuple(self):
         """
         Return the PostGIS version as a tuple (version string, major,
         minor, subminor).
         """
-        version = self.postgis_lib_version()
-        return (version, *get_version_tuple(version))
+        pass
 
     def proj_version_tuple(self):
         """
         Return the version of PROJ used by PostGIS as a tuple of the
         major, minor, and subminor release numbers.
         """
-        proj_regex = re.compile(r"(\d+)\.(\d+)\.(\d+)")
-        proj_ver_str = self.postgis_proj_version()
-        m = proj_regex.search(proj_ver_str)
-        if m:
-            return tuple(map(int, m.groups()))
-        else:
-            raise Exception("Could not determine PROJ version from PostGIS.")
+        pass
 
     def spatial_aggregate_name(self, agg_name):
         if agg_name == "Extent3D":
@@ -399,7 +344,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     def parse_raster(self, value):
         """Convert a PostGIS HEX String into a dict readable by GDALRaster."""
-        return from_pgraster(value)
+        pass
 
     def distance_expr_for_lookup(self, lhs, rhs, **kwargs):
         return super().distance_expr_for_lookup(

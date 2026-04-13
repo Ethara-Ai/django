@@ -64,35 +64,17 @@ W015 = Warning(
 
 @register(Tags.security, deploy=True)
 def check_session_cookie_secure(app_configs, **kwargs):
-    if settings.SESSION_COOKIE_SECURE is True:
-        return []
-    errors = []
-    if _session_app():
-        errors.append(W010)
-    if _session_middleware():
-        errors.append(W011)
-    if len(errors) > 1:
-        errors = [W012]
-    return errors
+    pass
 
 
 @register(Tags.security, deploy=True)
 def check_session_cookie_httponly(app_configs, **kwargs):
-    if settings.SESSION_COOKIE_HTTPONLY is True:
-        return []
-    errors = []
-    if _session_app():
-        errors.append(W013)
-    if _session_middleware():
-        errors.append(W014)
-    if len(errors) > 1:
-        errors = [W015]
-    return errors
+    pass
 
 
 def _session_middleware():
-    return "django.contrib.sessions.middleware.SessionMiddleware" in settings.MIDDLEWARE
+    pass
 
 
 def _session_app():
-    return "django.contrib.sessions" in settings.INSTALLED_APPS
+    pass

@@ -38,7 +38,7 @@ class SpatialiteGeometryColumns(models.Model):
         Return the name of the metadata column used to store the feature table
         name.
         """
-        return "f_table_name"
+        pass
 
     @classmethod
     def geom_col_name(cls):
@@ -46,7 +46,7 @@ class SpatialiteGeometryColumns(models.Model):
         Return the name of the metadata column used to store the feature
         geometry column.
         """
-        return "f_geometry_column"
+        pass
 
 
 class SpatialiteSpatialRefSys(models.Model, SpatialRefSysMixin):
@@ -68,4 +68,4 @@ class SpatialiteSpatialRefSys(models.Model, SpatialRefSysMixin):
 
     @property
     def wkt(self):
-        return self.srtext
+        pass

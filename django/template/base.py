@@ -131,11 +131,7 @@ class Origin:
 
     @property
     def loader_name(self):
-        if self.loader:
-            return "%s.%s" % (
-                self.loader.__module__,
-                self.loader.__class__.__name__,
-            )
+        pass
 
 
 class Template:
@@ -312,26 +308,11 @@ class PartialTemplate:
         return template.get_exception_info(exception, token)
 
     def find_partial_source(self, full_source):
-        if (
-            self._source_start is not None
-            and self._source_end is not None
-            and 0 <= self._source_start <= self._source_end <= len(full_source)
-        ):
-            return full_source[self._source_start : self._source_end]
-
-        return ""
+        pass
 
     @property
     def source(self):
-        template = self.origin.loader.get_template(self.origin.template_name)
-        if not template.engine.debug:
-            warnings.warn(
-                "PartialTemplate.source is only available when template "
-                "debugging is enabled.",
-                RuntimeWarning,
-                skip_file_prefixes=django_file_prefixes(),
-            )
-        return self.find_partial_source(template.source)
+        pass
 
     def _render(self, context):
         return self.nodelist.render(context)
@@ -591,11 +572,7 @@ class Parser:
         return nodelist
 
     def skip_past(self, endtag):
-        while self.tokens:
-            token = self.next_token()
-            if token.token_type == TokenType.BLOCK and token.contents == endtag:
-                return
-        self.unclosed_block_tag([endtag])
+        pass
 
     def extend_nodelist(self, nodelist, node, token):
         # Check that non-text nodes don't appear before an extends tag.

@@ -59,17 +59,7 @@ class BaseIterable:
         # Generators don't actually start running until the first time you call
         # next() on them, so make the generator object in the async thread and
         # then repeatedly dispatch to it in a sync thread.
-        sync_generator = self.__iter__()
-
-        def next_slice(gen):
-            return list(islice(gen, self.chunk_size))
-
-        while True:
-            chunk = await sync_to_async(next_slice)(sync_generator)
-            for item in chunk:
-                yield item
-            if len(chunk) < self.chunk_size:
-                break
+        pass
 
     # __aiter__() is a *synchronous* method that has to then return an
     # *asynchronous* iterator/generator. Thus, nest an async generator inside
@@ -436,9 +426,7 @@ class QuerySet(AltersData):
         # Remember, __aiter__ itself is synchronous, it's the thing it returns
         # that is async!
         async def generator():
-            await sync_to_async(self._fetch_all)()
-            for item in self._result_cache:
-                yield item
+            pass
 
         return generator()
 
@@ -579,36 +567,7 @@ class QuerySet(AltersData):
         An asynchronous iterator over the results from applying this QuerySet
         to the database.
         """
-        if chunk_size <= 0:
-            raise ValueError("Chunk size must be strictly positive.")
-        use_chunked_fetch = not connections[self.db].settings_dict.get(
-            "DISABLE_SERVER_SIDE_CURSORS"
-        )
-        iterable = self._iterable_class(
-            self, chunked_fetch=use_chunked_fetch, chunk_size=chunk_size
-        )
-        if self._prefetch_related_lookups:
-            results = []
-
-            async for item in iterable:
-                results.append(item)
-                if len(results) >= chunk_size:
-                    await aprefetch_related_objects(
-                        results, *self._prefetch_related_lookups
-                    )
-                    for result in results:
-                        yield result
-                    results.clear()
-
-            if results:
-                await aprefetch_related_objects(
-                    results, *self._prefetch_related_lookups
-                )
-                for result in results:
-                    yield result
-        else:
-            async for item in iterable:
-                yield item
+        pass
 
     def aggregate(self, *args, **kwargs):
         """
@@ -636,7 +595,7 @@ class QuerySet(AltersData):
         return self.query.chain().get_aggregation(self.db, kwargs)
 
     async def aaggregate(self, *args, **kwargs):
-        return await sync_to_async(self.aggregate)(*args, **kwargs)
+        pass
 
     def count(self):
         """
@@ -652,7 +611,7 @@ class QuerySet(AltersData):
         return self.query.get_count(using=self.db)
 
     async def acount(self):
-        return await sync_to_async(self.count)()
+        pass
 
     def get(self, *args, **kwargs):
         """
@@ -936,14 +895,7 @@ class QuerySet(AltersData):
         update_fields=None,
         unique_fields=None,
     ):
-        return await sync_to_async(self.bulk_create)(
-            objs=objs,
-            batch_size=batch_size,
-            ignore_conflicts=ignore_conflicts,
-            update_conflicts=update_conflicts,
-            update_fields=update_fields,
-            unique_fields=unique_fields,
-        )
+        pass
 
     abulk_create.alters_data = True
 
@@ -1008,11 +960,7 @@ class QuerySet(AltersData):
     bulk_update.alters_data = True
 
     async def abulk_update(self, objs, fields, batch_size=None):
-        return await sync_to_async(self.bulk_update)(
-            objs=objs,
-            fields=fields,
-            batch_size=batch_size,
-        )
+        pass
 
     abulk_update.alters_data = True
 
@@ -1100,11 +1048,7 @@ class QuerySet(AltersData):
     update_or_create.alters_data = True
 
     async def aupdate_or_create(self, defaults=None, create_defaults=None, **kwargs):
-        return await sync_to_async(self.update_or_create)(
-            defaults=defaults,
-            create_defaults=create_defaults,
-            **kwargs,
-        )
+        pass
 
     aupdate_or_create.alters_data = True
 
@@ -1140,42 +1084,23 @@ class QuerySet(AltersData):
         Return the earliest object according to fields (if given) or by the
         model's Meta.get_latest_by.
         """
-        if fields:
-            order_by = fields
-        else:
-            order_by = getattr(self.model._meta, "get_latest_by")
-            if order_by and not isinstance(order_by, (tuple, list)):
-                order_by = (order_by,)
-        if order_by is None:
-            raise ValueError(
-                "earliest() and latest() require either fields as positional "
-                "arguments or 'get_latest_by' in the model's Meta."
-            )
-        obj = self._chain()
-        obj.query.set_limits(high=1)
-        obj.query.clear_ordering(force=True)
-        obj.query.add_ordering(*order_by)
-        return obj.get()
+        pass
 
     def earliest(self, *fields):
-        if self.query.is_sliced:
-            raise TypeError("Cannot change a query once a slice has been taken.")
-        return self._earliest(*fields)
+        pass
 
     async def aearliest(self, *fields):
-        return await sync_to_async(self.earliest)(*fields)
+        pass
 
     def latest(self, *fields):
         """
         Return the latest object according to fields (if given) or by the
         model's Meta.get_latest_by.
         """
-        if self.query.is_sliced:
-            raise TypeError("Cannot change a query once a slice has been taken.")
-        return self.reverse()._earliest(*fields)
+        pass
 
     async def alatest(self, *fields):
-        return await sync_to_async(self.latest)(*fields)
+        pass
 
     def first(self):
         """Return the first object of a query or None if no match is found."""
@@ -1188,7 +1113,7 @@ class QuerySet(AltersData):
             return obj
 
     async def afirst(self):
-        return await sync_to_async(self.first)()
+        pass
 
     def last(self):
         """Return the last object of a query or None if no match is found."""
@@ -1201,7 +1126,7 @@ class QuerySet(AltersData):
             return obj
 
     async def alast(self):
-        return await sync_to_async(self.last)()
+        pass
 
     def in_bulk(self, id_list=None, *, field_name="pk"):
         """
@@ -1300,10 +1225,7 @@ class QuerySet(AltersData):
         return {get_key(obj): get_obj(obj) for obj in qs}
 
     async def ain_bulk(self, id_list=None, *, field_name="pk"):
-        return await sync_to_async(self.in_bulk)(
-            id_list=id_list,
-            field_name=field_name,
-        )
+        pass
 
     def delete(self):
         """Delete the records in the current QuerySet."""
@@ -1400,7 +1322,7 @@ class QuerySet(AltersData):
     update.alters_data = True
 
     async def aupdate(self, **kwargs):
-        return await sync_to_async(self.update)(**kwargs)
+        pass
 
     aupdate.alters_data = True
 
@@ -1458,7 +1380,7 @@ class QuerySet(AltersData):
         return self.filter(pk=obj.pk).exists()
 
     async def acontains(self, obj):
-        return await sync_to_async(self.contains)(obj=obj)
+        pass
 
     def _prefetch_related_objects(self):
         # This method can only be called once the result cache has been filled.
@@ -1470,28 +1392,17 @@ class QuerySet(AltersData):
         Runs an EXPLAIN on the SQL query this QuerySet would perform, and
         returns the results.
         """
-        return self.query.explain(using=self.db, format=format, **options)
+        pass
 
     async def aexplain(self, *, format=None, **options):
-        return await sync_to_async(self.explain)(format=format, **options)
+        pass
 
     ##################################################
     # PUBLIC METHODS THAT RETURN A QUERYSET SUBCLASS #
     ##################################################
 
     def raw(self, raw_query, params=(), translations=None, using=None):
-        if using is None:
-            using = self.db
-        qs = RawQuerySet(
-            raw_query,
-            model=self.model,
-            params=params,
-            translations=translations,
-            using=using,
-            fetch_mode=self._fetch_mode,
-        )
-        qs._prefetch_related_lookups = self._prefetch_related_lookups[:]
-        return qs
+        pass
 
     def _values(self, *fields, **expressions):
         clone = self._chain()
@@ -1640,15 +1551,14 @@ class QuerySet(AltersData):
         Return a new QuerySet that is a copy of the current one. This allows a
         QuerySet to proxy for a model manager in some cases.
         """
-        return self._chain()
+        pass
 
     def filter(self, *args, **kwargs):
         """
         Return a new QuerySet instance with the args ANDed to the existing
         set.
         """
-        self._not_support_combined_queries("filter")
-        return self._filter_or_exclude(False, args, kwargs)
+        pass
 
     def exclude(self, *args, **kwargs):
         """
@@ -1812,8 +1722,7 @@ class QuerySet(AltersData):
         """
         Return a query set with added aliases for extra data or aggregations.
         """
-        self._not_support_combined_queries("alias")
-        return self._annotate(args, kwargs, select=False)
+        pass
 
     def _annotate(self, args, kwargs, select=True):
         self._validate_values_are_expressions(
@@ -1980,20 +1889,7 @@ class QuerySet(AltersData):
         Return True if the QuerySet is ordered -- i.e. has an order_by()
         clause or a default ordering on the model (or is empty).
         """
-        if isinstance(self, EmptyQuerySet):
-            return True
-        if self.query.extra_order_by or self.query.order_by:
-            return True
-        elif (
-            self.query.default_ordering
-            and self.query.get_meta().ordering
-            and
-            # A default ordering doesn't affect GROUP BY queries.
-            not self.query.group_by
-        ):
-            return True
-        else:
-            return False
+        pass
 
     @property
     def totally_ordered(self):
@@ -2006,75 +1902,12 @@ class QuerySet(AltersData):
         ordering is ignored. Ordering specified via .extra(order_by=...)
         is also ignored.
         """
-        if not self.ordered:
-            return False
-        ordering = self.query.order_by
-        if not ordering and self.query.default_ordering:
-            ordering = self.query.get_meta().ordering
-        if not ordering:
-            return False
-        opts = self.model._meta
-        pk_fields = {f.attname for f in opts.pk_fields}
-        ordering_fields = set()
-        for part in ordering:
-            # Search for single field providing a total ordering.
-            field_name = None
-            if isinstance(part, str):
-                field_name = part.lstrip("-")
-            elif isinstance(part, F):
-                field_name = part.name
-            elif isinstance(part, OrderBy) and isinstance(part.expression, F):
-                field_name = part.expression.name
-            if field_name:
-                if field_name == "pk":
-                    return True
-                # Normalize attname references by using get_field().
-                try:
-                    field = opts.get_field(field_name)
-                except exceptions.FieldDoesNotExist:
-                    # Could be "?" for random ordering or a related field
-                    # lookup. Skip this part of introspection for now.
-                    continue
-                # Ordering by a related field name orders by the referenced
-                # model's ordering. Skip this part of introspection for now.
-                if field.remote_field and field_name == field.name:
-                    continue
-                if field.attname in pk_fields and len(pk_fields) == 1:
-                    return True
-                if field.unique and not field.null:
-                    return True
-                ordering_fields.add(field.attname)
-
-        # Account for members of a CompositePrimaryKey.
-        if ordering_fields.issuperset(pk_fields):
-            return True
-        # No single total ordering field, try unique_together and total
-        # unique constraints.
-        constraint_field_names = (
-            *opts.unique_together,
-            *(constraint.fields for constraint in opts.total_unique_constraints),
-        )
-        for field_names in constraint_field_names:
-            # Normalize attname references by using get_field().
-            try:
-                fields = [opts.get_field(field_name) for field_name in field_names]
-            except exceptions.FieldDoesNotExist:
-                continue
-            # Composite unique constraints containing a nullable column
-            # cannot ensure total ordering.
-            if any(field.null for field in fields):
-                continue
-            if ordering_fields.issuperset(field.attname for field in fields):
-                return True
-
-        return False
+        pass
 
     @property
     def db(self):
         """Return the database used if this query is executed now."""
-        if self._for_write:
-            return self._db or router.db_for_write(self.model, **self._hints)
-        return self._db or router.db_for_read(self.model, **self._hints)
+        pass
 
     ###################
     # PRIVATE METHODS #
@@ -2246,22 +2079,13 @@ class QuerySet(AltersData):
 
     def _merge_sanity_check(self, other):
         """Check that two QuerySet classes may be merged."""
-        if self._fields is not None and (
-            set(self.query.values_select) != set(other.query.values_select)
-            or set(self.query.extra_select) != set(other.query.extra_select)
-            or set(self.query.annotation_select) != set(other.query.annotation_select)
-        ):
-            raise TypeError(
-                "Merging '%s' classes must involve the same values in each case."
-                % self.__class__.__name__
-            )
+        pass
 
     def _merge_known_related_objects(self, other):
         """
         Keep track of all known related objects from either QuerySet instance.
         """
-        for field, objects in other._known_related_objects.items():
-            self._known_related_objects.setdefault(field, {}).update(objects)
+        pass
 
     def resolve_expression(self, *args, **kwargs):
         query = self.query.resolve_expression(*args, **kwargs)
@@ -2307,8 +2131,7 @@ class QuerySet(AltersData):
             )
 
     def _check_operator_queryset(self, other, operator_):
-        if self.query.combinator or other.query.combinator:
-            raise TypeError(f"Cannot use {operator_} operator with combined queryset.")
+        pass
 
     def _check_ordering_first_last_queryset_aggregation(self, method):
         if (
@@ -2372,22 +2195,7 @@ class RawQuerySet:
 
     def resolve_model_init_order(self):
         """Resolve the init field names and value positions."""
-        converter = connections[self.db].introspection.identifier_converter
-        model_init_fields = [
-            field
-            for column_name, field in self.model_fields.items()
-            if column_name in self.columns
-        ]
-        annotation_fields = [
-            (column, pos)
-            for pos, column in enumerate(self.columns)
-            if column not in self.model_fields
-        ]
-        model_init_order = [
-            self.columns.index(converter(f.column)) for f in model_init_fields
-        ]
-        model_init_names = [f.attname for f in model_init_fields]
-        return model_init_names, model_init_order, annotation_fields
+        pass
 
     def prefetch_related(self, *lookups):
         """Same as QuerySet.prefetch_related()"""
@@ -2438,9 +2246,7 @@ class RawQuerySet:
         # Remember, __aiter__ itself is synchronous, it's the thing it returns
         # that is async!
         async def generator():
-            await sync_to_async(self._fetch_all)()
-            for item in self._result_cache:
-                yield item
+            pass
 
         return generator()
 
@@ -2456,7 +2262,7 @@ class RawQuerySet:
     @property
     def db(self):
         """Return the database used if this query is executed now."""
-        return self._db or router.db_for_read(self.model, **self._hints)
+        pass
 
     def using(self, alias):
         """Select the database this RawQuerySet should execute against."""
@@ -2476,29 +2282,12 @@ class RawQuerySet:
         A list of model field names in the order they'll appear in the
         query results.
         """
-        columns = self.query.get_columns()
-        # Adjust any column names which don't match field names
-        for query_name, model_name in self.translations.items():
-            # Ignore translations for nonexistent column names
-            try:
-                index = columns.index(query_name)
-            except ValueError:
-                pass
-            else:
-                columns[index] = model_name
-        return columns
+        pass
 
     @cached_property
     def model_fields(self):
         """A dict mapping column names to model field names."""
-        converter = connections[self.db].introspection.identifier_converter
-        return {
-            converter(field.column): field
-            for field in self.model._meta.fields
-            # Fields with None "column" should be ignored
-            # (e.g. CompositePrimaryKey).
-            if field.column
-        }
+        pass
 
 
 class Prefetch:
@@ -2735,9 +2524,7 @@ def prefetch_related_objects(model_instances, *related_lookups):
 
 async def aprefetch_related_objects(model_instances, *related_lookups):
     """See prefetch_related_objects()."""
-    return await sync_to_async(prefetch_related_objects)(
-        model_instances, *related_lookups
-    )
+    pass
 
 
 def get_prefetcher(instance, through_attr, to_attr):
@@ -2758,12 +2545,12 @@ def get_prefetcher(instance, through_attr, to_attr):
         if isinstance(getattr(model, to_attr, None), cached_property):
 
             def has_cached_property(instance):
-                return to_attr in instance.__dict__
+                pass
 
             return has_cached_property
 
         def has_to_attr_attribute(instance):
-            return hasattr(instance, to_attr)
+            pass
 
         return has_to_attr_attribute
 
@@ -2799,7 +2586,7 @@ def get_prefetcher(instance, through_attr, to_attr):
                 if through_attr == to_attr:
 
                     def in_prefetched_cache(instance):
-                        return through_attr in instance._prefetched_objects_cache
+                        pass
 
                     is_fetched = in_prefetched_cache
     return prefetcher, rel_obj_descriptor, attr_found, is_fetched

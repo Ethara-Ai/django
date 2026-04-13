@@ -146,34 +146,19 @@ class HttpResponseBase:
 
     @property
     def reason_phrase(self):
-        if self._reason_phrase is not None:
-            return self._reason_phrase
-        # Leave self._reason_phrase unset in order to use the default
-        # reason phrase for status code.
-        return responses.get(self.status_code, "Unknown Status Code")
+        pass
 
     @reason_phrase.setter
     def reason_phrase(self, value):
-        self._reason_phrase = value
+        pass
 
     @property
     def charset(self):
-        if self._charset is not None:
-            return self._charset
-        # The Content-Type header may not yet be set, because the charset is
-        # being inserted *into* it.
-        if content_type := self.headers.get("Content-Type"):
-            if matched := _charset_from_content_type_re.search(content_type):
-                # Extract the charset and strip its double quotes.
-                # Note that having parsed it from the Content-Type, we don't
-                # store it back into the _charset for later intentionally, to
-                # allow for the Content-Type to be switched again later.
-                return matched["charset"].replace('"', "")
-        return settings.DEFAULT_CHARSET
+        pass
 
     @charset.setter
     def charset(self, value):
-        self._charset = value
+        pass
 
     def serialize_headers(self):
         """HTTP headers as a bytestring."""
@@ -188,11 +173,7 @@ class HttpResponseBase:
 
     @property
     def _content_type_for_repr(self):
-        return (
-            ', "%s"' % self.headers["Content-Type"]
-            if "Content-Type" in self.headers
-            else ""
-        )
+        pass
 
     def __setitem__(self, header, value):
         self.headers[header] = value
@@ -284,8 +265,7 @@ class HttpResponseBase:
         self.headers.setdefault(key, value)
 
     def set_signed_cookie(self, key, value, salt="", **kwargs):
-        value = signing.get_cookie_signer(salt=key + salt).sign(value)
-        return self.set_cookie(key, value, **kwargs)
+        pass
 
     def delete_cookie(self, key, path="/", domain=None, samesite=None):
         # Browsers can ignore the Set-Cookie header if the cookie doesn't use
@@ -355,13 +335,13 @@ class HttpResponseBase:
     # See https://docs.python.org/library/io.html#io.IOBase
 
     def readable(self):
-        return False
+        pass
 
     def seekable(self):
-        return False
+        pass
 
     def writable(self):
-        return False
+        pass
 
     def writelines(self, lines):
         raise OSError("This %s instance is not writable" % self.__class__.__name__)
@@ -396,29 +376,16 @@ class HttpResponse(HttpResponseBase):
 
     @property
     def content(self):
-        return b"".join(self._container)
+        pass
 
     @content.setter
     def content(self, value):
         # Consume iterators upon assignment to allow repeated iteration.
-        if hasattr(value, "__iter__") and not isinstance(
-            value, (bytes, memoryview, str)
-        ):
-            content = b"".join(self.make_bytes(chunk) for chunk in value)
-            if hasattr(value, "close"):
-                try:
-                    value.close()
-                except Exception:
-                    pass
-        else:
-            content = self.make_bytes(value)
-        # Create a list of properly encoded bytestrings to support write().
-        self._container = [content]
-        self.__dict__.pop("text", None)
+        pass
 
     @cached_property
     def text(self):
-        return self.content.decode(self.charset or "utf-8")
+        pass
 
     def __iter__(self):
         return iter(self._container)
@@ -433,11 +400,10 @@ class HttpResponse(HttpResponseBase):
         return self.content
 
     def writable(self):
-        return True
+        pass
 
     def writelines(self, lines):
-        for line in lines:
-            self.write(line)
+        pass
 
 
 class StreamingHttpResponse(HttpResponseBase):
@@ -479,33 +445,15 @@ class StreamingHttpResponse(HttpResponseBase):
 
     @property
     def streaming_content(self):
-        if self.is_async:
-            # pull to lexical scope to capture fixed reference in case
-            # streaming_content is set again later.
-            _iterator = self._iterator
-
-            async def awrapper():
-                async for part in _iterator:
-                    yield self.make_bytes(part)
-
-            return awrapper()
-        else:
-            return map(self.make_bytes, self._iterator)
+        pass
 
     @streaming_content.setter
     def streaming_content(self, value):
-        self._set_streaming_content(value)
+        pass
 
     def _set_streaming_content(self, value):
         # Ensure we can never iterate on "value" more than once.
-        try:
-            self._iterator = iter(value)
-            self.is_async = False
-        except TypeError:
-            self._iterator = aiter(value)
-            self.is_async = True
-        if hasattr(value, "close"):
-            self._resource_closers.append(value.close)
+        pass
 
     def __iter__(self):
         try:
@@ -520,10 +468,7 @@ class StreamingHttpResponse(HttpResponseBase):
 
             # async iterator. Consume in async_to_sync and map back.
             async def to_list(_iterator):
-                as_list = []
-                async for chunk in _iterator:
-                    as_list.append(chunk)
-                return as_list
+                pass
 
             return map(self.make_bytes, iter(async_to_sync(to_list)(self._iterator)))
 
@@ -563,70 +508,14 @@ class FileResponse(StreamingHttpResponse):
         super().__init__(*args, **kwargs)
 
     def _set_streaming_content(self, value):
-        if not hasattr(value, "read"):
-            self.file_to_stream = None
-            return super()._set_streaming_content(value)
-
-        self.file_to_stream = filelike = value
-        if hasattr(filelike, "close"):
-            self._resource_closers.append(filelike.close)
-        value = iter(lambda: filelike.read(self.block_size), b"")
-        self.set_headers(filelike)
-        super()._set_streaming_content(value)
+        pass
 
     def set_headers(self, filelike):
         """
         Set some common response headers (Content-Length, Content-Type, and
         Content-Disposition) based on the `filelike` response content.
         """
-        filename = getattr(filelike, "name", "")
-        filename = filename if isinstance(filename, str) else ""
-        seekable = hasattr(filelike, "seek") and (
-            not hasattr(filelike, "seekable") or filelike.seekable()
-        )
-        if hasattr(filelike, "tell"):
-            if seekable:
-                initial_position = filelike.tell()
-                filelike.seek(0, io.SEEK_END)
-                self.headers["Content-Length"] = filelike.tell() - initial_position
-                filelike.seek(initial_position)
-            elif hasattr(filelike, "getbuffer"):
-                self.headers["Content-Length"] = (
-                    filelike.getbuffer().nbytes - filelike.tell()
-                )
-            elif os.path.exists(filename):
-                self.headers["Content-Length"] = (
-                    os.path.getsize(filename) - filelike.tell()
-                )
-        elif seekable:
-            self.headers["Content-Length"] = sum(
-                iter(lambda: len(filelike.read(self.block_size)), 0)
-            )
-            filelike.seek(-int(self.headers["Content-Length"]), io.SEEK_END)
-
-        filename = os.path.basename(self.filename or filename)
-        if self._no_explicit_content_type:
-            if filename:
-                content_type, encoding = mimetypes.guess_type(filename)
-                # Encoding isn't set to prevent browsers from automatically
-                # uncompressing files.
-                content_type = {
-                    "br": "application/x-brotli",
-                    "bzip2": "application/x-bzip",
-                    "compress": "application/x-compress",
-                    "gzip": "application/gzip",
-                    "xz": "application/x-xz",
-                }.get(encoding, content_type)
-                self.headers["Content-Type"] = (
-                    content_type or "application/octet-stream"
-                )
-            else:
-                self.headers["Content-Type"] = "application/octet-stream"
-
-        if content_disposition := content_disposition_header(
-            self.as_attachment, filename
-        ):
-            self.headers["Content-Disposition"] = content_disposition
+        pass
 
 
 class HttpResponseRedirectBase(HttpResponse):
@@ -681,11 +570,7 @@ class HttpResponseNotModified(HttpResponse):
 
     @HttpResponse.content.setter
     def content(self, value):
-        if value:
-            raise AttributeError(
-                "You cannot set content to a 304 (Not Modified) response"
-            )
-        self._container = []
+        pass
 
 
 class HttpResponseBadRequest(HttpResponse):

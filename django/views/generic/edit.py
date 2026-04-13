@@ -155,7 +155,7 @@ class ProcessFormView(View):
     # PUT is a valid HTTP verb for creating (with a known URL) or editing an
     # object, note that browsers only support POST for now.
     def put(self, *args, **kwargs):
-        return self.post(*args, **kwargs)
+        pass
 
 
 class BaseFormView(FormMixin, ProcessFormView):

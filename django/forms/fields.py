@@ -605,7 +605,7 @@ class RegexField(CharField):
         self._set_regex(regex)
 
     def _get_regex(self):
-        return self._regex
+        pass
 
     def _set_regex(self, regex):
         if isinstance(regex, str):
@@ -875,13 +875,13 @@ class ChoiceField(Field):
 
     @property
     def choices(self):
-        return self._choices
+        pass
 
     @choices.setter
     def choices(self, value):
         # Setting choices on the field also sets the choices on the widget.
         # Note that the property setter for the widget will re-normalize.
-        self._choices = self.widget.choices = normalize_choices(value)
+        pass
 
     def to_python(self, value):
         """Return a string."""

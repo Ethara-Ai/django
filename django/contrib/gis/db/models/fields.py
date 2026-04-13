@@ -120,10 +120,10 @@ class BaseSpatialField(Field):
         return connection.ops.geo_db_type(self)
 
     def spheroid(self, connection):
-        return get_srid_info(self.srid, connection).spheroid
+        pass
 
     def units(self, connection):
-        return get_srid_info(self.srid, connection).units
+        pass
 
     def units_name(self, connection):
         return get_srid_info(self.srid, connection).units_name
@@ -411,7 +411,7 @@ class RasterField(BaseSpatialField):
         return super().db_type(connection)
 
     def from_db_value(self, value, expression, connection):
-        return connection.ops.parse_raster(value)
+        pass
 
     def contribute_to_class(self, cls, name, **kwargs):
         super().contribute_to_class(cls, name, **kwargs)

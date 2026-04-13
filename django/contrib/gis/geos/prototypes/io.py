@@ -186,7 +186,7 @@ def default_trim_value():
     GEOS changed the default value in 3.12.0. Can be replaced by True when
     3.12.0 becomes the minimum supported version.
     """
-    return geos_version_tuple() >= (3, 12)
+    pass
 
 
 DEFAULT_TRIM_VALUE = SimpleLazyObject(default_trim_value)
@@ -213,37 +213,27 @@ class WKTWriter(IOBase):
 
     @property
     def outdim(self):
-        return wkt_writer_get_outdim(self.ptr)
+        pass
 
     @outdim.setter
     def outdim(self, new_dim):
-        if new_dim not in (2, 3):
-            raise ValueError("WKT output dimension must be 2 or 3")
-        wkt_writer_set_outdim(self.ptr, new_dim)
+        pass
 
     @property
     def trim(self):
-        return self._trim
+        pass
 
     @trim.setter
     def trim(self, flag):
-        if bool(flag) != self._trim:
-            self._trim = bool(flag)
-            wkt_writer_set_trim(self.ptr, self._trim)
+        pass
 
     @property
     def precision(self):
-        return self._precision
+        pass
 
     @precision.setter
     def precision(self, precision):
-        if (not isinstance(precision, int) or precision < 0) and precision is not None:
-            raise AttributeError(
-                "WKT output rounding precision must be non-negative integer or None."
-            )
-        if precision != self._precision:
-            self._precision = precision
-            wkt_writer_set_precision(self.ptr, -1 if precision is None else precision)
+        pass
 
 
 class WKBWriter(IOBase):
@@ -285,36 +275,30 @@ class WKBWriter(IOBase):
 
     # Property for getting/setting the byteorder.
     def _get_byteorder(self):
-        return wkb_writer_get_byteorder(self.ptr)
+        pass
 
     def _set_byteorder(self, order):
-        if order not in (0, 1):
-            raise ValueError(
-                "Byte order parameter must be 0 (Big Endian) or 1 (Little Endian)."
-            )
-        wkb_writer_set_byteorder(self.ptr, order)
+        pass
 
     byteorder = property(_get_byteorder, _set_byteorder)
 
     # Property for getting/setting the output dimension.
     @property
     def outdim(self):
-        return wkb_writer_get_outdim(self.ptr)
+        pass
 
     @outdim.setter
     def outdim(self, new_dim):
-        if new_dim not in (2, 3):
-            raise ValueError("WKB output dimension must be 2 or 3")
-        wkb_writer_set_outdim(self.ptr, new_dim)
+        pass
 
     # Property for getting/setting the include srid flag.
     @property
     def srid(self):
-        return bool(wkb_writer_get_include_srid(self.ptr))
+        pass
 
     @srid.setter
     def srid(self, include):
-        wkb_writer_set_include_srid(self.ptr, bool(include))
+        pass
 
 
 # `ThreadLocalIO` object holds instances of the WKT and WKB reader/writer
@@ -340,13 +324,7 @@ def wkt_r():
 
 
 def wkt_w(dim=2, trim=False, precision=None):
-    if not thread_context.wkt_w:
-        thread_context.wkt_w = WKTWriter(dim=dim, trim=trim, precision=precision)
-    else:
-        thread_context.wkt_w.outdim = dim
-        thread_context.wkt_w.trim = trim
-        thread_context.wkt_w.precision = precision
-    return thread_context.wkt_w
+    pass
 
 
 def wkb_r():
@@ -363,9 +341,4 @@ def wkb_w(dim=2):
 
 
 def ewkb_w(dim=2):
-    if not thread_context.ewkb_w:
-        thread_context.ewkb_w = WKBWriter(dim=dim)
-        thread_context.ewkb_w.srid = True
-    else:
-        thread_context.ewkb_w.outdim = dim
-    return thread_context.ewkb_w
+    pass

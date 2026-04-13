@@ -57,7 +57,7 @@ class Task:
 
     @property
     def name(self):
-        return self.func.__name__
+        pass
 
     def using(
         self,
@@ -82,11 +82,11 @@ class Task:
 
     def enqueue(self, *args, **kwargs):
         """Queue up the Task to be executed."""
-        return self.get_backend().enqueue(self, args, kwargs)
+        pass
 
     async def aenqueue(self, *args, **kwargs):
         """Queue up the Task to be executed."""
-        return await self.get_backend().aenqueue(self, args, kwargs)
+        pass
 
     def get_result(self, result_id):
         """
@@ -95,21 +95,11 @@ class Task:
         Raise TaskResultDoesNotExist if such result does not exist, or raise
         TaskResultMismatch if the result exists but belongs to another Task.
         """
-        result = self.get_backend().get_result(result_id)
-        if result.task.func != self.func:
-            raise TaskResultMismatch(
-                f"Task does not match (received {result.task.module_path!r})"
-            )
-        return result
+        pass
 
     async def aget_result(self, result_id):
         """See get_result()."""
-        result = await self.get_backend().aget_result(result_id)
-        if result.task.func != self.func:
-            raise TaskResultMismatch(
-                f"Task does not match (received {result.task.module_path!r})"
-            )
-        return result
+        pass
 
     def call(self, *args, **kwargs):
         if iscoroutinefunction(self.func):
@@ -117,18 +107,14 @@ class Task:
         return self.func(*args, **kwargs)
 
     async def acall(self, *args, **kwargs):
-        if iscoroutinefunction(self.func):
-            return await self.func(*args, **kwargs)
-        return await sync_to_async(self.func)(*args, **kwargs)
+        pass
 
     def get_backend(self):
-        from . import task_backends
-
-        return task_backends[self.backend]
+        pass
 
     @property
     def module_path(self):
-        return f"{self.func.__module__}.{self.func.__qualname__}"
+        pass
 
 
 def task(
@@ -215,35 +201,25 @@ class TaskResult:
         If the task didn't succeed, an exception is raised.
         This is to distinguish against the task returning None.
         """
-        if self.status == TaskResultStatus.SUCCESSFUL:
-            return self._return_value
-        elif self.status == TaskResultStatus.FAILED:
-            raise ValueError("Task failed")
-        else:
-            raise ValueError("Task has not finished yet")
+        pass
 
     @property
     def is_finished(self):
-        return self.status in {TaskResultStatus.FAILED, TaskResultStatus.SUCCESSFUL}
+        pass
 
     @property
     def attempts(self):
-        return len(self.worker_ids)
+        pass
 
     def refresh(self):
         """Reload the cached task data from the task store."""
-        refreshed_task = self.task.get_backend().get_result(self.id)
-
-        for attr in TASK_REFRESH_ATTRS:
-            object.__setattr__(self, attr, getattr(refreshed_task, attr))
+        pass
 
     async def arefresh(self):
         """
         Reload the cached task data from the task store
         """
-        refreshed_task = await self.task.get_backend().aget_result(self.id)
-        for attr in TASK_REFRESH_ATTRS:
-            object.__setattr__(self, attr, getattr(refreshed_task, attr))
+        pass
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -252,4 +228,4 @@ class TaskContext:
 
     @property
     def attempt(self):
-        return self.task_result.attempts
+        pass

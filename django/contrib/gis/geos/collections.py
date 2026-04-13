@@ -87,12 +87,12 @@ class GeometryCollection(GEOSGeometry):
     @property
     def kml(self):
         "Return the KML for this Geometry Collection."
-        return "<MultiGeometry>%s</MultiGeometry>" % "".join(g.kml for g in self)
+        pass
 
     @property
     def tuple(self):
         "Return a tuple of all the coordinates in this Geometry Collection"
-        return tuple(g.tuple for g in self)
+        pass
 
     coords = tuple
 

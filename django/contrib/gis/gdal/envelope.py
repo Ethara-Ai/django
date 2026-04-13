@@ -110,96 +110,44 @@ class Envelope:
         the passed-in 2-tuple (a point), 4-tuple (an extent) or
         envelope.
         """
-        # We provide a number of different signatures for this method,
-        # and the logic here is all about converting them into a
-        # 4-tuple single parameter which does the actual work of
-        # expanding the envelope.
-        if len(args) == 1:
-            if isinstance(args[0], Envelope):
-                return self.expand_to_include(args[0].tuple)
-            elif hasattr(args[0], "x") and hasattr(args[0], "y"):
-                return self.expand_to_include(
-                    args[0].x, args[0].y, args[0].x, args[0].y
-                )
-            elif isinstance(args[0], (tuple, list)):
-                # A tuple was passed in.
-                if len(args[0]) == 2:
-                    return self.expand_to_include(
-                        (args[0][0], args[0][1], args[0][0], args[0][1])
-                    )
-                elif len(args[0]) == 4:
-                    minx, miny, maxx, maxy = args[0]
-                    if minx < self._envelope.MinX:
-                        self._envelope.MinX = minx
-                    if miny < self._envelope.MinY:
-                        self._envelope.MinY = miny
-                    if maxx > self._envelope.MaxX:
-                        self._envelope.MaxX = maxx
-                    if maxy > self._envelope.MaxY:
-                        self._envelope.MaxY = maxy
-                else:
-                    raise GDALException(
-                        "Incorrect number of tuple elements (%d)." % len(args[0])
-                    )
-            else:
-                raise TypeError("Incorrect type of argument: %s" % type(args[0]))
-        elif len(args) == 2:
-            # An x and an y parameter were passed in
-            return self.expand_to_include((args[0], args[1], args[0], args[1]))
-        elif len(args) == 4:
-            # Individual parameters passed in.
-            return self.expand_to_include(args)
-        else:
-            raise GDALException("Incorrect number (%d) of arguments." % len(args[0]))
+        pass
 
     @property
     def min_x(self):
         "Return the value of the minimum X coordinate."
-        return self._envelope.MinX
+        pass
 
     @property
     def min_y(self):
         "Return the value of the minimum Y coordinate."
-        return self._envelope.MinY
+        pass
 
     @property
     def max_x(self):
         "Return the value of the maximum X coordinate."
-        return self._envelope.MaxX
+        pass
 
     @property
     def max_y(self):
         "Return the value of the maximum Y coordinate."
-        return self._envelope.MaxY
+        pass
 
     @property
     def ur(self):
         "Return the upper-right coordinate."
-        return (self.max_x, self.max_y)
+        pass
 
     @property
     def ll(self):
         "Return the lower-left coordinate."
-        return (self.min_x, self.min_y)
+        pass
 
     @property
     def tuple(self):
         "Return a tuple representing the envelope."
-        return (self.min_x, self.min_y, self.max_x, self.max_y)
+        pass
 
     @property
     def wkt(self):
         "Return WKT representing a Polygon for this envelope."
-        # TODO: Fix significant figures.
-        return "POLYGON((%s %s,%s %s,%s %s,%s %s,%s %s))" % (
-            self.min_x,
-            self.min_y,
-            self.min_x,
-            self.max_y,
-            self.max_x,
-            self.max_y,
-            self.max_x,
-            self.min_y,
-            self.min_x,
-            self.min_y,
-        )
+        pass

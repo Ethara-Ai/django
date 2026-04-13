@@ -21,7 +21,7 @@ class BaseSpatialOperations:
 
     @cached_property
     def select_extent(self):
-        return self.select
+        pass
 
     # Aggregates
     disallowed_aggregates = ()

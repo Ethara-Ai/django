@@ -60,7 +60,7 @@ def geom_output(func, argtypes, offset=None):
         func.restype = c_int
 
         def geomerrcheck(result, func, cargs):
-            return check_geom_offset(result, func, cargs, offset)
+            pass
 
         func.errcheck = geomerrcheck
 
@@ -103,10 +103,7 @@ def const_string_output(func, argtypes, offset=None, decoding=None, cpl=False):
         func.restype = c_char_p
 
     def _check_const(result, func, cargs):
-        res = check_const_string(result, func, cargs, offset=offset, cpl=cpl)
-        if res and decoding:
-            res = res.decode(decoding)
-        return res
+        pass
 
     func.errcheck = _check_const
 
@@ -133,10 +130,7 @@ def string_output(func, argtypes, offset=-1, str_result=False, decoding=None):
     # Dynamically defining our error-checking function with the
     # given offset.
     def _check_str(result, func, cargs):
-        res = check_string(result, func, cargs, offset=offset, str_result=str_result)
-        if res and decoding:
-            res = res.decode(decoding)
-        return res
+        pass
 
     func.errcheck = _check_str
     return func

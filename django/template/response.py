@@ -68,15 +68,10 @@ class SimpleTemplateResponse(HttpResponse):
 
     def resolve_template(self, template):
         """Accept a template object, path-to-template, or list of paths."""
-        if isinstance(template, (list, tuple)):
-            return select_template(template, using=self.using)
-        elif isinstance(template, str):
-            return get_template(template, using=self.using)
-        else:
-            return template
+        pass
 
     def resolve_context(self, context):
-        return context
+        pass
 
     @property
     def rendered_content(self):
@@ -87,9 +82,7 @@ class SimpleTemplateResponse(HttpResponse):
         response content, you must either call render(), or set the
         content explicitly using the value of this property.
         """
-        template = self.resolve_template(self.template_name)
-        context = self.resolve_context(self.context_data)
-        return template.render(context, self._request)
+        pass
 
     def add_post_render_callback(self, callback):
         """Add a new post-rendering callback.
@@ -120,7 +113,7 @@ class SimpleTemplateResponse(HttpResponse):
 
     @property
     def is_rendered(self):
-        return self._is_rendered
+        pass
 
     def __iter__(self):
         if not self._is_rendered:
@@ -131,17 +124,12 @@ class SimpleTemplateResponse(HttpResponse):
 
     @property
     def content(self):
-        if not self._is_rendered:
-            raise ContentNotRenderedError(
-                "The response content must be rendered before it can be accessed."
-            )
-        return super().content
+        pass
 
     @content.setter
     def content(self, value):
         """Set the content for the response."""
-        HttpResponse.content.fset(self, value)
-        self._is_rendered = True
+        pass
 
 
 class TemplateResponse(SimpleTemplateResponse):

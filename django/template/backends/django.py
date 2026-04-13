@@ -97,7 +97,7 @@ class Template:
 
     @property
     def origin(self):
-        return self.template.origin
+        pass
 
     def render(self, context=None, request=None):
         context = make_context(

@@ -50,30 +50,16 @@ class Feed:
 
     def item_title(self, item):
         # Titles should be double escaped by default (see #6533)
-        return escape(str(item))
+        pass
 
     def item_description(self, item):
-        return str(item)
+        pass
 
     def item_link(self, item):
-        try:
-            return item.get_absolute_url()
-        except AttributeError:
-            raise ImproperlyConfigured(
-                "Give your %s class a get_absolute_url() method, or define an "
-                "item_link() method in your Feed class." % item.__class__.__name__
-            )
+        pass
 
     def item_enclosures(self, item):
-        enc_url = self._get_dynamic_attr("item_enclosure_url", item)
-        if enc_url:
-            enc = feedgenerator.Enclosure(
-                url=str(enc_url),
-                length=str(self._get_dynamic_attr("item_enclosure_length", item)),
-                mime_type=str(self._get_dynamic_attr("item_enclosure_mime_type", item)),
-            )
-            return [enc]
-        return []
+        pass
 
     def _get_dynamic_attr(self, attname, obj, default=None):
         try:

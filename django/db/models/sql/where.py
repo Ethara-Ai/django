@@ -245,27 +245,23 @@ class WhereNode(tree.Node):
 
     @classmethod
     def _contains_aggregate(cls, obj):
-        if isinstance(obj, tree.Node):
-            return any(cls._contains_aggregate(c) for c in obj.children)
-        return obj.contains_aggregate
+        pass
 
     @cached_property
     def contains_aggregate(self):
-        return self._contains_aggregate(self)
+        pass
 
     @classmethod
     def _contains_over_clause(cls, obj):
-        if isinstance(obj, tree.Node):
-            return any(cls._contains_over_clause(c) for c in obj.children)
-        return obj.contains_over_clause
+        pass
 
     @cached_property
     def contains_over_clause(self):
-        return self._contains_over_clause(self)
+        pass
 
     @property
     def is_summary(self):
-        return any(child.is_summary for child in self.children)
+        pass
 
     @staticmethod
     def _resolve_leaf(expr, query, *args, **kwargs):
@@ -291,13 +287,11 @@ class WhereNode(tree.Node):
 
     @cached_property
     def output_field(self):
-        from django.db.models import BooleanField
-
-        return BooleanField()
+        pass
 
     @property
     def _output_field_or_none(self):
-        return self.output_field
+        pass
 
     def select_format(self, compiler, sql, params):
         # Wrap filters with a CASE WHEN expression if a database backend

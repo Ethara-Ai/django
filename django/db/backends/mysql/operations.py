@@ -292,19 +292,13 @@ class DatabaseOperations(BaseDatabaseOperations):
         return converters
 
     def convert_booleanfield_value(self, value, expression, connection):
-        if value in (0, 1):
-            value = bool(value)
-        return value
+        pass
 
     def convert_datetimefield_value(self, value, expression, connection):
-        if value is not None:
-            value = timezone.make_aware(value, self.connection.timezone)
-        return value
+        pass
 
     def convert_uuidfield_value(self, value, expression, connection):
-        if value is not None:
-            value = uuid.UUID(value)
-        return value
+        pass
 
     def binary_placeholder_sql(self, value, compiler):
         if value is None:

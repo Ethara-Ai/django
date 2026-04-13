@@ -45,38 +45,7 @@ def page_not_found(request, exception, template_name=ERROR_404_TEMPLATE_NAME):
             The message from the exception which triggered the 404 (if one was
             supplied), or the exception class name
     """
-    exception_repr = exception.__class__.__name__
-    # Try to get an "interesting" exception message, if any (and not the ugly
-    # Resolver404 dictionary)
-    try:
-        message = exception.args[0]
-    except (AttributeError, IndexError):
-        pass
-    else:
-        if isinstance(message, str):
-            exception_repr = message
-    context = {
-        "request_path": quote(request.path),
-        "exception": exception_repr,
-    }
-    try:
-        template = loader.get_template(template_name)
-        body = template.render(context, request)
-    except TemplateDoesNotExist:
-        if template_name != ERROR_404_TEMPLATE_NAME:
-            # Reraise if it's a missing custom template.
-            raise
-        # Render template (even though there are no substitutions) to allow
-        # inspecting the context in tests.
-        template = Engine().from_string(
-            ERROR_PAGE_TEMPLATE
-            % {
-                "title": "Not Found",
-                "details": "The requested resource was not found on this server.",
-            },
-        )
-        body = template.render(Context(context))
-    return HttpResponseNotFound(body)
+    pass
 
 
 @requires_csrf_token
@@ -87,16 +56,7 @@ def server_error(request, template_name=ERROR_500_TEMPLATE_NAME):
     Templates: :template:`500.html`
     Context: None
     """
-    try:
-        template = loader.get_template(template_name)
-    except TemplateDoesNotExist:
-        if template_name != ERROR_500_TEMPLATE_NAME:
-            # Reraise if it's a missing custom template.
-            raise
-        return HttpResponseServerError(
-            ERROR_PAGE_TEMPLATE % {"title": "Server Error (500)", "details": ""},
-        )
-    return HttpResponseServerError(template.render())
+    pass
 
 
 @requires_csrf_token
@@ -107,19 +67,7 @@ def bad_request(request, exception, template_name=ERROR_400_TEMPLATE_NAME):
     Templates: :template:`400.html`
     Context: None
     """
-    try:
-        template = loader.get_template(template_name)
-        body = template.render(request=request)
-    except TemplateDoesNotExist:
-        if template_name != ERROR_400_TEMPLATE_NAME:
-            # Reraise if it's a missing custom template.
-            raise
-        return HttpResponseBadRequest(
-            ERROR_PAGE_TEMPLATE % {"title": "Bad Request (400)", "details": ""},
-        )
-    # No exception content is passed to the template, to not disclose any
-    # sensitive information.
-    return HttpResponseBadRequest(body)
+    pass
 
 
 @requires_csrf_token
@@ -136,15 +84,4 @@ def permission_denied(request, exception, template_name=ERROR_403_TEMPLATE_NAME)
     If the template does not exist, an Http403 response containing the text
     "403 Forbidden" (as per RFC 9110 Section 15.5.4) will be returned.
     """
-    try:
-        template = loader.get_template(template_name)
-    except TemplateDoesNotExist:
-        if template_name != ERROR_403_TEMPLATE_NAME:
-            # Reraise if it's a missing custom template.
-            raise
-        return HttpResponseForbidden(
-            ERROR_PAGE_TEMPLATE % {"title": "403 Forbidden", "details": ""},
-        )
-    return HttpResponseForbidden(
-        template.render(request=request, context={"exception": str(exception)})
-    )
+    pass

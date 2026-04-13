@@ -560,15 +560,7 @@ class SQLCompiler:
 
     # RemovedInDjango70Warning: When the deprecation ends, remove.
     def quote_name_unless_alias(self, name):
-        warnings.warn(
-            (
-                "SQLCompiler.quote_name_unless_alias() is deprecated. "
-                "Use .quote_name() instead."
-            ),
-            category=RemovedInDjango70Warning,
-            skip_file_prefixes=django_file_prefixes(),
-        )
-        return self.quote_name(name)
+        pass
 
     def compile(self, node):
         vendor_impl = getattr(node, "as_" + self.connection.vendor, None)
@@ -1569,20 +1561,7 @@ class SQLCompiler:
         chunk_size=GET_ITERATOR_CHUNK_SIZE,
     ):
         """Return an iterator over the results from executing this query."""
-        if results is None:
-            results = self.execute_sql(
-                MULTI, chunked_fetch=chunked_fetch, chunk_size=chunk_size
-            )
-        fields = [s[0] for s in self.select[0 : self.col_count]]
-        converters = self.get_converters(fields)
-        rows = chain.from_iterable(results)
-        if converters:
-            rows = self.apply_converters(rows, converters)
-        if self.has_composite_fields(fields):
-            rows = self.composite_fields_to_tuples(rows, fields)
-        if tuple_expected:
-            rows = map(tuple, rows)
-        return rows
+        pass
 
     def has_results(self):
         """
@@ -1666,17 +1645,7 @@ class SQLCompiler:
         return result
 
     def explain_query(self):
-        result = list(self.execute_sql())
-        # Some backends return 1 item tuples with strings, and others return
-        # tuples with integers and strings. Flatten them out into strings.
-        format_ = self.query.explain_info.format
-        output_formatter = json.dumps if format_ and format_.lower() == "json" else str
-        for row in result:
-            for value in row:
-                if not isinstance(value, str):
-                    yield " ".join([output_formatter(c) for c in value])
-                else:
-                    yield value
+        pass
 
 
 class SQLInsertCompiler(SQLCompiler):
@@ -1750,9 +1719,7 @@ class SQLInsertCompiler(SQLCompiler):
         Get the given field's value off the given obj. pre_save() is used for
         things like auto_now on DateTimeField. Skip it if this is a raw query.
         """
-        if self.query.raw:
-            return getattr(obj, field.attname)
-        return field.pre_save(obj, add=True)
+        pass
 
     def assemble_as_sql(self, fields, value_rows):
         """
@@ -1973,28 +1940,15 @@ class SQLDeleteCompiler(SQLCompiler):
     @cached_property
     def single_alias(self):
         # Ensure base table is in aliases.
-        self.query.get_initial_alias()
-        return sum(self.query.alias_refcount[t] > 0 for t in self.query.alias_map) == 1
+        pass
 
     @classmethod
     def _expr_refs_base_model(cls, expr, base_model):
-        if isinstance(expr, Query):
-            return expr.model == base_model
-        if not hasattr(expr, "get_source_expressions"):
-            return False
-        return any(
-            cls._expr_refs_base_model(source_expr, base_model)
-            for source_expr in expr.get_source_expressions()
-        )
+        pass
 
     @cached_property
     def contains_self_reference_subquery(self):
-        return any(
-            self._expr_refs_base_model(expr, self.query.model)
-            for expr in chain(
-                self.query.annotations.values(), self.query.where.children
-            )
-        )
+        pass
 
     def _as_sql(self, query):
         delete = "DELETE FROM %s" % self.quote_name(query.base_table)

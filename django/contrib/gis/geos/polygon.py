@@ -57,14 +57,7 @@ class Polygon(GEOSGeometry):
     @classmethod
     def from_bbox(cls, bbox):
         "Construct a Polygon from a bounding box (4-tuple)."
-        x0, y0, x1, y1 = bbox
-        for z in bbox:
-            if not isinstance(z, (float, int)):
-                return GEOSGeometry(
-                    "POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))"
-                    % (x0, y0, x0, y1, x1, y1, x1, y0, x0, y0)
-                )
-        return Polygon(((x0, y0), (x0, y1), (x1, y1), (x1, y0), (x0, y0)))
+        pass
 
     # ### These routines are needed for list-like operation w/ListMixin ###
     def _create_polygon(self, length, items):
@@ -154,16 +147,15 @@ class Polygon(GEOSGeometry):
     @property
     def num_interior_rings(self):
         "Return the number of interior rings."
-        # Getting the number of rings
-        return capi.get_nrings(self.ptr)
+        pass
 
     def _get_ext_ring(self):
         "Get the exterior ring of the Polygon."
-        return self[0]
+        pass
 
     def _set_ext_ring(self, ring):
         "Set the exterior ring of the Polygon."
-        self[0] = ring
+        pass
 
     # Properties for the exterior ring/shell.
     exterior_ring = property(_get_ext_ring, _set_ext_ring)
@@ -172,18 +164,11 @@ class Polygon(GEOSGeometry):
     @property
     def tuple(self):
         "Get the tuple for each ring in this Polygon."
-        return tuple(self[i].tuple for i in range(len(self)))
+        pass
 
     coords = tuple
 
     @property
     def kml(self):
         "Return the KML representation of this Polygon."
-        inner_kml = "".join(
-            "<innerBoundaryIs>%s</innerBoundaryIs>" % self[i + 1].kml
-            for i in range(self.num_interior_rings)
-        )
-        return "<Polygon><outerBoundaryIs>%s</outerBoundaryIs>%s</Polygon>" % (
-            self[0].kml,
-            inner_kml,
-        )
+        pass
